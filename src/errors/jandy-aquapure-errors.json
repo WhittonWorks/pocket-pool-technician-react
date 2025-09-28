@@ -1,0 +1,192 @@
+{
+  "id": "jandy-aquapure-errors-v1",
+  "title": "Jandy AquaPure — Error Codes",
+  "errors": [
+    {
+      "code": "120",
+      "title": "Low cell current in forward direction",
+      "meaning": "Cell current below target.",
+      "fix": "Check DC cord, clean cell if necessary, or replace cell."
+    },
+    {
+      "code": "121",
+      "title": "Low cell current in reverse direction",
+      "meaning": "Cell current below target.",
+      "fix": "Same as 120 — check DC cord, clean cell if necessary, or replace cell."
+    },
+    {
+      "code": "123",
+      "title": "Low to no current at cell",
+      "meaning": "Cell current well below target.",
+      "fix": "Check DC cord, clean cell, or replace if necessary."
+    },
+    {
+      "code": "124",
+      "title": "High current indicated at cell",
+      "meaning": "Cell current above normal.",
+      "fix": "Usually means a bad PIB."
+    },
+    {
+      "code": "125",
+      "title": "Cell fault",
+      "meaning": "Cell dirty or end-of-life condition.",
+      "fix": "Clean or replace the cell."
+    },
+    {
+      "code": "126",
+      "title": "Low forward current with low VAC input",
+      "meaning": "Current low and VAC input below 100/200 VAC.",
+      "fix": "Check input voltage, transformer, and PIB voltages."
+    },
+    {
+      "code": "127",
+      "title": "Low reverse current with low VAC input",
+      "meaning": "Current low and VAC input below 100/200 VAC.",
+      "fix": "Check input voltage, transformer, and PIB voltages."
+    },
+    {
+      "code": "144",
+      "title": "Low salinity",
+      "meaning": "Measured salinity below 2.0 gpl.",
+      "fix": "Add salt to pool."
+    },
+    {
+      "code": "145",
+      "title": "High salinity",
+      "meaning": "Measured salinity above 4.0 gpl.",
+      "fix": "Dilute pool water to reduce salt."
+    },
+    {
+      "code": "170",
+      "title": "PIB service condition (low AC voltage)",
+      "meaning": "Usually caused by low incoming AC voltage or faulty sensor.",
+      "fix": "Check transformer voltages; replace sensor if needed."
+    },
+    {
+      "code": "171",
+      "title": "PIB service condition",
+      "meaning": "Board fault.",
+      "fix": "Replace board."
+    },
+    {
+      "code": "172",
+      "title": "Flow sensor service",
+      "meaning": "Flow sensor error.",
+      "fix": "Clean sensor, check for damage, replace if necessary."
+    },
+    {
+      "code": "173",
+      "title": "Low VAC input / power supply not regulated",
+      "meaning": "Unit wired incorrectly or low input voltage.",
+      "fix": "Verify correct supply wiring and voltage."
+    },
+    {
+      "code": "174",
+      "title": "Pool temperature too high",
+      "meaning": "Temperature > 108°F.",
+      "fix": "Cool water or shut system down until temperature lowers."
+    },
+    {
+      "code": "175",
+      "title": "Flow sensor air lock / very low salinity",
+      "meaning": "Flow sensor not reading correctly.",
+      "fix": "Bleed air, correct salinity, or replace flow sensor."
+    },
+    {
+      "code": "180",
+      "title": "Heated sensor element not heating",
+      "meaning": "Sensor heater failed.",
+      "fix": "Generates 172 (Flow sensor service). Replace sensor if needed."
+    },
+    {
+      "code": "181",
+      "title": "Flow sensor temperature failure",
+      "meaning": "Sensor temp element fault.",
+      "fix": "Generates 172 (Flow sensor service). Replace sensor."
+    },
+    {
+      "code": "182",
+      "title": "Salinity sensor <0.2 gpl",
+      "meaning": "No salt or sensor air locked.",
+      "fix": "Correct salinity or bleed air. Generates 175 (flow sensor air lock)."
+    },
+    {
+      "code": "183",
+      "title": "Flow salinity sensor probe error",
+      "meaning": "Probe error detected.",
+      "fix": "Generates 172 (Flow sensor service). Replace sensor."
+    },
+    {
+      "code": "184",
+      "title": "Flow salinity sensor probe error",
+      "meaning": "Probe error detected.",
+      "fix": "Generates 172 (Flow sensor service). Replace sensor."
+    },
+    {
+      "code": "185",
+      "title": "Flow salinity sensor probe error",
+      "meaning": "Probe error detected.",
+      "fix": "Generates 172 (Flow sensor service). Replace sensor."
+    },
+    {
+      "code": "186",
+      "title": "Flow salinity sensor probe error",
+      "meaning": "Probe error detected.",
+      "fix": "Generates 172 (Flow sensor service). Replace sensor."
+    },
+    {
+      "code": "187",
+      "title": "PIB power supply too low or too high",
+      "meaning": "Invalid PIB voltage.",
+      "fix": "Generates 173 or 170 depending on Level II code."
+    },
+    {
+      "code": "188",
+      "title": "VAC input too low",
+      "meaning": "Incoming VAC under spec.",
+      "fix": "Generates 173 (low input voltage) if Level II 187 present."
+    },
+    {
+      "code": "189",
+      "title": "Relay not conducting forward",
+      "meaning": "Relay fault in forward direction.",
+      "fix": "Generates 171 (PIB service)."
+    },
+    {
+      "code": "190",
+      "title": "Relay not conducting reverse",
+      "meaning": "Relay fault in reverse direction.",
+      "fix": "Generates 171 (PIB service)."
+    },
+    {
+      "code": "191",
+      "title": "High cell current with low voltage",
+      "meaning": "Cell voltage below 19V.",
+      "fix": "Generates 170 (PIB service)."
+    },
+    {
+      "code": "192",
+      "title": "High cell current with low voltage",
+      "meaning": "Cell voltage below 19V.",
+      "fix": "Generates 171 (PIB service)."
+    },
+    {
+      "code": "193",
+      "title": "Cell current detected when off",
+      "meaning": "SCRs not turning off correctly.",
+      "fix": "Generates 170 (PIB service)."
+    },
+    {
+      "code": "194",
+      "title": "Cell current 85% lower than desired",
+      "meaning": "Cell voltage above 19V with very low current.",
+      "fix": "Generates 125 (Cell dirty or replacement)."
+    },
+    {
+      "code": "195",
+      "title": "Salinity invalid (PIB error)",
+      "meaning": "Out of range due to PIB error.",
+      "fix": "Generates 170 (PIB service)."
+    }
+  ]
+}

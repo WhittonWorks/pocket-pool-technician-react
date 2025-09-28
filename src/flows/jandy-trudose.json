@@ -1,0 +1,95 @@
+{
+  "id": "jandy-trudose-v1",
+  "title": "Jandy TruDose — Testing & Dosing (Guided)",
+  "start": "intro",
+  "nodes": {
+    "intro": {
+      "id": "intro",
+      "text": "Ensure pump is running and water is circulating. Proceed to testing.",
+      "input": "info",
+      "pass": "fc"
+    },
+    "fc": {
+      "id": "fc",
+      "text": "Measure Free Chlorine (FC) in ppm.",
+      "input": "number",
+      "unit": "ppm",
+      "range": [2, 5],
+      "pass": "ph",
+      "fail": "fc_action"
+    },
+    "fc_action": {
+      "id": "fc_action",
+      "text": "Adjust FC to target (2–5 ppm). Use liquid chlorine or adjust output.\nAfter dosing, allow circulation and retest.",
+      "input": "info",
+      "terminal": true
+    },
+    "ph": {
+      "id": "ph",
+      "text": "Measure pH.",
+      "input": "number",
+      "unit": "",
+      "range": [7.4, 7.6],
+      "pass": "ta",
+      "fail": "ph_action"
+    },
+    "ph_action": {
+      "id": "ph_action",
+      "text": "Adjust pH toward 7.4–7.6 using acid/base dosing per label. Allow mix, then retest.",
+      "input": "info",
+      "terminal": true
+    },
+    "ta": {
+      "id": "ta",
+      "text": "Measure Total Alkalinity (TA) ppm.",
+      "input": "number",
+      "unit": "ppm",
+      "range": [80, 120],
+      "pass": "cya",
+      "fail": "ta_action"
+    },
+    "ta_action": {
+      "id": "ta_action",
+      "text": "Adjust TA toward 80–120 ppm with baking soda (raise) or acid/aeration (lower). Retest after circulation.",
+      "input": "info",
+      "terminal": true
+    },
+    "cya": {
+      "id": "cya",
+      "text": "Measure Cyanuric Acid (CYA) ppm.",
+      "input": "number",
+      "unit": "ppm",
+      "range": [30, 50],
+      "pass": "salt",
+      "fail": "cya_action"
+    },
+    "cya_action": {
+      "id": "cya_action",
+      "text": "Adjust CYA toward 30–50 ppm (stabilizer to raise; dilution to lower). Retest.",
+      "input": "info",
+      "terminal": true
+    },
+    "salt": {
+      "id": "salt",
+      "text": "Measure Salt (ppm).",
+      "input": "number",
+      "unit": "ppm",
+      "range": [3000, 3500],
+      "pass": "td_done",
+      "fail": "salt_action"
+    },
+    "salt_action": {
+      "id": "salt_action",
+      "text": "Adjust salt toward 3000–3500 ppm. Dissolve evenly, avoid dumping on pool floor. Retest.",
+      "input": "info",
+      "terminal": true
+    },
+    "td_done": {
+      "id": "td_done",
+      "text": "All readings within recommended ranges. TruDose setup/maintenance complete ✅",
+      "input": "info",
+      "terminal": true,
+      "success": true
+    }
+  }
+}

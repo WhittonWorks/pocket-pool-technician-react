@@ -1,0 +1,98 @@
+{
+  "id": "jandy-aquapure-v1",
+  "title": "Jandy AquaPure — Guided Diagnostics",
+  "start": "ac_in",
+  "nodes": {
+    "ac_in": {
+      "id": "ac_in",
+      "text": "Confirm transformer secondary VAC (Blue → Blue/White) is 17–24 VAC.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [17, 24],
+      "pass": "v5",
+      "fail": "suspect_transformer"
+    },
+    "suspect_transformer": {
+      "id": "suspect_transformer",
+      "text": "VAC out of range. Check primary wiring/tap and transformer. Replace if needed.",
+      "input": "info",
+      "terminal": true
+    },
+    "v5": {
+      "id": "v5",
+      "text": "Measure +5V regulator on PIB (Brown → Brown/White). Expect 4.8–5.2 VDC.",
+      "input": "number",
+      "unit": "VDC",
+      "range": [4.8, 5.2],
+      "pass": "prod100",
+      "fail": "pib_power"
+    },
+    "pib_power": {
+      "id": "pib_power",
+      "text": "PIB supply/regulator issue. Inspect rectifier, filter caps, regulator; verify AC input.",
+      "input": "info",
+      "terminal": true
+    },
+    "prod100": {
+      "id": "prod100",
+      "text": "Set production to 100% before cell tests. Continue when set.",
+      "input": "info",
+      "pass": "rev_sel"
+    },
+    "rev_sel": {
+      "id": "rev_sel",
+      "text": "Select board revision.",
+      "input": "choice",
+      "choices": {
+        "Rev A (22–28 VDC)": "revA",
+        "Rev B+ (29–32 VDC)": "revB"
+      }
+    },
+    "revA": {
+      "id": "revA",
+      "text": "Measure cell voltage (center → outside post). Expect 22–28 VDC.",
+      "input": "number",
+      "unit": "VDC",
+      "range": [22, 28],
+      "pass": "cell_current",
+      "fail": "cell_or_driver"
+    },
+    "revB": {
+      "id": "revB",
+      "text": "Measure cell voltage (center → outside post). Expect 29–32 VDC.",
+      "input": "number",
+      "unit": "VDC",
+      "range": [29, 32],
+      "pass": "cell_current",
+      "fail": "cell_or_driver"
+    },
+    "cell_or_driver": {
+      "id": "cell_or_driver",
+      "text": "Cell voltage out of range. If AC and +5V OK, suspect PIB drivers/rectifier or deteriorated cell.",
+      "input": "info",
+      "terminal": true
+    },
+    "cell_current": {
+      "id": "cell_current",
+      "text": "Measure shunt millivolts (cell current). Expect 100–145 mV DC.",
+      "input": "number",
+      "unit": "mV",
+      "range": [100, 145],
+      "pass": "result_ok",
+      "fail": "current_low_high"
+    },
+    "current_low_high": {
+      "id": "current_low_high",
+      "text": "If low: clean cell, verify salinity/flow, end-of-life possible. If high: suspect short/scaled cell or driver fault.",
+      "input": "info",
+      "terminal": true
+    },
+    "result_ok": {
+      "id": "result_ok",
+      "text": "Readings within spec. No issues detected with provided measurements.",
+      "input": "info",
+      "terminal": true,
+      "success": true
+    }
+  }
+}

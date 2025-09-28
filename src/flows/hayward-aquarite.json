@@ -1,0 +1,79 @@
+{
+  "id": "hayward-aquarite-v1",
+  "title": "Hayward AquaRite — Guided Diagnostics (Beta)",
+  "start": "power",
+  "nodes": {
+    "power": {
+      "id": "power",
+      "text": "Confirm AC line power into control (per nameplate). Correct?",
+      "input": "yesno",
+      "pass": "switch",
+      "fail": "fix_power"
+    },
+    "fix_power": {
+      "id": "fix_power",
+      "text": "Correct incoming power / breaker / wiring to controller.",
+      "input": "info",
+      "terminal": true
+    },
+    "switch": {
+      "id": "switch",
+      "text": "Is the flow switch indicating flow when pump is on?",
+      "input": "yesno",
+      "pass": "salt",
+      "fail": "inspect_flow"
+    },
+    "inspect_flow": {
+      "id": "inspect_flow",
+      "text": "Clean filter / verify pump primed / inspect flow switch & cable.",
+      "input": "info",
+      "terminal": true
+    },
+    "salt": {
+      "id": "salt",
+      "text": "Check displayed salinity vs independent test. Within ±300 ppm?",
+      "input": "yesno",
+      "pass": "cell_current",
+      "fail": "recal_salt"
+    },
+    "recal_salt": {
+      "id": "recal_salt",
+      "text": "Calibrate/adjust salinity; if sensor reading drifts, inspect cell & board.",
+      "input": "info",
+      "terminal": true
+    },
+    "cell_current": {
+      "id": "cell_current",
+      "text": "With output 100%, measure cell current via diagnostics (menu) or shunt mV. Is current in expected range for cell size?",
+      "input": "yesno",
+      "pass": "cell_voltage",
+      "fail": "cell_clean_or_replace"
+    },
+    "cell_clean_or_replace": {
+      "id": "cell_clean_or_replace",
+      "text": "Low/no current: clean cell (acid wash if scaled) or replace if end-of-life; verify DC cable.",
+      "input": "info",
+      "terminal": true
+    },
+    "cell_voltage": {
+      "id": "cell_voltage",
+      "text": "Measure cell voltage at terminals. Is it within expected range for your model?",
+      "input": "yesno",
+      "pass": "ok",
+      "fail": "board_or_relay"
+    },
+    "board_or_relay": {
+      "id": "board_or_relay",
+      "text": "Voltage out of range with correct current suggests driver/relay or rectifier fault on board.",
+      "input": "info",
+      "terminal": true
+    },
+    "ok": {
+      "id": "ok",
+      "text": "System operating within expected ranges ✅",
+      "input": "info",
+      "terminal": true,
+      "success": true
+    }
+  }
+}
