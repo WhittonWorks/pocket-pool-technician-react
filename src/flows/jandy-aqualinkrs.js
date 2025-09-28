@@ -1,0 +1,56 @@
+{
+  "id": "jandy-aqualinkrs-v1",
+  "brand": "Jandy",
+  "equipmentType": "Automation",
+  "model": "AquaLink RS",
+  "title": "Jandy AquaLink RS — Guided Troubleshooting",
+  "start": "s1",
+  "nodes": {
+    "s1": {
+      "id": "s1",
+      "text": "Is the AquaLink RS power LED ON at the PCB?",
+      "input": "yesno",
+      "pass": "check_display",
+      "fail": "check_power"
+    },
+    "check_power": {
+      "id": "check_power",
+      "text": "Check breaker, wiring, and transformer (should be 24 VAC output). Repair or replace as needed.",
+      "input": "info",
+      "terminal": true
+    },
+    "check_display": {
+      "id": "check_display",
+      "text": "Does the indoor wall panel / PDA / iAquaLink show active communication?",
+      "input": "yesno",
+      "pass": "check_relays",
+      "fail": "comm_issue"
+    },
+    "comm_issue": {
+      "id": "comm_issue",
+      "text": "Check RS-485 wiring between board and remote. Verify 4-wire polarity. Replace cable or interface board if needed.",
+      "input": "info",
+      "terminal": true
+    },
+    "check_relays": {
+      "id": "check_relays",
+      "text": "Activate a pump/relay from the control. Do you hear the relay click and equipment turn on?",
+      "input": "yesno",
+      "pass": "system_ok",
+      "fail": "relay_issue"
+    },
+    "relay_issue": {
+      "id": "relay_issue",
+      "text": "Check relay coil voltage and wiring. Replace relay if not functioning.",
+      "input": "info",
+      "terminal": true
+    },
+    "system_ok": {
+      "id": "system_ok",
+      "text": "Automation system is functioning normally ✅",
+      "input": "info",
+      "terminal": true,
+      "success": true
+    }
+  }
+}

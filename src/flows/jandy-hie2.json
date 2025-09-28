@@ -1,5 +1,8 @@
 {
   "id": "jandy-hie2-v1",
+  "brand": "Jandy",
+  "equipmentType": "Heaters",
+  "model": "HI-E2",
   "title": "Jandy Hi-E2 Heater — Guided Troubleshooting",
   "start": "s1",
   "nodes": {

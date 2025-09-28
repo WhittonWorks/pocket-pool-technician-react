@@ -1,5 +1,8 @@
 {
   "id": "jandy-jxi-v1",
+  "brand": "Jandy",
+  "equipmentType": "Heaters",
+  "model": "JXi",
   "title": "Jandy JXi Heater — Guided Troubleshooting",
   "start": "s1",
   "nodes": {

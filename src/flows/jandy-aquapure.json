@@ -1,5 +1,8 @@
 {
   "id": "jandy-aquapure-v1",
+  "brand": "Jandy",
+  "equipmentType": "WaterCare",
+  "model": "AquaPure",
   "title": "Jandy AquaPure — Guided Diagnostics",
   "start": "ac_in",
   "nodes": {

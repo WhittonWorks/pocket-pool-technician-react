@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import Layout from "./Layout";
 import FlowRunner from "./FlowRunner";
-import jandyJxiFlow from "./flows/jandy-jxi.json";
-import aquapureFlow from "./flows/jandy-aquapure.json";
 import ErrorLookup from "./ErrorLookup";
+import flows from "./flows"; // auto-loads all JSON flows in /flows
 
 function App() {
   const [step, setStep] = useState("brand"); // brand → type → model
@@ -41,6 +40,16 @@ function App() {
   };
 
   const equipmentTypes = brand ? Object.keys(models[brand]) : [];
+
+  // 🔍 Helper to find matching flow JSON
+  function findFlow(brand, equipmentType, model) {
+    return flows.find(
+      (f) =>
+        f.brand === brand &&
+        f.equipmentType === equipmentType &&
+        f.model === model
+    );
+  }
 
   function renderSidebar() {
     if (step === "brand") {
@@ -115,34 +124,21 @@ function App() {
 
       {model && (
         <>
-          {brand === "Jandy" && equipmentType === "Heaters" && model === "JXi" ? (
-            <FlowRunner flow={jandyJxiFlow} />
-          ) : brand === "Jandy" && equipmentType === "WaterCare" && model === "AquaPure" ? (
-            <div>
-              <h2 className="text-xl font-bold">Jandy AquaPure</h2>
-              <p>Choose an option:</p>
-              <button
-                onClick={() => setStep("flow")}
-                className="px-4 py-2 bg-green-600 text-white rounded m-2"
-              >
-                Full Diagnostic Flow
-              </button>
-              <button
-                onClick={() => setStep("errors")}
-                className="px-4 py-2 bg-indigo-600 text-white rounded m-2"
-              >
-                Error Code Lookup
-              </button>
+          {(() => {
+            const flow = findFlow(brand, equipmentType, model);
 
-              {step === "flow" && <FlowRunner flow={aquapureFlow} />}
-              {step === "errors" && <ErrorLookup />}
-            </div>
-          ) : (
-            <p>
-              ✅ You chose <strong>{brand}</strong> → <strong>{equipmentType}</strong> →{" "}
-              <strong>{model}</strong>
-            </p>
-          )}
+            if (flow) {
+              return <FlowRunner flow={flow} />;
+            }
+
+            return (
+              <p>
+                ✅ You chose <strong>{brand}</strong> →{" "}
+                <strong>{equipmentType}</strong> → <strong>{model}</strong> — but no
+                diagnostic flow exists yet.
+              </p>
+            );
+          })()}
         </>
       )}
     </Layout>

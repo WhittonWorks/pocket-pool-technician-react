@@ -1,5 +1,8 @@
 {
   "id": "jandy-trudose-v1",
+  "brand": "Jandy",
+  "equipmentType": "WaterCare",
+  "model": "TruDose",
   "title": "Jandy TruDose — Testing & Dosing (Guided)",
   "start": "intro",
   "nodes": {
