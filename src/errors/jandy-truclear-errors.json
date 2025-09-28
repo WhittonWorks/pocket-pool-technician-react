@@ -1,0 +1,78 @@
+{
+  "id": "jandy-truclear-errors-v1",
+  "title": "Jandy TruClear — Display Readings & Error Codes",
+  "errors": [
+    {
+      "code": "EN",
+      "title": "Language on startup",
+      "meaning": "This acronym should appear during the 3-second startup screen.",
+      "fix": ""
+    },
+    {
+      "code": "English",
+      "title": "Language",
+      "meaning": "Language selected/available for the user. Output is OFF while selection is made.",
+      "fix": ""
+    },
+    {
+      "code": "Standby",
+      "title": "Standby",
+      "meaning": "System is ready and waiting for the next valid chlorination cycle without errors. Output is OFF.",
+      "fix": ""
+    },
+    {
+      "code": "Standby ‡",
+      "title": "Connected to Jandy Automation",
+      "meaning": "System connected via RS485 to Jandy Automation, waiting for next valid cycle. Output is OFF.",
+      "fix": ""
+    },
+    {
+      "code": "Standby #",
+      "title": "Connected to Jandy Variable Speed Pump (with controller)",
+      "meaning": "System connected via RS485 to Jandy VS Pump (with controller), waiting for next valid cycle. Output is OFF.",
+      "fix": ""
+    },
+    {
+      "code": "Chlorinating",
+      "title": "Chlorination",
+      "meaning": "System is operating within a valid chlorination cycle without errors. Output is ON.",
+      "fix": ""
+    },
+    {
+      "code": "Cleaning",
+      "title": "Polarity reversing",
+      "meaning": "System is reversing polarity during a valid cycle. Output is OFF until cleaning completes.",
+      "fix": ""
+    },
+    {
+      "code": "Lo Temp / Lo Salt",
+      "title": "Low water conductivity",
+      "meaning": "System detected low water conductivity (possible cold water, low salt, or both). Output is OFF until condition clears.",
+      "fix": ""
+    },
+    {
+      "code": "No Flow",
+      "title": "No flow or low flow",
+      "meaning": "System detected absence of flow while operating within a valid cycle. Output is OFF.",
+      "fix": ""
+    },
+    {
+      "code": "Check Cell",
+      "title": "Cell overload",
+      "meaning": "System running within valid cycle but detected a short circuit or overload. Output is OFF. Designed as a service alert.",
+      "fix": ""
+    },
+    {
+      "code": "Check Cell",
+      "title": "Cell open circuit",
+      "meaning": "System detected cell open circuit/disconnection. Output is OFF but retries every 30s. Designed as a service alert.",
+      "fix": ""
+    },
+    {
+      "code": "Over Temp",
+      "title": "Overheated controller",
+      "meaning": "Controller detected internal temperature too high. At 70°C, output reduced by 50%. At 80°C, output is OFF and error is displayed. Clears automatically when temp < 80°C.",
+      "fix": ""
+    }
+  ]
+}

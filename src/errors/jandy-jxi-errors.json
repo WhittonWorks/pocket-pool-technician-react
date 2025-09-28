@@ -1,0 +1,48 @@
+{
+  "id": "jandy-jxi-errors-v1",
+  "title": "Jandy JXi — Error Codes",
+  "errors": [
+    {
+      "code": "FAULT-CHECK IGN CONTROL",
+      "title": "Ignition failure",
+      "meaning": "Present since or disconnected air. Fan not operating. Fan running slow. Premature fan failure. Air flow restricted at intake or discharge. Broken igniter. Low gas supply pressure/volume. No flame at burner.",
+      "fix": "Check tubing and replace if necessary. Correct fault or replace fan. Replace igniter. Verify proper wiring for 120 VAC or 240 VAC. Check for proper clearances around heater and for adequate room ventilation if enclosed. Inspect for blockage or restriction at discharge of flue. Check ignition control LED codes (see Section 10.3, Ignition Control LED Service Codes). Verify that the size, length and number of elbows on the gas supply line meet national codes. Identify and correct loose wiring connections, or problems with igniter, gas valve, or ignition control."
+    },
+    {
+      "code": "FAULT CHECK FLOW",
+      "title": "Flow fault",
+      "meaning": "Pump is not running. Low pump pressure. Pressure switch fault. Variable speed pump set too low.",
+      "fix": "Check breakers and power source, recheck wiring, set time clock and current time. Clean filter or clear blockage, check position of valve in plumbing system. Make sure return eyeball fittings are installed on the wall of the pool. Adjust or replace pressure switch. Adjust variable speed pump."
+    },
+    {
+      "code": "FAULT-HIGH LIMIT",
+      "title": "High limit opened",
+      "meaning": "When temperature is exceeded, limit switch fault.",
+      "fix": "Inspect vent for obstructions or blockages. For indoor installations, check vent pipe for bird, insect or rodent activity that could cause a blockage. Replace switches."
+    },
+    {
+      "code": "FAULT-HIGH FLUE TEMPERATURE",
+      "title": "High flue temperature",
+      "meaning": "Flue temperature limit fault.",
+      "fix": "Contact a service professional to review fault condition. Identify and correct loose connections. Replace flue sensor."
+    },
+    {
+      "code": "FAULT-SHORTED H2O SENSOR/ OPEN WATER SENSOR",
+      "title": "Shorted or open water sensor",
+      "meaning": "Faulty wiring or connection. Failed water temperature sensor.",
+      "fix": "Inspect water temperature sensor wiring. Ensure sensor is connected correctly into the power interface board (PIB). Replace water temperature sensor. Refer to qualified service personnel."
+    },
+    {
+      "code": "AUX Monitor",
+      "title": "Auxiliary monitor",
+      "meaning": "Check VersaFlo.",
+      "fix": "Check VersaFlo."
+    },
+    {
+      "code": "FAULT-PUMP",
+      "title": "Pump status",
+      "meaning": "Status message indicating the filter pump is currently turned OFF when the heater system is programmed in Maintain Temp mode.",
+      "fix": "No service required. This is normal when the control is in a Maintain Temp mode."
+    }
+  ]
+}

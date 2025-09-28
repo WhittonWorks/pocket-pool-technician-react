@@ -1,0 +1,42 @@
+{
+  "id": "jandy-versatemp-errors-v1",
+  "title": "Jandy VersaTemp Heat Pump — Error Codes",
+  "errors": [
+    {
+      "code": "FAULT-NO_FLOW",
+      "title": "No water flow",
+      "meaning": "Low or restricted water flow through the heat pump. External bypass valve may be in the wrong position, or the water flow switch has malfunctioned. The water flow switch opens creating a fault and the heat pump shuts off.",
+      "fix": ""
+    },
+    {
+      "code": "FAULT-LOW_REF_PRESSURE",
+      "title": "Low refrigerant pressure",
+      "meaning": "When the ambient temperature is low, the suction pressure can drop significantly. This causes the low pressure switch to open and the control will shut off the compressor.",
+      "fix": ""
+    },
+    {
+      "code": "FAULT-HIGH_REF_PRESSURE",
+      "title": "High refrigerant pressure",
+      "meaning": "When the head pressure builds too high, the high pressure switch will open causing the heat pump to shut off immediately. The control will sense this fault condition and shut off the compressor until the switch re-closes.",
+      "fix": ""
+    },
+    {
+      "code": "FAULT-HIGH_WATER_TEMP",
+      "title": "High water temperature",
+      "meaning": "When the pool or spa water temperature heats to the maximum allowed temperature or above, the water thermostat will shut off the heat pump unless it is in CHILLER mode. This feature also remains active when called for heat via a remote thermostat, preventing dangerously high water temps caused by sensor malfunction.",
+      "fix": ""
+    },
+    {
+      "code": "FAULT-COIL_SENSOR",
+      "title": "Coil sensor fault",
+      "meaning": "If the coil temperature sensor malfunctions or is not connected, the control will shut off the heat pump.",
+      "fix": ""
+    },
+    {
+      "code": "FAULT-WATER_SENSOR",
+      "title": "Water sensor fault",
+      "meaning": "If the water temperature sensor malfunctions or is not connected, the control will shut off the heat pump.",
+      "fix": ""
+    }
+  ]
+}

@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import Layout from "./Layout";
 import FlowRunner from "./FlowRunner";
 import jandyJxiFlow from "./flows/jandy-jxi.json";
-import ErrorLookup from "./ErrorLookup";
 import aquapureFlow from "./flows/jandy-aquapure.json";
+import ErrorLookup from "./ErrorLookup";
 
 function App() {
   const [step, setStep] = useState("brand"); // brand → type → model
@@ -18,7 +18,7 @@ function App() {
       Heaters: ["JXi", "JXiQ", "HI-E2", "VersaTemp"],
       Pumps: ["VS FloPro", "ePump"],
       Filters: ["CL Cartridge", "CV Cartridge"],
-      WaterCare: ["AquaPure"],
+      WaterCare: ["AquaPure", "TruDose"],
       Lighting: ["WaterColors LED"],
       Automation: ["AquaLink RS"],
     },
@@ -112,15 +112,31 @@ function App() {
   return (
     <Layout sidebar={renderSidebar()}>
       <h1>Pocket Pool Technician 🚀</h1>
-      {!brand && <p>Select a brand to get started.</p>}
-      {brand && !equipmentType && <p><strong>{brand}</strong> selected — now pick a type.</p>}
-      {brand && equipmentType && !model && (
-        <p><strong>{brand}</strong> → <strong>{equipmentType}</strong> — now pick a model.</p>
-      )}
+
       {model && (
         <>
           {brand === "Jandy" && equipmentType === "Heaters" && model === "JXi" ? (
             <FlowRunner flow={jandyJxiFlow} />
+          ) : brand === "Jandy" && equipmentType === "WaterCare" && model === "AquaPure" ? (
+            <div>
+              <h2 className="text-xl font-bold">Jandy AquaPure</h2>
+              <p>Choose an option:</p>
+              <button
+                onClick={() => setStep("flow")}
+                className="px-4 py-2 bg-green-600 text-white rounded m-2"
+              >
+                Full Diagnostic Flow
+              </button>
+              <button
+                onClick={() => setStep("errors")}
+                className="px-4 py-2 bg-indigo-600 text-white rounded m-2"
+              >
+                Error Code Lookup
+              </button>
+
+              {step === "flow" && <FlowRunner flow={aquapureFlow} />}
+              {step === "errors" && <ErrorLookup />}
+            </div>
           ) : (
             <p>
               ✅ You chose <strong>{brand}</strong> → <strong>{equipmentType}</strong> →{" "}

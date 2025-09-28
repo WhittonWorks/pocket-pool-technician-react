@@ -1,0 +1,84 @@
+{
+  "id": "hayward-hfdn-errors-v1",
+  "title": "Hayward HFDN — Error Codes",
+  "errors": [
+    {
+      "code": "AC",
+      "title": "Blower Vacuum Switch closed",
+      "meaning": "Blower vacuum switch is detected closed when it should not be.",
+      "fix": ""
+    },
+    {
+      "code": "AO",
+      "title": "Blower Vacuum Switch open",
+      "meaning": "Blower vacuum switch is detected open when it should be closed.",
+      "fix": ""
+    },
+    {
+      "code": "BD",
+      "title": "Bad board or secondary high voltage fault",
+      "meaning": "The control board has failed or detected a secondary high-voltage fault.",
+      "fix": ""
+    },
+    {
+      "code": "CE",
+      "title": "Communication Error",
+      "meaning": "Communication error between the Control Module and Display Interface Assembly.",
+      "fix": ""
+    },
+    {
+      "code": "EE",
+      "title": "Bad board",
+      "meaning": "Control board has failed.",
+      "fix": ""
+    },
+    {
+      "code": "HF",
+      "title": "Flame present with Gas Valve not energized",
+      "meaning": "Flame signal detected when gas valve is not energized.",
+      "fix": ""
+    },
+    {
+      "code": "HS",
+      "title": "Maximum return water temperature exceeded",
+      "meaning": "Return water exceeded maximum safe temperature and/or rapid rise detected.",
+      "fix": ""
+    },
+    {
+      "code": "IF",
+      "title": "Ignition Failure",
+      "meaning": "Ignition sequence failed — flame was not established.",
+      "fix": ""
+    },
+    {
+      "code": "IO",
+      "title": "Igniter Circuit Open",
+      "meaning": "Igniter circuit is open or not connected.",
+      "fix": ""
+    },
+    {
+      "code": "LO",
+      "title": "Pressure/Limit Switch Fault",
+      "meaning": "Water Pressure Switch, Vent Pressure Switch, or Temperature Limit Switch fault.",
+      "fix": ""
+    },
+    {
+      "code": "PF",
+      "title": "Polarity/Voltage Fault",
+      "meaning": "Voltage polarity reversed or low voltage detected.",
+      "fix": ""
+    },
+    {
+      "code": "SB",
+      "title": "Keypad failure",
+      "meaning": "Keypad not responding or failed.",
+      "fix": ""
+    },
+    {
+      "code": "SF",
+      "title": "Temperature Sensor failure",
+      "meaning": "Temperature sensor (thermistor) input failure.",
+      "fix": ""
+    }
+  ]
+}
