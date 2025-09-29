@@ -1,72 +1,150 @@
 {
-  "id": "jandy-truclear-symptoms-v1",
   "title": "Jandy TruClear — Symptoms & Troubleshooting",
   "symptoms": [
     {
-      "id": "truclear-symptom-01",
-      "title": "Low or no chlorine",
-      "meaning": "Possible causes: Low stabilizer (cyanuric acid), pH out of range (7.4–7.6), insufficient operating hours, chlorine output % too low, temporary chlorine loss from heavy organic load, low salt (<3000 ppm), high nitrate level, metals in pool water, new pool not shocked properly, clogged/dirty cell.",
-      "fix": "Actions: Add stabilizer to 30–50 ppm, adjust pH to 7.4–7.6, increase operating time, increase output %, run pump/cell 24 hrs and shock if needed, test/add salt to 3000–3500 ppm, contact pool professional for nitrates/metals, super chlorinate new water, clean cell per manual."
+      "symptom": "Low or no chlorine",
+      "causes": [
+        "Low stabilizer (cyanuric acid) in pool water",
+        "pH not within recommended range (7.4–7.6)",
+        "Insufficient operating hours",
+        "Chlorine output % set too low",
+        "Temporary chlorine loss due to heavy organic load (rain, leaves, fertilizer, pets, heavy bather load)",
+        "Low pool salt (<3000 ppm)",
+        "High nitrate level",
+        "Metals in pool water",
+        "New pool water not shocked properly on startup",
+        "Clogged/dirty cell"
+      ],
+      "actions": [
+        "Add stabilizer to maintain 30–50 ppm",
+        "Adjust pH to 7.4–7.6",
+        "Increase system operating time",
+        "Increase chlorine output percentage",
+        "Run pump & cell 24 hrs, shock if still low",
+        "Use salinity test strips; add salt to maintain 3000–3500 ppm",
+        "Contact pool professional (nitrates/metals)",
+        "Super chlorinate if new water",
+        "Clean cell as per Section 6.3"
+      ]
     },
     {
-      "id": "truclear-symptom-02",
-      "title": "Chlorine level too high (>7 ppm)",
-      "meaning": "Possible causes: Output % set too high, power pack & cell running too long.",
-      "fix": "Actions: Decrease chlorine production, reduce run time."
+      "symptom": "Chlorine level too high (>7 ppm)",
+      "causes": [
+        "Chlorine output % set too high",
+        "Power pack & cell on too long"
+      ],
+      "actions": [
+        "Decrease chlorine production by pressing Output button",
+        "Reduce operation time if consistently high"
+      ]
     },
     {
-      "id": "truclear-symptom-03",
-      "title": "No display on LCD (screen blank)",
-      "meaning": "Possible cause: No power to unit.",
-      "fix": "Actions: Check pump timer connection, check if GFCI is tripped."
+      "symptom": "No display on LCD (screen blank)",
+      "causes": [
+        "No power to unit"
+      ],
+      "actions": [
+        "Check connection to pump timer",
+        "Check if GFCI is tripped"
+      ]
     },
     {
-      "id": "truclear-symptom-04",
-      "title": "Display says 'No Flow'",
-      "meaning": "Possible causes: Insufficient water flow, dirty filter, poor connection between cell & power pack, closed valves, pump undersized/failing.",
-      "fix": "Actions: Clean pump/skimmer baskets, clean filter, verify cell connection, check valve alignment, check pump size/operation."
+      "symptom": "Display says 'No Flow'",
+      "causes": [
+        "Insufficient water flow through cell",
+        "Dirty filter",
+        "Poor connection between cell & power pack",
+        "Closed valves",
+        "Pump fails to provide sufficient flow"
+      ],
+      "actions": [
+        "Check & clean pump & skimmer baskets",
+        "Clean filter",
+        "Verify secure connection between cell & power pack",
+        "Check valve alignment",
+        "Check proper pump size & operation"
+      ]
     },
     {
-      "id": "truclear-symptom-05",
-      "title": "Display says 'Lo Tmp/Lo Salt'",
-      "meaning": "Possible causes: Salt <2500 ppm, calcium buildup, expired cell, combo of low temp (35–65°F) & low salt (1500–2000 ppm).",
-      "fix": "Actions: Maintain 3000–3500 ppm salinity, clean cell, replace if expired, adjust salt depending on water temp."
+      "symptom": "Display says 'Lo Tmp/Lo Salt'",
+      "causes": [
+        "Salt level below 2500 ppm (depending on temperature)",
+        "Calcium buildup in cell",
+        "Expired cell",
+        "Combination of low water temp (35–65°F / 2–18°C) and low salt (1500–2000 ppm)"
+      ],
+      "actions": [
+        "Maintain salinity 3000–3500 ppm",
+        "Clean cell (calcium buildup)",
+        "Replace cell if expired",
+        "Adjust salt depending on water temp"
+      ]
     },
     {
-      "id": "truclear-symptom-06",
-      "title": "Salt level too low",
-      "meaning": "Possible causes: Not enough salt added, leak in pool.",
-      "fix": "Actions: Add salt to 3000 ppm, repair leak."
+      "symptom": "Salt level too low",
+      "causes": [
+        "Not enough salt added",
+        "Leak in pool"
+      ],
+      "actions": [
+        "Add salt until 3000 ppm",
+        "Repair pool leak"
+      ]
     },
     {
-      "id": "truclear-symptom-07",
-      "title": "Salt level too high",
-      "meaning": "Possible causes: Too much salt, debris between plates.",
-      "fix": "Actions: Backwash/drain/dilute pool to 3000–3500 ppm, remove debris/clean/replace cell."
+      "symptom": "Salt level too high",
+      "causes": [
+        "Too much salt added",
+        "Metal debris between plates"
+      ],
+      "actions": [
+        "Backwash/drain/dilute pool until 3000–3500 ppm",
+        "Remove debris and clean/replace cell if needed"
+      ]
     },
     {
-      "id": "truclear-symptom-08",
-      "title": "Strong chlorine odor",
-      "meaning": "Possible causes: Excess chloramines, oxidized organic waste.",
-      "fix": "Actions: Manually shock pool, if odor persists >12 hrs, take water sample to dealer."
+      "symptom": "Strong chlorine odor",
+      "causes": [
+        "Excess chloramines",
+        "Organic waste oxidized (strong odor persists >12 hrs)"
+      ],
+      "actions": [
+        "Manually shock pool",
+        "If persistent, take water sample to dealer"
+      ]
     },
     {
-      "id": "truclear-symptom-09",
-      "title": "Cloudy water or slimy walls",
-      "meaning": "Possible cause: Algae/bacteria growth.",
-      "fix": "Actions: Brush affected areas, manually shock pool."
+      "symptom": "Cloudy water or slimy walls",
+      "causes": [
+        "Algae/bacteria growth"
+      ],
+      "actions": [
+        "Brush affected areas",
+        "Manually shock pool"
+      ]
     },
     {
-      "id": "truclear-symptom-10",
-      "title": "Eye or skin irritation",
-      "meaning": "Possible causes: Improper water balance, high chloramines.",
-      "fix": "Actions: Balance water, raise output to 100% & run pump 24 hrs (no swimming)."
+      "symptom": "Eye or skin irritation",
+      "causes": [
+        "Improper water balance",
+        "High chloramine levels"
+      ],
+      "actions": [
+        "Balance water chemistry",
+        "Raise production to 100% & run pump 24 hrs (do not swim during treatment)"
+      ]
     },
     {
-      "id": "truclear-symptom-11",
-      "title": "Scale formation on equipment",
-      "meaning": "Possible causes: High calcium hardness, incorrect pH (mineral precipitation).",
-      "fix": "Actions: Dilute water, use sequestering agent if needed, adjust alkalinity 80–120 ppm, pH to 7.4–7.6."
+      "symptom": "Scale formation on equipment",
+      "causes": [
+        "High calcium hardness",
+        "Incorrect pH (minerals precipitating)"
+      ],
+      "actions": [
+        "Dilute pool water with fresh water",
+        "Use sequestering agent if needed",
+        "Adjust alkalinity 80–120 ppm, pH to 7.4–7.6"
+      ]
     }
   ]
 }

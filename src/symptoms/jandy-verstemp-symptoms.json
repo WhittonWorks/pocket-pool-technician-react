@@ -3,21 +3,21 @@
   "symptoms": [
     {
       "symptom": "Heat pump will not start, no control board display",
-      "action": [
+      "actions": [
         "Breaker or fuse may be tripped. Reset breaker or check fuse. If pump still does not run, call for service.",
         "Three-phase models only: The phases may be reversed or there may be a phase loss. Call for service."
       ]
     },
     {
       "symptom": "Heat pump will not start, control board display working",
-      "action": [
+      "actions": [
         "Heat pump may be in delay countdown (up to 5 minutes).",
         "Verify thermostat is calling for heating (correct mode and temperature)."
       ]
     },
     {
       "symptom": "Heat pump runs but does not heat",
-      "action": [
+      "actions": [
         "Verify air coil is blowing air out the top of the unit.",
         "If newly installed, allow continuous operation for 24–48 hours.",
         "Increase circulating pump run time or switch control board to Maintain Heat function.",
@@ -26,7 +26,7 @@
     },
     {
       "symptom": "Heat pump does not run and control board displays: FAULT – NO FLOW",
-      "action": [
+      "actions": [
         "Verify circulating pump is on and valves are in correct positions.",
         "Check and clean filters and skimmers.",
         "Check water level in pool.",
@@ -35,7 +35,7 @@
     },
     {
       "symptom": "Heat pump does not run and control board displays: FAULT – HIGH REF PRESSURE",
-      "action": [
+      "actions": [
         "Verify pump is on and there are no water flow restrictions.",
         "For two-speed or variable-speed pumps, switch to a higher speed.",
         "Verify valves, filters, skimmers, and water level are correct.",
@@ -44,7 +44,7 @@
     },
     {
       "symptom": "Heat pump does not run or short cycles and control board shows: FAULT – LOW REF PRESSURE",
-      "action": [
+      "actions": [
         "Check fan operation (air blowing out top).",
         "May be normal if pool water temperature is below 50°F.",
         "If persists, call for service."
@@ -52,7 +52,7 @@
     },
     {
       "symptom": "Heat pump leaking water",
-      "action": [
+      "actions": [
         "Possible heat exchanger or plumbing leak.",
         "Turn off pump for at least 1 hour to test.",
         "If water stops → normal condensation.",
