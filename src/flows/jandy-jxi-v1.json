@@ -16,7 +16,7 @@
       }
     },
 
-    /* ---------------- REV G ---------------- */
+  
     "rev_g_start": {
       "id": "rev_g_start",
       "text": "Which input voltage is the JXi Rev G configured for?",
@@ -116,7 +116,7 @@
       "success": true
     },
 
-    /* ---------------- REV H ---------------- */
+ 
     "rev_h_start": {
       "id": "rev_h_start",
       "text": "Which input voltage is the JXi Rev H configured for?",
@@ -216,7 +216,7 @@
       "success": true
     },
 
-    /* -------- Shared Fix/Terminal Nodes -------- */
+
     "fix_power": {
       "id": "fix_power",
       "text": "Correct incoming power / breaker / wiring to heater.",
