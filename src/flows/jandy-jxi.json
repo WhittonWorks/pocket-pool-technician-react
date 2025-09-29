@@ -26,7 +26,7 @@
     },
     "s1b": {
       "id": "s1b",
-      "text": "Measure power at Dist. Board between Black (C) and Red (B). Expected: 220–252 VAC.",
+      "text": "Measure power at Distribution Board between Black (C) and Red (B). Expected: 220–252 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [220, 252],
@@ -50,7 +50,7 @@
     },
     "rep_transformer": {
       "id": "rep_transformer",
-      "text": "Replace transformer. Recheck system.",
+      "text": "Replace transformer and recheck system.",
       "input": "info",
       "terminal": true
     },
