@@ -15,8 +15,6 @@
         "Rev H": "rev_h_start"
       }
     },
-
-  
     "rev_g_start": {
       "id": "rev_g_start",
       "text": "Which input voltage is the JXi Rev G configured for?",
@@ -31,7 +29,10 @@
       "text": "Measure power at Distribution Board (Black C → Red B). Expect 110–126 VAC.",
       "input": "number",
       "unit": "VAC",
-      "range": [110, 126],
+      "range": [
+        110,
+        126
+      ],
       "pass": "rev_g_step2",
       "fail": "fix_power"
     },
@@ -40,7 +41,10 @@
       "text": "Measure power at Distribution Board (Black C → Red B). Expect 220–252 VAC.",
       "input": "number",
       "unit": "VAC",
-      "range": [220, 252],
+      "range": [
+        220,
+        252
+      ],
       "pass": "rev_g_step2",
       "fail": "fix_power"
     },
@@ -49,7 +53,10 @@
       "text": "Measure Transformer: 24 VAC between Red (2) & Yellow (1). Expect 22–26 VAC.",
       "input": "number",
       "unit": "VAC",
-      "range": [22, 26],
+      "range": [
+        22,
+        26
+      ],
       "pass": "rev_g_step3",
       "fail": "replace_transformer"
     },
@@ -65,7 +72,10 @@
       "text": "Check Water Pressure Switch: 24 VAC Purple (4) → Yellow (1). Expect 22–26 VAC.",
       "input": "number",
       "unit": "VAC",
-      "range": [22, 26],
+      "range": [
+        22,
+        26
+      ],
       "pass": "rev_g_step5",
       "fail": "replace_pressure_switch"
     },
@@ -74,7 +84,10 @@
       "text": "Check Fusible Link chain: Orange (6), Blue (7), Black (8). All 22–26 VAC?",
       "input": "number",
       "unit": "VAC",
-      "range": [22, 26],
+      "range": [
+        22,
+        26
+      ],
       "pass": "rev_g_blower",
       "fail": "safety_chain_fault"
     },
@@ -97,7 +110,10 @@
       "text": "Check for 24 VAC at Brown (gas valve) → Yellow. Is it present?",
       "input": "number",
       "unit": "VAC",
-      "range": [22, 26],
+      "range": [
+        22,
+        26
+      ],
       "pass": "rev_g_flame",
       "fail": "replace_gas_valve"
     },
@@ -115,8 +131,6 @@
       "terminal": true,
       "success": true
     },
-
- 
     "rev_h_start": {
       "id": "rev_h_start",
       "text": "Which input voltage is the JXi Rev H configured for?",
@@ -131,7 +145,10 @@
       "text": "Measure power at Distribution Board (Black C → Red B). Expect 110–126 VAC.",
       "input": "number",
       "unit": "VAC",
-      "range": [110, 126],
+      "range": [
+        110,
+        126
+      ],
       "pass": "rev_h_step2",
       "fail": "fix_power"
     },
@@ -140,7 +157,10 @@
       "text": "Measure power at Distribution Board (Black C → Red B). Expect 220–252 VAC.",
       "input": "number",
       "unit": "VAC",
-      "range": [220, 252],
+      "range": [
+        220,
+        252
+      ],
       "pass": "rev_h_step2",
       "fail": "fix_power"
     },
@@ -149,7 +169,10 @@
       "text": "Measure Transformer: 24 VAC Red (2) → Yellow (1). Expect 22–26 VAC.",
       "input": "number",
       "unit": "VAC",
-      "range": [22, 26],
+      "range": [
+        22,
+        26
+      ],
       "pass": "rev_h_step3",
       "fail": "replace_transformer"
     },
@@ -165,7 +188,10 @@
       "text": "Check Water Pressure Switch: 24 VAC Purple (4) → Yellow (1). Expect 22–26 VAC.",
       "input": "number",
       "unit": "VAC",
-      "range": [22, 26],
+      "range": [
+        22,
+        26
+      ],
       "pass": "rev_h_step5",
       "fail": "replace_pressure_switch"
     },
@@ -174,7 +200,10 @@
       "text": "Check Fusible Link chain: Orange (6), Blue (7), Black (8). All 22–26 VAC?",
       "input": "number",
       "unit": "VAC",
-      "range": [22, 26],
+      "range": [
+        22,
+        26
+      ],
       "pass": "rev_h_blower",
       "fail": "safety_chain_fault"
     },
@@ -197,7 +226,10 @@
       "text": "Check for 24 VAC at Brown (gas valve) → Yellow. Is it present?",
       "input": "number",
       "unit": "VAC",
-      "range": [22, 26],
+      "range": [
+        22,
+        26
+      ],
       "pass": "rev_h_flame",
       "fail": "replace_gas_valve"
     },
@@ -215,8 +247,6 @@
       "terminal": true,
       "success": true
     },
-
-
     "fix_power": {
       "id": "fix_power",
       "text": "Correct incoming power / breaker / wiring to heater.",
