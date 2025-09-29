@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { inputStyle, cardStyle } from "./styles";
 
 function SymptomLookup({ symptoms }) {
   const [query, setQuery] = useState("");

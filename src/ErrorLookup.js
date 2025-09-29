@@ -1,24 +1,32 @@
 import React, { useState } from "react";
-import errors from "./errors/jandy-aquapure-errors.json";
+import { inputStyle, cardStyle } from "./styles";
 
-function ErrorLookup() {
+function ErrorLookup({ errors }) {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState(null);
 
-  // Suggestions: codes that start with whatever the user typed
-  const suggestions = errors.errors.filter((e) =>
-    e.code.startsWith(search.trim())
+  // Flatten all error files into one array
+  const allErrors = Object.values(errors).flatMap((file) =>
+    file.errors.map((e) => ({
+      ...e,
+      source: file.title, // keep track of where it came from
+    }))
+  );
+
+  // Suggestions: codes that start with what the user typed
+  const suggestions = allErrors.filter((e) =>
+    e.code.toLowerCase().startsWith(search.trim().toLowerCase())
   );
 
   function handleSelect(code) {
-    const match = errors.errors.find((e) => e.code === code);
+    const match = allErrors.find((e) => e.code === code);
     setSelected(match);
     setSearch(code); // fill input with chosen code
   }
 
   return (
     <div className="p-4 border rounded bg-gray-50">
-      <h2 className="text-xl font-bold mb-2">AquaPure Error Code Lookup</h2>
+      <h2 className="text-xl font-bold mb-2">Error Code Lookup</h2>
 
       {/* Input */}
       <input
@@ -37,11 +45,11 @@ function ErrorLookup() {
         <ul className="border rounded bg-white mt-1 shadow max-h-40 overflow-y-auto">
           {suggestions.map((s) => (
             <li
-              key={s.code}
+              key={s.code + s.source}
               onClick={() => handleSelect(s.code)}
               className="p-2 hover:bg-gray-200 cursor-pointer"
             >
-              {s.code} — {s.title}
+              {s.code} — {s.title} <span className="text-xs text-gray-500">({s.source})</span>
             </li>
           ))}
         </ul>
@@ -53,8 +61,10 @@ function ErrorLookup() {
           <h3 className="font-bold text-lg">
             {selected.code} — {selected.title}
           </h3>
-          <p><strong>Meaning:</strong> {selected.meaning}</p>
-          <p><strong>Fix:</strong> {selected.fix}</p>
+          {selected.meaning && <p><strong>Meaning:</strong> {selected.meaning}</p>}
+          {selected.description && <p><strong>Description:</strong> {selected.description}</p>}
+          {selected.fix && <p><strong>Fix:</strong> {selected.fix}</p>}
+          <p className="text-sm text-gray-500 mt-2"><em>Source: {selected.source}</em></p>
         </div>
       )}
 
