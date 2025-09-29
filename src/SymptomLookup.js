@@ -1,68 +1,92 @@
 import React, { useState } from "react";
-import symptoms from "./symptoms/general-symptoms.json"; // change to your actual file
 
-function SymptomLookup() {
-  const [search, setSearch] = useState("");
-  const [selected, setSelected] = useState(null);
+function SymptomLookup({ symptoms }) {
+  const [query, setQuery] = useState("");
 
-  // Auto-suggest: filter symptoms by title or meaning
-  const suggestions = symptoms.symptoms.filter(
-    (s) =>
-      s.title.toLowerCase().includes(search.toLowerCase()) ||
-      s.meaning.toLowerCase().includes(search.toLowerCase())
+  // Flatten all symptom files into one array
+  const allSymptoms = Object.values(symptoms).flatMap((file) =>
+    file.symptoms.map((s) => ({
+      ...s,
+      source: file.title, // add where it came from
+    }))
   );
 
-  function handleSelect(symptom) {
-    setSelected(symptom);
-    setSearch(symptom.title); // autofill input
-  }
+  // Filter symptoms by search query
+  const filtered = allSymptoms.filter((s) =>
+    s.symptom.toLowerCase().includes(query.toLowerCase())
+  );
 
   return (
-    <div className="p-4 border rounded bg-gray-50">
-      <h2 className="text-xl font-bold mb-2">Symptom Lookup</h2>
-
-      {/* Input */}
+    <div>
       <input
         type="text"
-        placeholder="Enter symptom..."
-        value={search}
-        onChange={(e) => {
-          setSearch(e.target.value);
-          setSelected(null);
-        }}
-        className="border p-2 rounded w-full"
+        placeholder="🔍 Search symptoms (e.g. 'low chlorine', 'no flow')"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        style={inputStyle}
       />
 
-      {/* Suggestions */}
-      {search && suggestions.length > 0 && !selected && (
-        <ul className="border rounded bg-white mt-1 shadow max-h-40 overflow-y-auto">
-          {suggestions.map((s) => (
-            <li
-              key={s.id}
-              onClick={() => handleSelect(s)}
-              className="p-2 hover:bg-gray-200 cursor-pointer"
-            >
-              {s.title}
-            </li>
-          ))}
-        </ul>
+      {query && filtered.length === 0 && (
+        <p style={{ color: "red" }}>No symptoms found.</p>
       )}
 
-      {/* Result Card */}
-      {selected && (
-        <div className="mt-4 p-3 border rounded bg-white shadow">
-          <h3 className="font-bold text-lg">{selected.title}</h3>
-          <p><strong>Meaning:</strong> {selected.meaning}</p>
-          {selected.fix && <p><strong>Fix:</strong> {selected.fix}</p>}
+      {filtered.map((s, idx) => (
+        <div key={idx} style={cardStyle}>
+          <h3>{s.symptom}</h3>
+          <p>
+            <strong>Source:</strong> {s.source}
+          </p>
+          {s.causes && (
+            <>
+              <strong>Possible Causes:</strong>
+              <ul>
+                {s.causes.map((c, i) => (
+                  <li key={i}>{c}</li>
+                ))}
+              </ul>
+            </>
+          )}
+          {s.actions && (
+            <>
+              <strong>Recommended Actions:</strong>
+              <ul>
+                {s.actions.map((a, i) => (
+                  <li key={i}>{a}</li>
+                ))}
+              </ul>
+            </>
+          )}
+          {s.action && (
+            <>
+              <strong>Recommended Actions:</strong>
+              <ul>
+                {s.action.map((a, i) => (
+                  <li key={i}>{a}</li>
+                ))}
+              </ul>
+            </>
+          )}
         </div>
-      )}
-
-      {/* No match */}
-      {search && suggestions.length === 0 && !selected && (
-        <p className="text-red-600 mt-4">❌ No matching symptom found.</p>
-      )}
+      ))}
     </div>
   );
 }
 
-export default SymptomLookup;
+const inputStyle = {
+  width: "100%",
+  padding: "10px",
+  marginBottom: "12px",
+  borderRadius: "6px",
+  border: "1px solid #ccc",
+  fontSize: "16px",
+};
+
+const cardStyle = {
+  border: "1px solid #ddd",
+  borderRadius: "6px",
+  padding: "12px",
+  marginBottom: "10px",
+  background: "#f9f9f9",
+};
+
+export default SymptomLookup;;

@@ -2,16 +2,19 @@ import React, { useState } from "react";
 import Layout from "./Layout";
 import FlowRunner from "./FlowRunner";
 import ErrorLookup from "./ErrorLookup";
-import flows from "./flows"; // auto-loads all JSON flows in /flows
+import flows from "./flows"; // auto-load all flows
+import errorFiles from "./errors"; // auto-load all error JSONs
+import symptomFiles from "./symptoms"; // auto-load all symptom JSONs
 
 function App() {
-  const [step, setStep] = useState("brand"); // brand → type → model
+  const [section, setSection] = useState("home"); // home | flows | errors | symptoms
+  const [step, setStep] = useState("brand"); // for flows
   const [brand, setBrand] = useState(null);
   const [equipmentType, setEquipmentType] = useState(null);
   const [model, setModel] = useState(null);
 
+  // Brands and models for flows
   const brands = ["Jandy", "Hayward", "Pentair"];
-
   const models = {
     Jandy: {
       Heaters: ["JXi", "JXiQ", "HI-E2", "VersaTemp"],
@@ -38,10 +41,9 @@ function App() {
       Automation: ["EasyTouch", "IntelliCenter"],
     },
   };
-
   const equipmentTypes = brand ? Object.keys(models[brand]) : [];
 
-  // 🔍 Helper to find matching flow JSON
+  // Find the right flow JSON
   function findFlow(brand, equipmentType, model) {
     return flows.find(
       (f) =>
@@ -51,7 +53,66 @@ function App() {
     );
   }
 
-  function renderSidebar() {
+  // Home menu
+  if (section === "home") {
+    return (
+      <Layout>
+        <h1>Pocket Pool Technician 🚀</h1>
+        <button style={btnStyle} onClick={() => setSection("flows")}>
+          🔧 Troubleshooting Flows
+        </button>
+        <button style={btnStyle} onClick={() => setSection("errors")}>
+          ❗ Error Code Lookup
+        </button>
+        <button style={btnStyle} onClick={() => setSection("symptoms")}>
+          🧪 Symptom Lookup
+        </button>
+      </Layout>
+    );
+  }
+
+  // Flows menu
+  if (section === "flows") {
+    return (
+      <Layout sidebar={renderFlowSidebar()}>
+        <h1>🔧 Troubleshooting Flows</h1>
+        {model && (() => {
+          const flow = findFlow(brand, equipmentType, model);
+          return flow ? (
+            <FlowRunner flow={flow} />
+          ) : (
+            <p>
+              ⚠️ No diagnostic flow found for <strong>{brand}</strong> →{" "}
+              <strong>{equipmentType}</strong> → <strong>{model}</strong>.
+            </p>
+          );
+        })()}
+      </Layout>
+    );
+  }
+
+  // Errors menu
+  if (section === "errors") {
+    return (
+      <Layout>
+        <h1>❗ Error Code Lookup</h1>
+        <ErrorLookup errors={errorFiles} />
+      </Layout>
+    );
+  }
+
+  // Symptoms menu
+  if (section === "symptoms") {
+    return (
+      <Layout>
+        <h1>🧪 Symptom Lookup</h1>
+        <p>(Symptom lookup component goes here)</p>
+      </Layout>
+    );
+  }
+
+  // Helper: Flow sidebar
+  function renderFlowSidebar() {
     if (step === "brand") {
       return (
         <div>
@@ -68,6 +129,9 @@ function App() {
               {b}
             </button>
           ))}
+          <button style={backStyle} onClick={() => setSection("home")}>
+            ← Back to Home
+          </button>
         </div>
       );
     }
@@ -105,11 +169,7 @@ function App() {
             {brand} {equipmentType}
           </h3>
           {models[brand][equipmentType].map((m) => (
-            <button
-              key={m}
-              onClick={() => setModel(m)}
-              style={btnStyle}
-            >
+            <button key={m} onClick={() => setModel(m)} style={btnStyle}>
               {m}
             </button>
           ))}
@@ -117,51 +177,26 @@ function App() {
       );
     }
   }
-
-  return (
-    <Layout sidebar={renderSidebar()}>
-      <h1>Pocket Pool Technician 🚀</h1>
-
-      {model && (
-        <>
-          {(() => {
-            const flow = findFlow(brand, equipmentType, model);
-
-            if (flow) {
-              return <FlowRunner flow={flow} />;
-            }
-
-            return (
-              <p>
-                ✅ You chose <strong>{brand}</strong> →{" "}
-                <strong>{equipmentType}</strong> → <strong>{model}</strong> — but no
-                diagnostic flow exists yet.
-              </p>
-            );
-          })()}
-        </>
-      )}
-    </Layout>
-  );
 }
 
 const btnStyle = {
   display: "block",
   width: "100%",
   textAlign: "left",
-  padding: "8px 10px",
-  marginBottom: 8,
+  padding: "12px 16px",
+  marginBottom: 10,
   borderRadius: 6,
   border: "none",
   background: "#333",
   color: "#fff",
+  fontSize: "16px",
   cursor: "pointer",
 };
 
 const backStyle = {
   ...btnStyle,
   background: "#555",
-  marginBottom: 12,
+  marginTop: 12,
 };
 
 export default App;
