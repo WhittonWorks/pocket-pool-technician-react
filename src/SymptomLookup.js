@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { inputStyle, cardStyle } from "./styles";
 
 function SymptomLookup({ symptoms }) {
   const [query, setQuery] = useState("");
@@ -18,54 +17,63 @@ function SymptomLookup({ symptoms }) {
   );
 
   return (
-    <div>
+    <div className="p-4">
+      {/* Search box */}
       <input
         type="text"
         placeholder="🔍 Search symptoms (e.g. 'low chlorine', 'no flow')"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        style={inputStyle}
+        className="w-full p-2 mb-3 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200"
       />
 
+      {/* No results */}
       {query && filtered.length === 0 && (
-        <p style={{ color: "red" }}>No symptoms found.</p>
+        <p className="text-red-600">❌ No symptoms found.</p>
       )}
 
+      {/* Results */}
       {filtered.map((s, idx) => (
-        <div key={idx} style={cardStyle}>
-          <h3>{s.symptom}</h3>
-          <p>
+        <div
+          key={idx}
+          className="mb-4 p-4 border border-gray-200 rounded-lg bg-white shadow-sm"
+        >
+          <h3 className="text-lg font-bold mb-2">{s.symptom}</h3>
+          <p className="text-sm text-gray-500 mb-2">
             <strong>Source:</strong> {s.source}
           </p>
+
           {s.causes && (
-            <>
+            <div className="mb-2">
               <strong>Possible Causes:</strong>
-              <ul>
+              <ul className="list-disc list-inside ml-4 text-gray-700">
                 {s.causes.map((c, i) => (
                   <li key={i}>{c}</li>
                 ))}
               </ul>
-            </>
+            </div>
           )}
+
           {s.actions && (
-            <>
+            <div className="mb-2">
               <strong>Recommended Actions:</strong>
-              <ul>
+              <ul className="list-disc list-inside ml-4 text-gray-700">
                 {s.actions.map((a, i) => (
                   <li key={i}>{a}</li>
                 ))}
               </ul>
-            </>
+            </div>
           )}
+
           {s.action && (
-            <>
+            <div className="mb-2">
               <strong>Recommended Actions:</strong>
-              <ul>
+              <ul className="list-disc list-inside ml-4 text-gray-700">
                 {s.action.map((a, i) => (
                   <li key={i}>{a}</li>
                 ))}
               </ul>
-            </>
+            </div>
           )}
         </div>
       ))}
@@ -73,21 +81,4 @@ function SymptomLookup({ symptoms }) {
   );
 }
 
-const inputStyle = {
-  width: "100%",
-  padding: "10px",
-  marginBottom: "12px",
-  borderRadius: "6px",
-  border: "1px solid #ccc",
-  fontSize: "16px",
-};
-
-const cardStyle = {
-  border: "1px solid #ddd",
-  borderRadius: "6px",
-  padding: "12px",
-  marginBottom: "10px",
-  background: "#f9f9f9",
-};
-
-export default SymptomLookup;;
+export default SymptomLookup;
