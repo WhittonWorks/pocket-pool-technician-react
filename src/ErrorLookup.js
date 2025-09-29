@@ -25,7 +25,7 @@ function ErrorLookup({ errors }) {
 
   return (
     <div className="p-4 border rounded bg-gray-50">
-      <h2 className="text-xl font-bold mb-2">Error Code Lookup</h2>
+      <h2 className="text-xl font-bold mb-4 text-gray-900">⚡ Error Code Lookup</h2>
 
       {/* Input */}
       <input
@@ -36,7 +36,7 @@ function ErrorLookup({ errors }) {
           setSearch(e.target.value);
           setSelected(null); // reset result if typing
         }}
-        className="border p-2 rounded w-full"
+        className="border p-2 rounded w-full bg-white text-gray-900 placeholder-gray-500"
       />
 
       {/* Suggestions Dropdown */}
