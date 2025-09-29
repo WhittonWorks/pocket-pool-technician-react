@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { inputStyle, cardStyle } from "./styles";
 
 function ErrorLookup({ errors }) {
   const [search, setSearch] = useState("");
@@ -47,9 +46,10 @@ function ErrorLookup({ errors }) {
             <li
               key={s.code + s.source}
               onClick={() => handleSelect(s.code)}
-              className="p-2 hover:bg-gray-200 cursor-pointer"
+              className="p-2 hover:bg-gray-200 cursor-pointer text-gray-800"
             >
-              {s.code} — {s.title} <span className="text-xs text-gray-500">({s.source})</span>
+              <span className="font-semibold">{s.code}</span> — {s.title}
+              <span className="text-xs text-gray-500"> ({s.source})</span>
             </li>
           ))}
         </ul>
@@ -58,13 +58,27 @@ function ErrorLookup({ errors }) {
       {/* Result Card */}
       {selected && (
         <div className="mt-4 p-3 border rounded bg-white shadow">
-          <h3 className="font-bold text-lg">
+          <h3 className="font-bold text-lg text-gray-900">
             {selected.code} — {selected.title}
           </h3>
-          {selected.meaning && <p><strong>Meaning:</strong> {selected.meaning}</p>}
-          {selected.description && <p><strong>Description:</strong> {selected.description}</p>}
-          {selected.fix && <p><strong>Fix:</strong> {selected.fix}</p>}
-          <p className="text-sm text-gray-500 mt-2"><em>Source: {selected.source}</em></p>
+          {selected.meaning && (
+            <p className="text-gray-800">
+              <strong>Meaning:</strong> {selected.meaning}
+            </p>
+          )}
+          {selected.description && (
+            <p className="text-gray-800">
+              <strong>Description:</strong> {selected.description}
+            </p>
+          )}
+          {selected.fix && (
+            <p className="text-gray-800">
+              <strong>Fix:</strong> {selected.fix}
+            </p>
+          )}
+          <p className="text-sm text-gray-500 mt-2">
+            <em>Source: {selected.source}</em>
+          </p>
         </div>
       )}
 
