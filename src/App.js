@@ -1,19 +1,15 @@
-console.log("App.js loaded");
-
 import React, { useState } from "react";
 import Layout from "./Layout";
 import FlowRunner from "./FlowRunner";
 import ErrorLookup from "./ErrorLookup";
-import flows from "./flows"; // auto-loads all JSON flows in /flows
-
-import React, { useState } from "react";
-import Layout from "./Layout";
-import FlowRunner from "./FlowRunner";
-import ErrorLookup from "./ErrorLookup";
-import { findFlow } from "./flows"; // ✅ use helper from flows/index.js
+import SymptomLookup from "./SymptomLookup";
+import flows from "./flows";
+import errors from "./errors";
+import symptoms from "./symptoms";
 
 function App() {
-  const [step, setStep] = useState("brand"); // brand → type → model
+  const [mode, setMode] = useState(null); // "diagnostics" | "errors" | "symptoms"
+  const [step, setStep] = useState("brand");
   const [brand, setBrand] = useState(null);
   const [equipmentType, setEquipmentType] = useState(null);
   const [model, setModel] = useState(null);
@@ -49,68 +45,121 @@ function App() {
 
   const equipmentTypes = brand ? Object.keys(models[brand]) : [];
 
+  function findFlow(brand, equipmentType, model) {
+    return flows.find(
+      (f) =>
+        f.brand === brand &&
+        f.equipmentType === equipmentType &&
+        f.model === model
+    );
+  }
+
   function renderSidebar() {
-    if (step === "brand") {
+    if (!mode) {
       return (
         <div>
-          <h3>Choose Brand</h3>
-          {brands.map((b) => (
-            <button
-              key={b}
-              onClick={() => {
-                setBrand(b);
-                setStep("type");
-              }}
-              style={btnStyle}
-            >
-              {b}
-            </button>
-          ))}
+          <h3 className="font-bold mb-2">Choose Mode</h3>
+          <button style={btnStyle} onClick={() => setMode("diagnostics")}>
+            🔍 Guided Diagnostics
+          </button>
+          <button style={btnStyle} onClick={() => setMode("errors")}>
+            ⚡ Error Code Lookup
+          </button>
+          <button style={btnStyle} onClick={() => setMode("symptoms")}>
+            🩺 Symptom Lookup
+          </button>
         </div>
       );
     }
 
-    if (step === "type") {
+    if (mode === "diagnostics") {
+      if (step === "brand") {
+        return (
+          <div>
+            <button onClick={() => setMode(null)} style={backStyle}>
+              ← Back
+            </button>
+            <h3 className="font-bold mb-2">Choose Brand</h3>
+            {brands.map((b) => (
+              <button
+                key={b}
+                onClick={() => {
+                  setBrand(b);
+                  setStep("type");
+                }}
+                style={btnStyle}
+              >
+                {b}
+              </button>
+            ))}
+          </div>
+        );
+      }
+
+      if (step === "type") {
+        return (
+          <div>
+            <button onClick={() => setStep("brand")} style={backStyle}>
+              ← Back
+            </button>
+            <h3 className="font-bold mb-2">{brand} Equipment</h3>
+            {equipmentTypes.map((t) => (
+              <button
+                key={t}
+                onClick={() => {
+                  setEquipmentType(t);
+                  setStep("model");
+                }}
+                style={btnStyle}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+        );
+      }
+
+      if (step === "model") {
+        return (
+          <div>
+            <button onClick={() => setStep("type")} style={backStyle}>
+              ← Back
+            </button>
+            <h3 className="font-bold mb-2">
+              {brand} {equipmentType}
+            </h3>
+            {models[brand][equipmentType].map((m) => (
+              <button
+                key={m}
+                onClick={() => setModel(m)}
+                style={btnStyle}
+              >
+                {m}
+              </button>
+            ))}
+          </div>
+        );
+      }
+    }
+
+    if (mode === "errors") {
       return (
         <div>
-          <button onClick={() => setStep("brand")} style={backStyle}>
+          <button onClick={() => setMode(null)} style={backStyle}>
             ← Back
           </button>
-          <h3>{brand} Equipment</h3>
-          {equipmentTypes.map((t) => (
-            <button
-              key={t}
-              onClick={() => {
-                setEquipmentType(t);
-                setStep("model");
-              }}
-              style={btnStyle}
-            >
-              {t}
-            </button>
-          ))}
+          <ErrorLookup errors={errors} />
         </div>
       );
     }
 
-    if (step === "model") {
+    if (mode === "symptoms") {
       return (
         <div>
-          <button onClick={() => setStep("type")} style={backStyle}>
+          <button onClick={() => setMode(null)} style={backStyle}>
             ← Back
           </button>
-          <h3>
-            {brand} {equipmentType}
-          </h3>
-          {models[brand][equipmentType].map((m) => (
-            <button
-              key={m}
-              onClick={() => setModel(m)}
-              style={btnStyle}
-            >
-              {m}
-            </button>
-          ))}
+          <SymptomLookup symptoms={symptoms} />
         </div>
       );
     }
@@ -118,26 +167,36 @@ function App() {
 
   return (
     <Layout sidebar={renderSidebar()}>
-      <h1>Pocket Pool Technician 🚀</h1>
+      <h1 className="text-2xl font-bold mb-4">Pocket Pool Technician 🚀</h1>
 
-      {model && (
+      {mode === "diagnostics" && model && (
         <>
           {(() => {
-            const flow = findFlow(brand, equipmentType, model); // ✅ now pulled from helper
-
+            const flow = findFlow(brand, equipmentType, model);
             if (flow) {
               return <FlowRunner flow={flow} />;
             }
-
             return (
               <p>
                 ✅ You chose <strong>{brand}</strong> →{" "}
-                <strong>{equipmentType}</strong> → <strong>{model}</strong> — but no
-                diagnostic flow exists yet.
+                <strong>{equipmentType}</strong> → <strong>{model}</strong> — but
+                no diagnostic flow exists yet.
               </p>
             );
           })()}
         </>
+      )}
+
+      {mode === "errors" && (
+        <h2 className="text-xl font-bold text-gray-700 mb-2">
+          ⚡ Error Code Lookup Mode
+        </h2>
+      )}
+
+      {mode === "symptoms" && (
+        <h2 className="text-xl font-bold text-gray-700 mb-2">
+          🩺 Symptom Lookup Mode
+        </h2>
       )}
     </Layout>
   );
@@ -147,13 +206,14 @@ const btnStyle = {
   display: "block",
   width: "100%",
   textAlign: "left",
-  padding: "8px 10px",
+  padding: "10px 12px",
   marginBottom: 8,
   borderRadius: 6,
   border: "none",
   background: "#333",
   color: "#fff",
   cursor: "pointer",
+  fontSize: "16px",
 };
 
 const backStyle = {

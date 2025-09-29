@@ -1,24 +1,29 @@
 import React, { useState } from "react";
-import errors from "./errors/jandy-aquapure-errors.json";
 
-function ErrorLookup() {
+function ErrorLookup({ errors }) {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState(null);
 
-  // Suggestions: codes that start with whatever the user typed
-  const suggestions = errors.errors.filter((e) =>
-    e.code.startsWith(search.trim())
+  const allErrors = Object.values(errors).flatMap((file) =>
+    file.errors.map((e) => ({
+      ...e,
+      source: file.title,
+    }))
+  );
+
+  const suggestions = allErrors.filter((e) =>
+    e.code.toLowerCase().startsWith(search.trim().toLowerCase())
   );
 
   function handleSelect(code) {
-    const match = errors.errors.find((e) => e.code === code);
+    const match = allErrors.find((e) => e.code === code);
     setSelected(match);
-    setSearch(code); // fill input with chosen code
+    setSearch(code);
   }
 
   return (
-    <div className="p-4 border rounded bg-gray-50">
-      <h2 className="text-xl font-bold mb-2">AquaPure Error Code Lookup</h2>
+    <div className="p-4 border rounded bg-white shadow text-gray-800">
+      <h2 className="text-xl font-bold mb-2">Error Code Lookup</h2>
 
       {/* Input */}
       <input
@@ -27,34 +32,37 @@ function ErrorLookup() {
         value={search}
         onChange={(e) => {
           setSearch(e.target.value);
-          setSelected(null); // reset result if typing
+          setSelected(null);
         }}
         className="border p-2 rounded w-full"
       />
 
-      {/* Suggestions Dropdown */}
+      {/* Suggestions */}
       {search && suggestions.length > 0 && !selected && (
         <ul className="border rounded bg-white mt-1 shadow max-h-40 overflow-y-auto">
           {suggestions.map((s) => (
             <li
-              key={s.code}
+              key={s.code + s.source}
               onClick={() => handleSelect(s.code)}
-              className="p-2 hover:bg-gray-200 cursor-pointer"
+              className="p-2 hover:bg-gray-200 cursor-pointer text-gray-800"
             >
-              {s.code} — {s.title}
+              {s.code} — {s.title}{" "}
+              <span className="text-xs text-gray-500">({s.source})</span>
             </li>
           ))}
         </ul>
       )}
 
-      {/* Result Card */}
+      {/* Result */}
       {selected && (
-        <div className="mt-4 p-3 border rounded bg-white shadow">
+        <div className="mt-4 p-3 border rounded bg-white shadow text-gray-800">
           <h3 className="font-bold text-lg">
             {selected.code} — {selected.title}
           </h3>
-          <p><strong>Meaning:</strong> {selected.meaning}</p>
-          <p><strong>Fix:</strong> {selected.fix}</p>
+          {selected.meaning && <p><strong>Meaning:</strong> {selected.meaning}</p>}
+          {selected.description && <p><strong>Description:</strong> {selected.description}</p>}
+          {selected.fix && <p><strong>Fix:</strong> {selected.fix}</p>}
+          <p className="text-sm text-gray-500 mt-2"><em>Source: {selected.source}</em></p>
         </div>
       )}
 

@@ -1,193 +1,149 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 function FlowRunner({ flow }) {
-  const STORAGE_KEY = "ppt-active-flow";
+  const [currentId, setCurrentId] = useState(flow.start);
+  const [input, setInput] = useState("");
+  const [history, setHistory] = useState([]);
 
-  // Load saved state if exists
-  const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+  const current = flow.nodes[currentId];
 
-  const [currentId, setCurrentId] = useState(saved.currentId || flow.start);
-  const [history, setHistory] = useState(saved.history || []);
-  const [value, setValue] = useState("");
-  const [log, setLog] = useState(saved.log || []);
+  function handleNext(value) {
+    let nextId = null;
 
-  const node = flow.nodes[currentId];
+    if (current.input === "number") {
+      const num = parseFloat(value);
+      if (!isNaN(num)) {
+        if (num >= current.range[0] && num <= current.range[1]) {
+          nextId = current.pass;
+        } else {
+          nextId = current.fail;
+        }
+      }
+    } else if (current.input === "yesno") {
+      nextId = value ? current.pass : current.fail;
+    } else if (current.input === "choice") {
+      nextId = current.choices[value];
+    } else if (current.pass) {
+      nextId = current.pass;
+    }
 
-  // Save state on every change
-  useEffect(() => {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({
-        currentId,
-        history,
-        log,
-      })
-    );
-  }, [currentId, history, log]);
-
-  function addLog(answer) {
-    const entry = {
-      stepId: currentId,
-      question: node.text,
-      input: node.input,
-      answer,
-      timestamp: new Date().toISOString(),
-    };
-    setLog([...log, entry]);
+    if (nextId) {
+      setHistory([...history, currentId]);
+      setCurrentId(nextId);
+      setInput(""); // clear input after moving
+    }
   }
 
-  function goNext(nextId, answer) {
-    if (!nextId) return;
-    addLog(answer);
-    setHistory([...history, currentId]);
-    setCurrentId(nextId);
-    setValue("");
+  function handleBack() {
+    if (history.length > 0) {
+      const prev = history[history.length - 1];
+      setHistory(history.slice(0, -1));
+      setCurrentId(prev);
+      setInput("");
+    }
   }
 
-  function goBack() {
-    if (history.length === 0) return;
-    const prev = history[history.length - 1];
-    setHistory(history.slice(0, -1));
-    setCurrentId(prev);
-  }
-
-  function resetFlow() {
-    localStorage.removeItem(STORAGE_KEY);
+  function handleRestart() {
     setCurrentId(flow.start);
     setHistory([]);
-    setLog([]);
-    setValue("");
-  }
-
-  function downloadLog() {
-    const blob = new Blob([JSON.stringify(log, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${flow.id || "ppt-flow-log"}.json`;
-    link.click();
-    URL.revokeObjectURL(url);
-  }
-
-  if (!node) {
-    return <div className="text-red-600">⚠️ Flow error: node “{currentId}” not found.</div>;
+    setInput("");
   }
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-bold">{flow.title}</h2>
-      <p className="text-lg">{node.text}</p>
+    <div className="p-4 border rounded bg-white shadow text-gray-800">
+      <h2 className="text-xl font-bold mb-2">{flow.title}</h2>
+      <p className="mb-4">{current.text}</p>
 
-      {/* number input */}
-      {node.input === "number" && (
+      {/* Input handling */}
+      {current.input === "number" && (
         <div className="space-y-2">
           <input
             type="number"
-            value={value}
-            placeholder={node.unit ? `Enter value (${node.unit})` : "Enter value"}
-            onChange={(e) => setValue(e.target.value)}
+            value={input || ""}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder={`Enter value (${current.unit || ""})`}
             className="border p-2 rounded w-full"
           />
-          {node.range && (
-            <small className="block text-gray-600">
-              Expected: {node.range[0]}–{node.range[1]} {node.unit || ""}
-            </small>
-          )}
           <button
-            onClick={() => {
-              const num = parseFloat(value);
-              if (isNaN(num) || !node.range) return;
-              const [min, max] = node.range;
-              goNext(num >= min && num <= max ? node.pass : node.fail, num);
-            }}
-            className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+            onClick={() => handleNext(parseFloat(input))}
+            disabled={input === ""}
+            className={`px-4 py-2 rounded ${
+              input === ""
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-blue-600 text-white"
+            }`}
           >
-            Next
+            Next →
           </button>
         </div>
       )}
 
-      {/* yes/no as buttons */}
-      {node.input === "yesno" && (
-        <div className="flex gap-4">
+      {current.input === "yesno" && (
+        <div className="space-x-2">
           <button
-            onClick={() => goNext(node.pass, "Yes")}
-            className="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700"
+            onClick={() => handleNext(true)}
+            className="bg-green-600 text-white px-4 py-2 rounded"
           >
-            Yes
+            ✅ Yes
           </button>
           <button
-            onClick={() => goNext(node.fail, "No")}
-            className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
+            onClick={() => handleNext(false)}
+            className="bg-red-600 text-white px-4 py-2 rounded"
           >
-            No
+            ❌ No
           </button>
         </div>
       )}
 
-      {/* choice as buttons */}
-      {node.input === "choice" && node.choices && (
-        <div className="flex flex-col gap-2">
-          {Object.keys(node.choices).map((label) => (
+      {current.input === "choice" && (
+        <div className="space-y-2">
+          {Object.keys(current.choices).map((c) => (
             <button
-              key={label}
-              onClick={() => goNext(node.choices[label], label)}
-              className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+              key={c}
+              onClick={() => handleNext(c)}
+              className="bg-blue-600 text-white px-4 py-2 rounded block w-full text-left"
             >
-              {label}
+              {c}
             </button>
           ))}
         </div>
       )}
 
-      {/* info / terminal */}
-      {node.input === "info" && (
-        <div className="p-3 rounded">
-          <p>{node.text}</p>
-          {node.terminal && (
-            node.success ? (
-              <p className="text-green-600 font-bold">✅ Success: It Works!</p>
-            ) : (
-              <p className="text-red-600 font-bold">❌ Failure: Lets Fix The Problem!</p>
-            )
-          )}
-          <div className="mt-4">
-            <h3 className="font-bold">Step Log:</h3>
-            <ul className="list-disc pl-6 text-sm">
-              {log.map((entry, idx) => (
-                <li key={idx}>
-                  <strong>{entry.question}</strong> → {entry.answer} (
-                  {new Date(entry.timestamp).toLocaleTimeString()})
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="flex gap-4 mt-4">
-            <button
-              onClick={resetFlow}
-              className="px-4 py-2 rounded bg-gray-700 text-white hover:bg-gray-800"
-            >
-              Start Over
-            </button>
-            <button
-              onClick={downloadLog}
-              className="px-4 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-700"
-            >
-              Download Log (JSON)
-            </button>
-          </div>
-        </div>
+      {current.input === "info" && (
+        <p className="text-gray-600 italic">ℹ️ {current.text}</p>
       )}
 
-      {/* Back button */}
-      {history.length > 0 && (
+      {/* Terminal nodes */}
+      {current.terminal && (
+        <p
+          className={`font-bold mt-4 ${
+            current.success ? "text-green-600" : "text-red-600"
+          }`}
+        >
+          {current.success ? "✅ Success" : "❌ Failure"}
+        </p>
+      )}
+
+      {/* Controls */}
+      <div className="mt-6 space-x-2">
         <button
-          onClick={goBack}
-          className="px-4 py-2 rounded bg-gray-600 text-white hover:bg-gray-700"
+          onClick={handleBack}
+          disabled={history.length === 0}
+          className={`px-4 py-2 rounded ${
+            history.length === 0
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-gray-600 text-white"
+          }`}
         >
           ← Back
         </button>
-      )}
+        <button
+          onClick={handleRestart}
+          className="px-4 py-2 rounded bg-red-600 text-white"
+        >
+          🔄 Restart
+        </button>
+      </div>
     </div>
   );
 }

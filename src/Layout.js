@@ -1,66 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 function Layout({ sidebar, children }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  const isMobile = window.innerWidth < 768; // crude check
+  // Keep track of resize events so it adapts
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
-    <div style={{ display: "flex", height: "100vh", flexDirection: isMobile ? "column" : "row" }}>
+    <div className="flex h-screen flex-col md:flex-row">
       {/* Mobile top bar */}
       {isMobile && (
-        <header
-          style={{
-            background: "#222",
-            color: "#fff",
-            padding: "10px 16px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <span style={{ fontWeight: "bold" }}>PPT</span>
+        <header className="bg-gray-900 text-white flex items-center justify-between px-4 py-3">
+          <span className="font-bold">PPT</span>
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            style={{
-              background: "#444",
-              color: "#fff",
-              border: "none",
-              padding: "6px 10px",
-              borderRadius: 4,
-            }}
+            className="bg-gray-700 px-3 py-1 rounded hover:bg-gray-600"
           >
             {menuOpen ? "Close Menu" : "Menu"}
           </button>
         </header>
       )}
 
-      {/* Sidebar (desktop) or dropdown (mobile) */}
+      {/* Sidebar */}
       {(menuOpen || !isMobile) && (
-        <aside
-          style={{
-            width: isMobile ? "100%" : 240,
-            background: "#222",
-            color: "#fff",
-            padding: 16,
-            boxSizing: "border-box",
-          }}
-        >
+        <aside className="w-full md:w-64 bg-gray-900 text-white p-4">
           {sidebar}
         </aside>
       )}
 
       {/* Main content */}
-      <main
-        style={{
-          flex: 1,
-          padding: 16,
-          background: "#f5f5f5",
-          overflow: "auto",
-        }}
-      >
-        {children}
-      </main>
+      <main className="flex-1 p-4 bg-gray-100 overflow-auto">{children}</main>
     </div>
   );
 }
