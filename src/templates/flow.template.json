@@ -1,0 +1,39 @@
+{
+  "id": "brand-model-flow-v1",
+  "brand": "BrandName",
+  "equipmentType": "Heaters | Pumps | Filters | WaterCare | Automation | Lighting",
+  "model": "ModelName",
+  "title": "Brand Model — Guided Troubleshooting",
+  "start": "s1",
+  "nodes": {
+    "s1": {
+      "id": "s1",
+      "text": "First diagnostic step goes here.",
+      "input": "yesno",
+      "pass": "s2",
+      "fail": "terminal_fix"
+    },
+    "s2": {
+      "id": "s2",
+      "text": "Example number input. Measure voltage.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [110, 126],
+      "pass": "terminal_ok",
+      "fail": "terminal_fix"
+    },
+    "terminal_fix": {
+      "id": "terminal_fix",
+      "text": "Suggested fix if step fails.",
+      "input": "info",
+      "terminal": true
+    },
+    "terminal_ok": {
+      "id": "terminal_ok",
+      "text": "✅ System operating normally",
+      "input": "info",
+      "terminal": true,
+      "success": true
+    }
+  }
+}
