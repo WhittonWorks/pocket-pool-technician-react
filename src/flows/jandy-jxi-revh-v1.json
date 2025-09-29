@@ -1,0 +1,192 @@
+{
+  "id": "jandy-jxi-revh-v1",
+  "brand": "Jandy",
+  "equipmentType": "Heaters",
+  "model": "JXi Rev H+",
+  "title": "Jandy JXi Rev H+ Heater — Guided Troubleshooting",
+  "start": "s1",
+  "nodes": {
+    "s1": {
+      "id": "s1",
+      "text": "Which input voltage is the JXi configured for?",
+      "input": "choice",
+      "choices": {
+        "120V": "s1a",
+        "240V": "s1b"
+      }
+    },
+    "s1a": {
+      "id": "s1a",
+      "text": "Measure power at Distribution Board between Black (C) and Red (B). Expected: 110–126 VAC.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [110, 126],
+      "pass": "transformer",
+      "fail": "correct_power"
+    },
+    "s1b": {
+      "id": "s1b",
+      "text": "Measure power at Distribution Board between Blue (F) and White (D). Expected: 220–252 VAC.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [220, 252],
+      "pass": "transformer",
+      "fail": "correct_power"
+    },
+    "correct_power": {
+      "id": "correct_power",
+      "text": "Correct filter pump wiring/power. Then retest.",
+      "input": "info",
+      "terminal": true
+    },
+    "transformer": {
+      "id": "transformer",
+      "text": "Measure Transformer: 24 VAC between Red (2) and Yellow (1). Expected: 22–26 VAC.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [22, 26],
+      "pass": "fuse",
+      "fail": "replace_transformer"
+    },
+    "replace_transformer": {
+      "id": "replace_transformer",
+      "text": "Replace transformer and recheck system.",
+      "input": "info",
+      "terminal": true
+    },
+    "fuse": {
+      "id": "fuse",
+      "text": "Measure Fuse: 24 VAC at Red (2) & Yellow (1) on PIB. Expected: 22–26 VAC.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [22, 26],
+      "pass": "pressure_switch",
+      "fail": "replace_fuse"
+    },
+    "replace_fuse": {
+      "id": "replace_fuse",
+      "text": "Locate/repair short circuit and replace fuse.",
+      "input": "info",
+      "terminal": true
+    },
+    "pressure_switch": {
+      "id": "pressure_switch",
+      "text": "Check Water Pressure Switch: 24 VAC between Purple (4) and Yellow (1). Expected: 22–26 VAC.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [22, 26],
+      "pass": "high_limit",
+      "fail": "replace_pressure_switch"
+    },
+    "replace_pressure_switch": {
+      "id": "replace_pressure_switch",
+      "text": "If pressure > 2 PSI, replace Pressure Switch; else fix filter/flow issue.",
+      "input": "info",
+      "terminal": true
+    },
+    "high_limit": {
+      "id": "high_limit",
+      "text": "Check High Limits: 24 VAC between Black (8) and Yellow (1). Expected: 22–26 VAC.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [22, 26],
+      "pass": "ignition_control",
+      "fail": "replace_high_limit"
+    },
+    "replace_high_limit": {
+      "id": "replace_high_limit",
+      "text": "Replace High Limits and recheck system.",
+      "input": "info",
+      "terminal": true
+    },
+    "ignition_control": {
+      "id": "ignition_control",
+      "text": "Measure Power to Ignition Control: 24 VAC between Black/Yellow (10) and Yellow (1). Expected: 22–26 VAC.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [22, 26],
+      "pass": "blower",
+      "fail": "replace_pib"
+    },
+    "replace_pib": {
+      "id": "replace_pib",
+      "text": "Replace PIB board.",
+      "input": "info",
+      "terminal": true
+    },
+    "blower": {
+      "id": "blower",
+      "text": "Is the Blower ON?",
+      "input": "yesno",
+      "pass": "air_pressure_switch",
+      "fail": "check_blower"
+    },
+    "check_blower": {
+      "id": "check_blower",
+      "text": "Check blower wiring, relay, or replace blower motor.",
+      "input": "info",
+      "terminal": true
+    },
+    "air_pressure_switch": {
+      "id": "air_pressure_switch",
+      "text": "Check Air Pressure Switch: 24 VAC between Orange (12) and Yellow (1). Expected: 22–26 VAC.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [22, 26],
+      "pass": "ignitor_glow",
+      "fail": "replace_air_pressure_switch"
+    },
+    "replace_air_pressure_switch": {
+      "id": "replace_air_pressure_switch",
+      "text": "Check blower tubing, seals, or replace Air Pressure Switch if needed.",
+      "input": "info",
+      "terminal": true
+    },
+    "ignitor_glow": {
+      "id": "ignitor_glow",
+      "text": "After blower runs ~15s, does the Hot Surface Igniter glow?",
+      "input": "yesno",
+      "pass": "burners",
+      "fail": "check_ignitor"
+    },
+    "check_ignitor": {
+      "id": "check_ignitor",
+      "text": "Measure igniter resistance (40–75 Ω). Replace igniter if open or out of spec.",
+      "input": "info",
+      "terminal": true
+    },
+    "burners": {
+      "id": "burners",
+      "text": "After ignitor glows, do burners ignite?",
+      "input": "yesno",
+      "pass": "flame",
+      "fail": "replace_gas_valve"
+    },
+    "replace_gas_valve": {
+      "id": "replace_gas_valve",
+      "text": "Replace Gas Valve.",
+      "input": "info",
+      "terminal": true
+    },
+    "flame": {
+      "id": "flame",
+      "text": "Do burners stay on beyond 7s?",
+      "input": "yesno",
+      "pass": "success",
+      "fail": "flame_rectification"
+    },
+    "flame_rectification": {
+      "id": "flame_rectification",
+      "text": "Heater not recognizing flame (rectification). Check gas pressure, ground, sensor cleanliness, ignitor, wiring, etc.",
+      "input": "info",
+      "terminal": true
+    },
+    "success": {
+      "id": "success",
+      "text": "Heater operating properly ✅",
+      "input": "info",
+      "terminal": true,
+      "success": true
+    }
+  }
+}
