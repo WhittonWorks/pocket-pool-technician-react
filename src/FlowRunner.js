@@ -3,17 +3,21 @@ import React, { useState } from "react";
 function FlowRunner({ flow }) {
   const [currentNode, setCurrentNode] = useState(flow.start);
   const [history, setHistory] = useState([]);
+  const [inputValue, setInputValue] = useState(""); // store number entry
+
   const node = flow.nodes[currentNode];
 
   function goTo(next) {
     if (!next) return;
     setHistory([...history, currentNode]);
     setCurrentNode(next);
+    setInputValue(""); // reset input after moving forward
   }
 
   function resetFlow() {
     setCurrentNode(flow.start);
     setHistory([]);
+    setInputValue("");
   }
 
   return (
@@ -48,21 +52,25 @@ function FlowRunner({ flow }) {
               type="number"
               className="border p-2 rounded w-32 mr-2"
               placeholder={`Enter ${node.unit || "value"}`}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  const val = parseFloat(e.target.value);
-                  if (
-                    val >= node.range[0] &&
-                    val <= node.range[1]
-                  ) {
-                    goTo(node.pass);
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+            />
+            <button
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              onClick={() => {
+                const val = parseFloat(inputValue);
+                if (!isNaN(val)) {
+                  if (val >= node.range[0] && val <= node.range[1]) {
+                    goTo(node.pass || node.ok); // support pass/ok
                   } else {
                     goTo(node.fail);
                   }
                 }
               }}
-            />
-            <p className="text-sm text-gray-500">
+            >
+              Next →
+            </button>
+            <p className="text-sm text-gray-500 mt-2">
               Expected: {node.range[0]}–{node.range[1]} {node.unit}
             </p>
           </div>
@@ -86,13 +94,11 @@ function FlowRunner({ flow }) {
         {/* Info Node */}
         {node.input === "info" && (
           <div>
-            <p className="text-gray-700 mb-3">
-              ℹ️ {node.text}
-            </p>
-            {!node.terminal && (
+            <p className="text-gray-700 mb-3">ℹ️ {node.text}</p>
+            {!(node.terminal) && (node.pass || node.ok) && (
               <button
                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                onClick={() => goTo(node.pass)}
+                onClick={() => goTo(node.pass || node.ok)}
               >
                 Continue →
               </button>
