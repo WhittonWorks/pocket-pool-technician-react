@@ -8,66 +8,105 @@
   "nodes": {
     "s1": {
       "id": "s1",
-      "text": "Is the unit powered ON (control board display active)?",
+      "text": "Is the control board display ON?",
       "input": "yesno",
       "pass": "s2",
-      "fail": "check_power"
+      "fail": "no_display"
     },
-    "check_power": {
-      "id": "check_power",
-      "text": "Check breaker, fuses, and wiring. Restore power to unit.",
+    "no_display": {
+      "id": "no_display",
+      "text": "Breaker/fuse may be tripped, or phase loss/reversal (3-phase models).",
       "input": "info",
       "terminal": true
     },
     "s2": {
       "id": "s2",
-      "text": "Is there a fault code displayed?",
+      "text": "Is the display showing FAULT – NO FLOW?",
       "input": "yesno",
-      "pass": "fault_branch",
+      "pass": "fault_no_flow",
       "fail": "s3"
     },
-    "fault_branch": {
-      "id": "fault_branch",
-      "text": "Refer to VersaTemp Fault/Error Codes for next steps.",
+    "fault_no_flow": {
+      "id": "fault_no_flow",
+      "text": "Verify circulating pump is ON, valves open, filters/skimmers clean, and water level is adequate.",
       "input": "info",
       "terminal": true
     },
     "s3": {
       "id": "s3",
-      "text": "Is the compressor running?",
+      "text": "Is the display showing FAULT – HIGH REF PRESSURE?",
       "input": "yesno",
-      "pass": "s4",
-      "fail": "check_contactors"
+      "pass": "fault_high_ref",
+      "fail": "s4"
     },
-    "check_contactors": {
-      "id": "check_contactors",
-      "text": "Check compressor contactor, wiring, and capacitor. Replace faulty parts.",
+    "fault_high_ref": {
+      "id": "fault_high_ref",
+      "text": "Check pump/valves/filters for restrictions. Switch to higher pump speed if variable-speed. Cycle power up to 3 times. Call for service if persists.",
       "input": "info",
       "terminal": true
     },
     "s4": {
       "id": "s4",
-      "text": "Is the fan blowing air out the top of the unit?",
+      "text": "Is the display showing FAULT – LOW REF PRESSURE?",
       "input": "yesno",
-      "pass": "s5",
-      "fail": "check_fan"
+      "pass": "fault_low_ref",
+      "fail": "s5"
     },
-    "check_fan": {
-      "id": "check_fan",
-      "text": "Check fan capacitor, motor, and wiring. Replace faulty components.",
+    "fault_low_ref": {
+      "id": "fault_low_ref",
+      "text": "Check fan operation (air blowing out top). May be normal if water < 50°F. Call for service if persists.",
       "input": "info",
       "terminal": true
     },
     "s5": {
       "id": "s5",
-      "text": "After running 15+ minutes, is water heating?",
+      "text": "Is the display showing FAULT – HIGH WATER TEMP?",
       "input": "yesno",
-      "pass": "success",
-      "fail": "check_refrigerant"
+      "pass": "fault_high_water",
+      "fail": "s6"
     },
-    "check_refrigerant": {
-      "id": "check_refrigerant",
-      "text": "Possible refrigerant issue. Check coil for frost/icing. Call licensed HVAC/pool heat tech.",
+    "fault_high_water": {
+      "id": "fault_high_water",
+      "text": "Pool/spa water reached max allowed temp. Normal unless caused by bad sensor or remote call. Check sensors, cool water, or switch to CHILLER mode.",
+      "input": "info",
+      "terminal": true
+    },
+    "s6": {
+      "id": "s6",
+      "text": "Is the display showing FAULT – COIL SENSOR?",
+      "input": "yesno",
+      "pass": "fault_coil",
+      "fail": "s7"
+    },
+    "fault_coil": {
+      "id": "fault_coil",
+      "text": "Coil temperature sensor not connected or failed. Replace if necessary.",
+      "input": "info",
+      "terminal": true
+    },
+    "s7": {
+      "id": "s7",
+      "text": "Is the display showing FAULT – WATER SENSOR?",
+      "input": "yesno",
+      "pass": "fault_water_sensor",
+      "fail": "s8"
+    },
+    "fault_water_sensor": {
+      "id": "fault_water_sensor",
+      "text": "Water temperature sensor not connected or failed. Replace if necessary.",
+      "input": "info",
+      "terminal": true
+    },
+    "s8": {
+      "id": "s8",
+      "text": "Is the heat pump leaking water?",
+      "input": "yesno",
+      "pass": "leak_check",
+      "fail": "success"
+    },
+    "leak_check": {
+      "id": "leak_check",
+      "text": "Turn off pump for 1 hour. If water stops → normal condensation. If leak continues → call for service.",
       "input": "info",
       "terminal": true
     },
