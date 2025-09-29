@@ -17,7 +17,7 @@
       "id": "check_power",
       "text": "Check breaker, wiring, and transformer (should be 24 VAC output). Repair or replace as needed.",
       "input": "info",
-      "terminal": true"
+      "terminal": true
     },
     "check_display": {
       "id": "check_display",
