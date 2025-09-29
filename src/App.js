@@ -1,8 +1,16 @@
+console.log("App.js loaded");
+
 import React, { useState } from "react";
 import Layout from "./Layout";
 import FlowRunner from "./FlowRunner";
 import ErrorLookup from "./ErrorLookup";
 import flows from "./flows"; // auto-loads all JSON flows in /flows
+
+import React, { useState } from "react";
+import Layout from "./Layout";
+import FlowRunner from "./FlowRunner";
+import ErrorLookup from "./ErrorLookup";
+import { findFlow } from "./flows"; // ✅ use helper from flows/index.js
 
 function App() {
   const [step, setStep] = useState("brand"); // brand → type → model
@@ -40,16 +48,6 @@ function App() {
   };
 
   const equipmentTypes = brand ? Object.keys(models[brand]) : [];
-
-  // 🔍 Helper to find matching flow JSON
-  function findFlow(brand, equipmentType, model) {
-    return flows.find(
-      (f) =>
-        f.brand === brand &&
-        f.equipmentType === equipmentType &&
-        f.model === model
-    );
-  }
 
   function renderSidebar() {
     if (step === "brand") {
@@ -125,7 +123,7 @@ function App() {
       {model && (
         <>
           {(() => {
-            const flow = findFlow(brand, equipmentType, model);
+            const flow = findFlow(brand, equipmentType, model); // ✅ now pulled from helper
 
             if (flow) {
               return <FlowRunner flow={flow} />;
