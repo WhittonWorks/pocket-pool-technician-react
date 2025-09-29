@@ -1,0 +1,82 @@
+{
+  "id": "jandy-versatemp-v1",
+  "brand": "Jandy",
+  "equipmentType": "Heaters",
+  "model": "VersaTemp",
+  "title": "Jandy VersaTemp Heat Pump — Guided Troubleshooting",
+  "start": "s1",
+  "nodes": {
+    "s1": {
+      "id": "s1",
+      "text": "Is the unit powered ON (control board display active)?",
+      "input": "yesno",
+      "pass": "s2",
+      "fail": "check_power"
+    },
+    "check_power": {
+      "id": "check_power",
+      "text": "Check breaker, fuses, and wiring. Restore power to unit.",
+      "input": "info",
+      "terminal": true
+    },
+    "s2": {
+      "id": "s2",
+      "text": "Is there a fault code displayed?",
+      "input": "yesno",
+      "pass": "fault_branch",
+      "fail": "s3"
+    },
+    "fault_branch": {
+      "id": "fault_branch",
+      "text": "Refer to VersaTemp Fault/Error Codes for next steps.",
+      "input": "info",
+      "terminal": true
+    },
+    "s3": {
+      "id": "s3",
+      "text": "Is the compressor running?",
+      "input": "yesno",
+      "pass": "s4",
+      "fail": "check_contactors"
+    },
+    "check_contactors": {
+      "id": "check_contactors",
+      "text": "Check compressor contactor, wiring, and capacitor. Replace faulty parts.",
+      "input": "info",
+      "terminal": true
+    },
+    "s4": {
+      "id": "s4",
+      "text": "Is the fan blowing air out the top of the unit?",
+      "input": "yesno",
+      "pass": "s5",
+      "fail": "check_fan"
+    },
+    "check_fan": {
+      "id": "check_fan",
+      "text": "Check fan capacitor, motor, and wiring. Replace faulty components.",
+      "input": "info",
+      "terminal": true
+    },
+    "s5": {
+      "id": "s5",
+      "text": "After running 15+ minutes, is water heating?",
+      "input": "yesno",
+      "pass": "success",
+      "fail": "check_refrigerant"
+    },
+    "check_refrigerant": {
+      "id": "check_refrigerant",
+      "text": "Possible refrigerant issue. Check coil for frost/icing. Call licensed HVAC/pool heat tech.",
+      "input": "info",
+      "terminal": true
+    },
+    "success": {
+      "id": "success",
+      "text": "Heat pump operating normally ✅",
+      "input": "info",
+      "terminal": true,
+      "success": true
+    }
+  }
+}
