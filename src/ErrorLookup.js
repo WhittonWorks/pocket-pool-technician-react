@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 
 function ErrorLookup({ errors }) {
+function ErrorLookup({ errors }) {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState(null);
 
+  // Flatten errors into a single list
   const allErrors = Object.values(errors).flatMap((file) =>
     file.errors.map((e) => ({
       ...e,
@@ -11,6 +13,7 @@ function ErrorLookup({ errors }) {
     }))
   );
 
+  // Filter suggestions by code
   const suggestions = allErrors.filter((e) =>
     e.code.toLowerCase().startsWith(search.trim().toLowerCase())
   );
@@ -34,7 +37,7 @@ function ErrorLookup({ errors }) {
           setSearch(e.target.value);
           setSelected(null);
         }}
-        className="border p-2 rounded w-full"
+        className="border p-2 rounded w-full bg-white text-gray-900 placeholder-gray-500"
       />
 
       {/* Suggestions */}
@@ -59,10 +62,24 @@ function ErrorLookup({ errors }) {
           <h3 className="font-bold text-lg">
             {selected.code} — {selected.title}
           </h3>
-          {selected.meaning && <p><strong>Meaning:</strong> {selected.meaning}</p>}
-          {selected.description && <p><strong>Description:</strong> {selected.description}</p>}
-          {selected.fix && <p><strong>Fix:</strong> {selected.fix}</p>}
-          <p className="text-sm text-gray-500 mt-2"><em>Source: {selected.source}</em></p>
+          {selected.meaning && (
+            <p>
+              <strong>Meaning:</strong> {selected.meaning}
+            </p>
+          )}
+          {selected.description && (
+            <p>
+              <strong>Description:</strong> {selected.description}
+            </p>
+          )}
+          {selected.fix && (
+            <p>
+              <strong>Fix:</strong> {selected.fix}
+            </p>
+          )}
+          <p className="text-sm text-gray-500 mt-2">
+            <em>Source: {selected.source}</em>
+          </p>
         </div>
       )}
 

@@ -1,0 +1,12 @@
+{
+  "id": "brand-model-errors-v1",
+  "title": "Brand Model — Error Codes",
+  "errors": [
+    {
+      "code": "ERR001",
+      "title": "Example error title",
+      "meaning": "What this error means.",
+      "fix": "How to fix this error."
+    }
+  ]
+}

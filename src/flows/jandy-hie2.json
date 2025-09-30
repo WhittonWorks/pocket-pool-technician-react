@@ -23,7 +23,7 @@
     },
     "s2": {
       "id": "s2",
-      "text": "Check transformer: 24 VAC at Red & Yellow wires?",
+      "text": "Check transformer: 24 VAC at Red & Yellow wires.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
@@ -64,7 +64,7 @@
     },
     "s5": {
       "id": "s5",
-      "text": "Check Pressure Switch: 24 VAC at Purple & Yellow wires?",
+      "text": "Check Pressure Switch: 24 VAC at Purple & Yellow wires.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
@@ -92,7 +92,7 @@
     },
     "s7": {
       "id": "s7",
-      "text": "Check Ignition Control: 24 VAC between Black/Yellow & Yellow wires?",
+      "text": "Check Ignition Control: 24 VAC between Black/Yellow & Yellow wires.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
@@ -133,7 +133,7 @@
     },
     "s10": {
       "id": "s10",
-      "text": "After ignitor glows, check for gas valve activation: 24 VAC at Brown & Yellow wires?",
+      "text": "After ignitor glows, check for gas valve activation: 24 VAC at Brown & Yellow wires.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],

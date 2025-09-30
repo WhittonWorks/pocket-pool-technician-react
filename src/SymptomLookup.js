@@ -3,6 +3,7 @@ import React, { useState } from "react";
 function SymptomLookup({ symptoms }) {
   const [query, setQuery] = useState("");
 
+  // Flatten all symptom files into one list
   const allSymptoms = Object.values(symptoms).flatMap((file) =>
     file.symptoms.map((s) => ({
       ...s,
@@ -10,71 +11,72 @@ function SymptomLookup({ symptoms }) {
     }))
   );
 
-  console.log("Symptoms loaded:", allSymptoms);
-
-  const filtered = allSymptoms.filter((s) =>
-    s.symptom.toLowerCase().includes(query.toLowerCase())
+  const filtered = allSymptoms.filter(
+    (s) =>
+      s.symptom &&
+      s.symptom.toLowerCase().includes(query.trim().toLowerCase())
   );
 
   return (
     <div className="p-4 border rounded bg-white shadow text-gray-800">
       <h2 className="text-xl font-bold mb-2">Symptom Lookup</h2>
 
+      {/* Search bar */}
       <input
         type="text"
         placeholder="🔍 Search symptoms (e.g. 'low chlorine', 'no flow')"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        className="border p-2 rounded w-full"
+        className="border p-2 rounded w-full bg-white text-gray-900 placeholder-gray-500"
       />
 
+      {/* Messages */}
       {query && filtered.length === 0 && (
         <p className="text-red-600 mt-4">❌ No symptoms found.</p>
       )}
-
       {!query && allSymptoms.length === 0 && (
         <p className="text-gray-500 mt-4">⚠️ No symptom data loaded.</p>
       )}
 
-      {filtered.map((s, idx) => (
-        <div key={idx} className="mt-4 p-3 border rounded bg-gray-50 shadow">
-          <h3 className="font-bold text-lg">{s.symptom}</h3>
-          <p className="text-sm text-gray-500"><em>Source: {s.source}</em></p>
+      {/* Results */}
+      {filtered.map((s, idx) => {
+        // Normalize: prefer "actions" if present, else use "action"
+        const recommendedActions = s.actions || s.action;
 
-          {s.causes && (
-            <>
-              <strong>Possible Causes:</strong>
-              <ul className="list-disc ml-5">
-                {s.causes.map((c, i) => (
-                  <li key={i}>{c}</li>
-                ))}
-              </ul>
-            </>
-          )}
+        return (
+          <div
+            key={idx}
+            className="mt-4 p-3 border rounded bg-gray-50 shadow-sm"
+          >
+            <h3 className="font-bold text-lg">{s.symptom}</h3>
+            <p className="text-sm text-gray-500 mb-2">
+              <em>Source: {s.source}</em>
+            </p>
 
-          {s.actions && (
-            <>
-              <strong>Recommended Actions:</strong>
-              <ul className="list-disc ml-5">
-                {s.actions.map((a, i) => (
-                  <li key={i}>{a}</li>
-                ))}
-              </ul>
-            </>
-          )}
+            {s.causes && (
+              <div className="mb-2">
+                <strong>Possible Causes:</strong>
+                <ul className="list-disc ml-5">
+                  {s.causes.map((c, i) => (
+                    <li key={i}>{c}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
-          {s.action && (
-            <>
-              <strong>Recommended Actions:</strong>
-              <ul className="list-disc ml-5">
-                {s.action.map((a, i) => (
-                  <li key={i}>{a}</li>
-                ))}
-              </ul>
-            </>
-          )}
-        </div>
-      ))}
+            {recommendedActions && (
+              <div>
+                <strong>Recommended Actions:</strong>
+                <ul className="list-disc ml-5">
+                  {recommendedActions.map((a, i) => (
+                    <li key={i}>{a}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

@@ -1,0 +1,121 @@
+{
+  "id": "jandy-versatemp-v1",
+  "brand": "Jandy",
+  "equipmentType": "Heaters",
+  "model": "VersaTemp",
+  "title": "Jandy VersaTemp Heat Pump — Guided Troubleshooting",
+  "start": "s1",
+  "nodes": {
+    "s1": {
+      "id": "s1",
+      "text": "Is the control board display ON?",
+      "input": "yesno",
+      "pass": "s2",
+      "fail": "no_display"
+    },
+    "no_display": {
+      "id": "no_display",
+      "text": "Breaker/fuse may be tripped, or phase loss/reversal (3-phase models).",
+      "input": "info",
+      "terminal": true
+    },
+    "s2": {
+      "id": "s2",
+      "text": "Is the display showing FAULT – NO FLOW?",
+      "input": "yesno",
+      "pass": "fault_no_flow",
+      "fail": "s3"
+    },
+    "fault_no_flow": {
+      "id": "fault_no_flow",
+      "text": "Verify circulating pump is ON, valves open, filters/skimmers clean, and water level is adequate.",
+      "input": "info",
+      "terminal": true
+    },
+    "s3": {
+      "id": "s3",
+      "text": "Is the display showing FAULT – HIGH REF PRESSURE?",
+      "input": "yesno",
+      "pass": "fault_high_ref",
+      "fail": "s4"
+    },
+    "fault_high_ref": {
+      "id": "fault_high_ref",
+      "text": "Check pump/valves/filters for restrictions. Switch to higher pump speed if variable-speed. Cycle power up to 3 times. Call for service if persists.",
+      "input": "info",
+      "terminal": true
+    },
+    "s4": {
+      "id": "s4",
+      "text": "Is the display showing FAULT – LOW REF PRESSURE?",
+      "input": "yesno",
+      "pass": "fault_low_ref",
+      "fail": "s5"
+    },
+    "fault_low_ref": {
+      "id": "fault_low_ref",
+      "text": "Check fan operation (air blowing out top). May be normal if water < 50°F. Call for service if persists.",
+      "input": "info",
+      "terminal": true
+    },
+    "s5": {
+      "id": "s5",
+      "text": "Is the display showing FAULT – HIGH WATER TEMP?",
+      "input": "yesno",
+      "pass": "fault_high_water",
+      "fail": "s6"
+    },
+    "fault_high_water": {
+      "id": "fault_high_water",
+      "text": "Pool/spa water reached max allowed temp. Normal unless caused by bad sensor or remote call. Check sensors, cool water, or switch to CHILLER mode.",
+      "input": "info",
+      "terminal": true
+    },
+    "s6": {
+      "id": "s6",
+      "text": "Is the display showing FAULT – COIL SENSOR?",
+      "input": "yesno",
+      "pass": "fault_coil",
+      "fail": "s7"
+    },
+    "fault_coil": {
+      "id": "fault_coil",
+      "text": "Coil temperature sensor not connected or failed. Replace if necessary.",
+      "input": "info",
+      "terminal": true
+    },
+    "s7": {
+      "id": "s7",
+      "text": "Is the display showing FAULT – WATER SENSOR?",
+      "input": "yesno",
+      "pass": "fault_water_sensor",
+      "fail": "s8"
+    },
+    "fault_water_sensor": {
+      "id": "fault_water_sensor",
+      "text": "Water temperature sensor not connected or failed. Replace if necessary.",
+      "input": "info",
+      "terminal": true
+    },
+    "s8": {
+      "id": "s8",
+      "text": "Is the heat pump leaking water?",
+      "input": "yesno",
+      "pass": "leak_check",
+      "fail": "success"
+    },
+    "leak_check": {
+      "id": "leak_check",
+      "text": "Turn off pump for 1 hour. If water stops → normal condensation. If leak continues → call for service.",
+      "input": "info",
+      "terminal": true
+    },
+    "success": {
+      "id": "success",
+      "text": "Heat pump operating normally ✅",
+      "input": "info",
+      "terminal": true,
+      "success": true
+    }
+  }
+}

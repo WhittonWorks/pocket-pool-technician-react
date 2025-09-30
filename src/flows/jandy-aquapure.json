@@ -92,7 +92,7 @@
     },
     "result_ok": {
       "id": "result_ok",
-      "text": "Readings within spec. No issues detected with provided measurements.",
+      "text": "Readings within spec. No issues detected with provided measurements. ✅",
       "input": "info",
       "terminal": true,
       "success": true

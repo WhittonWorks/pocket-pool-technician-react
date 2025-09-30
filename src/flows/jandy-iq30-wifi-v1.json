@@ -1,0 +1,72 @@
+{
+  "id": "jandy-iq30-wifi-v1",
+  "brand": "Jandy",
+  "equipmentType": "Automation",
+  "model": "iQ20/iQ30",
+  "title": "Jandy iQ20/iQ30 — WiFi & Hotspot Setup",
+  "start": "wifi_start",
+  "nodes": {
+    "wifi_start": {
+      "id": "wifi_start",
+      "text": "Can the iQ20/iQ30 connect to the home WiFi network?",
+      "input": "yesno",
+      "pass": "wifi_success",
+      "fail": "hotspot_intro"
+    },
+
+    "wifi_success": {
+      "id": "wifi_success",
+      "text": "✅ Connected to WiFi successfully. Automation system should be online.",
+      "input": "info",
+      "terminal": true,
+      "success": true
+    },
+
+
+    "hotspot_intro": {
+      "id": "hotspot_intro",
+      "text": "WiFi connection failed. Begin Hotspot Setup instead. Is the LED on the iQ20/iQ30 flashing blue?",
+      "input": "yesno",
+      "pass": "hotspot_detect",
+      "fail": "reset_module"
+    },
+
+    "reset_module": {
+      "id": "reset_module",
+      "text": "Press and hold the WiFi button on the iQ20/iQ30 until the LED flashes blue. This enables Hotspot Mode.",
+      "input": "info",
+      "pass": "hotspot_detect"
+    },
+
+    "hotspot_detect": {
+      "id": "hotspot_detect",
+      "text": "Is the iAquaLink app detecting the Hotspot signal?",
+      "input": "yesno",
+      "pass": "hotspot_connect",
+      "fail": "hotspot_troubleshoot"
+    },
+
+    "hotspot_connect": {
+      "id": "hotspot_connect",
+      "text": "Follow the in-app steps to connect to the Hotspot and enter WiFi credentials. Does the app confirm connection?",
+      "input": "yesno",
+      "pass": "hotspot_success",
+      "fail": "hotspot_troubleshoot"
+    },
+
+    "hotspot_troubleshoot": {
+      "id": "hotspot_troubleshoot",
+      "text": "Troubleshooting steps:\n• Ensure mobile device location is ON\n• Enable Bluetooth & allow app permissions\n• Stay within range of the iQ20/iQ30\n• Retry Hotspot setup in the app",
+      "input": "info",
+      "terminal": true
+    },
+
+    "hotspot_success": {
+      "id": "hotspot_success",
+      "text": "✅ Hotspot setup successful. Automation system should now be online.",
+      "input": "info",
+      "terminal": true,
+      "success": true
+    }
+  }
+}

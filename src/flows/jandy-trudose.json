@@ -14,7 +14,7 @@
     },
     "fc": {
       "id": "fc",
-      "text": "Measure Free Chlorine (FC) in ppm.",
+      "text": "Measure Free Chlorine (FC) in ppm. Expected: 2–5 ppm.",
       "input": "number",
       "unit": "ppm",
       "range": [2, 5],
@@ -23,15 +23,15 @@
     },
     "fc_action": {
       "id": "fc_action",
-      "text": "Adjust FC to target (2–5 ppm). Use liquid chlorine or adjust output.\nAfter dosing, allow circulation and retest.",
+      "text": "Adjust FC to target (2–5 ppm). Use liquid chlorine or adjust output. After dosing, allow circulation and retest.",
       "input": "info",
       "terminal": true
     },
     "ph": {
       "id": "ph",
-      "text": "Measure pH.",
+      "text": "Measure pH. Expected: 7.4–7.6.",
       "input": "number",
-      "unit": "",
+      "unit": "pH",
       "range": [7.4, 7.6],
       "pass": "ta",
       "fail": "ph_action"
@@ -44,7 +44,7 @@
     },
     "ta": {
       "id": "ta",
-      "text": "Measure Total Alkalinity (TA) ppm.",
+      "text": "Measure Total Alkalinity (TA). Expected: 80–120 ppm.",
       "input": "number",
       "unit": "ppm",
       "range": [80, 120],
@@ -59,7 +59,7 @@
     },
     "cya": {
       "id": "cya",
-      "text": "Measure Cyanuric Acid (CYA) ppm.",
+      "text": "Measure Cyanuric Acid (CYA). Expected: 30–50 ppm.",
       "input": "number",
       "unit": "ppm",
       "range": [30, 50],
@@ -74,7 +74,7 @@
     },
     "salt": {
       "id": "salt",
-      "text": "Measure Salt (ppm).",
+      "text": "Measure Salt. Expected: 3000–3500 ppm.",
       "input": "number",
       "unit": "ppm",
       "range": [3000, 3500],

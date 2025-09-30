@@ -3,7 +3,7 @@
   "brand": "Hayward",
   "equipmentType": "WaterCare",
   "model": "AquaRite 900",
-  "title": "Hayward AquaRite — Guided Diagnostics (Beta)",
+  "title": "Hayward AquaRite — Guided Diagnostics",
   "start": "power",
   "nodes": {
     "power": {

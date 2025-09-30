@@ -135,7 +135,7 @@ function FlowRunner({ flow }) {
               : "bg-gray-600 text-white"
           }`}
         >
-          ← Back
+          🔄 Restart
         </button>
         <button
           onClick={handleRestart}

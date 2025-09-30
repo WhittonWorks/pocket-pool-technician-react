@@ -1,62 +1,102 @@
 {
-  "title": "Jandy VersaTemp Heat Pump — Symptoms",
+  "id": "jandy-versatemp-symptoms-v1",
+  "title": "Jandy VersaTemp Heat Pump — Common Symptoms",
   "symptoms": [
     {
-      "symptom": "Heat pump will not start, no control board display",
-      "action": [
-        "Breaker or fuse may be tripped. Reset breaker or check fuse. If pump still does not run, call for service.",
-        "Three-phase models only: The phases may be reversed or there may be a phase loss. Call for service."
+      "symptom": "Heat pump will not start (no display)",
+      "causes": [
+        "Breaker/fuse tripped",
+        "No line power to unit",
+        "Phase reversal or phase loss (3-phase only)"
+      ],
+      "actions": [
+        "Check and reset breaker/fuse",
+        "Verify 240 VAC supply at input",
+        "For 3-phase units: verify correct phasing and no phase loss"
       ]
     },
     {
-      "symptom": "Heat pump will not start, control board display working",
-      "action": [
-        "Heat pump may be in delay countdown (up to 5 minutes).",
-        "Verify thermostat is calling for heating (correct mode and temperature)."
+      "symptom": "Heat pump will not start (display ON)",
+      "causes": [
+        "Startup delay active (up to 5 minutes)",
+        "Thermostat not calling for heat"
+      ],
+      "actions": [
+        "Wait until delay completes",
+        "Verify correct mode and temperature set point"
       ]
     },
     {
       "symptom": "Heat pump runs but does not heat",
-      "action": [
-        "Verify air coil is blowing air out the top of the unit.",
-        "If newly installed, allow continuous operation for 24–48 hours.",
-        "Increase circulating pump run time or switch control board to Maintain Heat function.",
-        "Verify air/return intake dampers are open."
+      "causes": [
+        "Air coil not exhausting properly",
+        "New installation (short runtime)",
+        "Insufficient pump runtime",
+        "Return air intake dampers closed"
+      ],
+      "actions": [
+        "Verify strong airflow out the top of unit",
+        "Allow 24–48 hrs of continuous operation after install",
+        "Increase pump runtime or use Maintain Heat mode",
+        "Ensure intake dampers are open"
       ]
     },
     {
-      "symptom": "Heat pump does not run and control board displays: FAULT – NO FLOW",
-      "action": [
-        "Verify circulating pump is on and valves are in correct positions.",
-        "Check and clean filters and skimmers.",
-        "Check water level in pool.",
-        "Temporarily turn off fountains/water features that bypass the heat pump inlet."
+      "symptom": "FAULT — NO FLOW",
+      "causes": [
+        "Pump off",
+        "Valves in incorrect position",
+        "Dirty filter/skimmer",
+        "Low pool water level",
+        "Water features bypassing heat pump"
+      ],
+      "actions": [
+        "Turn pump ON",
+        "Verify valve positions",
+        "Clean filter/skimmers",
+        "Top off pool water",
+        "Temporarily turn off fountains/water features"
       ]
     },
     {
-      "symptom": "Heat pump does not run and control board displays: FAULT – HIGH REF PRESSURE",
-      "action": [
-        "Verify pump is on and there are no water flow restrictions.",
-        "For two-speed or variable-speed pumps, switch to a higher speed.",
-        "Verify valves, filters, skimmers, and water level are correct.",
-        "Condition may clear by cycling power up to 3 times. If not, call for service."
+      "symptom": "FAULT — HIGH REF PRESSURE",
+      "causes": [
+        "Water flow restriction",
+        "Low pump speed (VS/2-speed pumps)",
+        "Closed valves or dirty filter",
+        "Low pool water level"
+      ],
+      "actions": [
+        "Verify pump running",
+        "Switch to higher pump speed",
+        "Clean filter/skimmers and confirm valves open",
+        "Top off pool water"
       ]
     },
     {
-      "symptom": "Heat pump does not run or short cycles and control board shows: FAULT – LOW REF PRESSURE",
-      "action": [
-        "Check fan operation (air blowing out top).",
-        "May be normal if pool water temperature is below 50°F.",
-        "If persists, call for service."
+      "symptom": "FAULT — LOW REF PRESSURE",
+      "causes": [
+        "Ambient temperature too low",
+        "Fan not operating",
+        "Low refrigerant or restriction"
+      ],
+      "actions": [
+        "Normal if pool water < 50°F",
+        "Check fan operation (air out the top)",
+        "If persists → call for service"
       ]
     },
     {
       "symptom": "Heat pump leaking water",
-      "action": [
-        "Possible heat exchanger or plumbing leak.",
-        "Turn off pump for at least 1 hour to test.",
-        "If water stops → normal condensation.",
-        "If leak continues after 1 hour → call for service."
+      "causes": [
+        "Condensation (normal)",
+        "Plumbing leak",
+        "Heat exchanger leak"
+      ],
+      "actions": [
+        "Turn pump OFF for 1 hr → if water stops, it’s condensation",
+        "If water continues, inspect plumbing",
+        "If leak persists, call for service"
       ]
     }
   ]

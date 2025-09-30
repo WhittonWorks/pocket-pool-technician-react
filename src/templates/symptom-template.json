@@ -1,0 +1,16 @@
+{
+  "title": "Brand Model — Symptoms",
+  "symptoms": [
+    {
+      "symptom": "Example symptom description",
+      "causes": [
+        "Possible cause 1",
+        "Possible cause 2"
+      ],
+      "actions": [
+        "Recommended action 1",
+        "Recommended action 2"
+      ]
+    }
+  ]
+}

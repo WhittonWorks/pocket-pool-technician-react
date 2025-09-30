@@ -5,38 +5,38 @@
     {
       "code": "FAULT-NO_FLOW",
       "title": "No water flow",
-      "meaning": "Low or restricted water flow through the heat pump. External bypass valve may be in the wrong position, or the water flow switch has malfunctioned. The water flow switch opens creating a fault and the heat pump shuts off.",
-      "fix": ""
+      "meaning": "Low or restricted water flow through the heat pump. External bypass valve may be in the wrong position, or the water flow switch has malfunctioned.",
+      "fix": "Verify circulating pump is ON, valves are open, filters and skimmers are clean, and water level is adequate."
     },
     {
       "code": "FAULT-LOW_REF_PRESSURE",
       "title": "Low refrigerant pressure",
-      "meaning": "When the ambient temperature is low, the suction pressure can drop significantly. This causes the low pressure switch to open and the control will shut off the compressor.",
-      "fix": ""
+      "meaning": "When ambient temperature is low, suction pressure can drop significantly. The low-pressure switch opens and shuts off the compressor.",
+      "fix": "Check fan operation (air blowing out top). May be normal if pool water is below 50°F. Call for service if persists."
     },
     {
       "code": "FAULT-HIGH_REF_PRESSURE",
       "title": "High refrigerant pressure",
-      "meaning": "When the head pressure builds too high, the high pressure switch will open causing the heat pump to shut off immediately. The control will sense this fault condition and shut off the compressor until the switch re-closes.",
-      "fix": ""
+      "meaning": "Head pressure built too high, causing the high-pressure switch to open. The compressor shuts off until pressure normalizes.",
+      "fix": "Check pump and valves for restrictions. Clean filters and skimmers. Increase pump speed if variable-speed. Cycle power up to 3 times; call for service if persists."
     },
     {
       "code": "FAULT-HIGH_WATER_TEMP",
       "title": "High water temperature",
-      "meaning": "When the pool or spa water temperature heats to the maximum allowed temperature or above, the water thermostat will shut off the heat pump unless it is in CHILLER mode. This feature also remains active when called for heat via a remote thermostat, preventing dangerously high water temps caused by sensor malfunction.",
-      "fix": ""
+      "meaning": "Water temp reached maximum allowed. Thermostat shuts off unless in CHILLER mode. Prevents dangerously high temps from sensor malfunction.",
+      "fix": "Verify sensors, cool water, or switch to CHILLER mode. Replace faulty sensors if needed."
     },
     {
       "code": "FAULT-COIL_SENSOR",
       "title": "Coil sensor fault",
-      "meaning": "If the coil temperature sensor malfunctions or is not connected, the control will shut off the heat pump.",
-      "fix": ""
+      "meaning": "The coil temperature sensor is malfunctioning or not connected.",
+      "fix": "Inspect wiring, reconnect if loose, or replace coil sensor."
     },
     {
       "code": "FAULT-WATER_SENSOR",
       "title": "Water sensor fault",
-      "meaning": "If the water temperature sensor malfunctions or is not connected, the control will shut off the heat pump.",
-      "fix": ""
+      "meaning": "The water temperature sensor is malfunctioning or not connected.",
+      "fix": "Inspect wiring, reconnect if loose, or replace water sensor."
     }
   ]
 }
