@@ -27,7 +27,7 @@ export function findFlow(brand, equipmentType, model) {
 
   return flows[key] || null;
 }
-
+console.log("DEBUG FLOWS:", flows);
 export default flows;
 // Debug: log all available flow keys on startup
 console.log("Available diagnostic flows:", Object.keys(flows));

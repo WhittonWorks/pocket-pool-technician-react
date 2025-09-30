@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
 function ErrorLookup({ errors }) {
-function ErrorLookup({ errors }) {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState(null);
 

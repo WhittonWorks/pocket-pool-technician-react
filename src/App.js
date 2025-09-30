@@ -3,7 +3,7 @@ import Layout from "./Layout";
 import FlowRunner from "./FlowRunner";
 import ErrorLookup from "./ErrorLookup";
 import SymptomLookup from "./SymptomLookup";
-import flows from "./flows";
+import flows, { findFlow } from "./flows";  // ✅ import both flows + helper
 import errors from "./errors";
 import symptoms from "./symptoms";
 
@@ -143,17 +143,8 @@ function App() {
     }
   };
 
-  // ✅ moved here, inside App but outside models
+  // ✅ equipmentTypes stays the same
   const equipmentTypes = brand ? Object.keys(models[brand]) : [];
-
-  function findFlow(brand, equipmentType, model) {
-    return flows.find(
-      (f) =>
-        f.brand === brand &&
-        f.equipmentType === equipmentType &&
-        f.model === model
-    );
-  }
 
   function renderSidebar() {
     if (!mode) {
@@ -270,23 +261,24 @@ function App() {
     <Layout sidebar={renderSidebar()}>
       <h1 className="text-2xl font-bold mb-4">Pocket Pool Technician 🚀</h1>
 
-      {mode === "diagnostics" && model && (
-        <>
-          {(() => {
-            const flow = findFlow(brand, equipmentType, model);
-            if (flow) {
-              return <FlowRunner flow={flow} />;
-            }
-            return (
-              <p>
-                ✅ You chose <strong>{brand}</strong> →{" "}
-                <strong>{equipmentType}</strong> → <strong>{model}</strong> — but
-                no diagnostic flow exists yet.
-              </p>
-            );
-          })()}
-        </>
-      )}
+{mode === "diagnostics" && model && (
+  <>
+    {(() => {
+      const flow = findFlow(brand, equipmentType, model);
+      if (flow) {
+        // ✅ add key so React resets FlowRunner whenever the flow changes
+        return <FlowRunner key={flow.id} flow={flow} />;
+      }
+      return (
+        <p>
+          ✅ You chose <strong>{brand}</strong> →{" "}
+          <strong>{equipmentType}</strong> → <strong>{model}</strong> — but
+          no diagnostic flow exists yet.
+        </p>
+      );
+    })()}
+  </>
+)}
 
       {mode === "errors" && (
         <h2 className="text-xl font-bold text-gray-700 mb-2">
