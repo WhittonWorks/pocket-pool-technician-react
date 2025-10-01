@@ -14,11 +14,12 @@ function App() {
   const [equipmentType, setEquipmentType] = useState(null);
   const [model, setModel] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // 🔹 Watch screen size to detect mobile vs desktop
   useEffect(() => {
     function handleResize() {
-      setIsMobile(window.innerWidth < 768); // mobile breakpoint
+      setIsMobile(window.innerWidth < 768);
     }
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -61,13 +62,13 @@ function App() {
       return (
         <div>
           <h3 className="font-bold mb-2">Choose Mode</h3>
-          <button style={btnStyle} onClick={() => setMode("diagnostics")}>
+          <button style={btnStyle} onClick={() => { setMode("diagnostics"); setSidebarCollapsed(false); }}>
             🔍 Guided Diagnostics
           </button>
-          <button style={btnStyle} onClick={() => setMode("errors")}>
+          <button style={btnStyle} onClick={() => { setMode("errors"); setSidebarCollapsed(false); }}>
             ⚡ Error Code Lookup
           </button>
-          <button style={btnStyle} onClick={() => setMode("symptoms")}>
+          <button style={btnStyle} onClick={() => { setMode("symptoms"); setSidebarCollapsed(false); }}>
             🩺 Symptom Lookup
           </button>
         </div>
@@ -137,7 +138,7 @@ function App() {
                   setModel(m);
                   // 🔹 Auto-collapse on mobile
                   if (isMobile) {
-                    setMode("collapsed");
+                    setSidebarCollapsed(true);
                   }
                 }}
                 style={btnStyle}
@@ -174,7 +175,7 @@ function App() {
   }
 
   return (
-    <Layout sidebar={mode === "collapsed" ? null : renderSidebar()}>
+    <Layout sidebar={sidebarCollapsed ? null : renderSidebar()}>
       <h1 className="text-2xl font-bold mb-4">Pocket Pool Technician 🚀</h1>
 
       {mode === "diagnostics" && model && (
