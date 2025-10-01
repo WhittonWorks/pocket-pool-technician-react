@@ -31,7 +31,11 @@
       "unit": "VAC",
       "range": [110, 126],
       "pass": "rev_g_step2",
-      "fail": "fix_power"
+      "fail": "fix_power",
+      "media": {
+        "image": "/media/jandy/jxi/mock.jxi.jpg",
+        "video": "/media/jandy/jxi/mock.jxi.mp4"
+      }
     },
     "rev_g_240": {
       "id": "rev_g_240",
@@ -49,12 +53,7 @@
       "unit": "VAC",
       "range": [22, 26],
       "pass": "rev_g_step3",
-      "fail": "replace_transformer",
-      "media": {
-        "image": "/media/jandy/jxi/measure-transformer.png",
-        "video": "/media/jandy/jxi/measure-transformer.mp4",
-        "caption": "Where to place the meter leads on Red (2) and Yellow (1)."
-      }
+      "fail": "replace_transformer"
     },
     "rev_g_step3": {
       "id": "rev_g_step3",
@@ -134,7 +133,11 @@
       "unit": "VAC",
       "range": [110, 126],
       "pass": "rev_h_step2",
-      "fail": "fix_power"
+      "fail": "fix_power",
+      "media": {
+        "image": "/media/jandy/jxi/mock.jxi.jpg",
+        "video": "/media/jandy/jxi/mock.jxi.mp4"
+      }
     },
     "rev_h_240": {
       "id": "rev_h_240",
