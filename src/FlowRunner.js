@@ -3,30 +3,76 @@ import React, { useState } from "react";
 function FlowRunner({ flow, onExit }) {
   const [currentId, setCurrentId] = useState(flow.start);
   const [answers, setAnswers] = useState({});
+  const [history, setHistory] = useState([]); // back stack
   const [mediaToShow, setMediaToShow] = useState(null);
 
-  const current = flow.nodes[currentId];
+  // local UI state for choice/number
+  const [selectedChoice, setSelectedChoice] = useState(null);
+  const [numberInput, setNumberInput] = useState("");
 
-  function handleNext(nextId, value) {
-    if (value !== undefined) {
-      setAnswers((prev) => ({ ...prev, [currentId]: value }));
-    }
-    if (flow.nodes[nextId]) {
-      setCurrentId(nextId);
-      setMediaToShow(null); // reset media when advancing
-    }
+  const current = flow.nodes[currentId];
+  if (!current) return <p>⚠️ Invalid step.</p>;
+
+  function resetLocalUI() {
+    setSelectedChoice(null);
+    setNumberInput("");
+    setMediaToShow(null);
   }
 
-  if (!current) return <p>⚠️ Invalid step.</p>;
+  function goTo(nextId, value) {
+    setAnswers((prev) =>
+      value !== undefined ? { ...prev, [currentId]: value } : prev
+    );
+    setHistory((prev) => [...prev, currentId]); // push current step
+    setCurrentId(nextId);
+    resetLocalUI();
+  }
+
+  function goBack() {
+    if (history.length === 0) return;
+    const prev = history[history.length - 1];
+    setHistory((h) => h.slice(0, -1));
+    setCurrentId(prev);
+    resetLocalUI();
+  }
+
+  function handleYesNo(nextId, value) {
+    goTo(nextId, value);
+  }
+
+  function handleNumberNext() {
+    const val = parseFloat(numberInput);
+    if (isNaN(val)) return;
+    const inRange =
+      Array.isArray(current.range) &&
+      val >= current.range[0] &&
+      val <= current.range[1];
+    const nextId = inRange ? current.pass : current.fail;
+    if (nextId) goTo(nextId, val);
+  }
+
+  function handleChoiceNext() {
+    if (!selectedChoice) return;
+    const nextId = current.choices[selectedChoice];
+    if (nextId) goTo(nextId, selectedChoice);
+  }
+
+  function handleInfoNext() {
+    if (current.terminal) {
+      onExit?.();
+    } else if (current.pass) {
+      goTo(current.pass);
+    }
+  }
 
   return (
     <div className="p-4 border rounded bg-white shadow text-gray-800">
       {/* Step text */}
-      <h3 className="font-bold mb-2">{current.text}</h3>
+      <h3 className="font-bold mb-3">{current.text}</h3>
 
-      {/* Media buttons */}
+      {/* See Photo / See Video buttons */}
       {current.media && (
-        <div className="mb-4">
+        <div className="mb-3">
           {current.media.image && (
             <button
               onClick={() => setMediaToShow("image")}
@@ -46,28 +92,67 @@ function FlowRunner({ flow, onExit }) {
         </div>
       )}
 
-      {/* Input handling */}
-      {current.input === "choice" &&
-        Object.entries(current.choices).map(([label, nextId]) => (
+      {/* Inputs */}
+      {current.input === "choice" && (
+        <div className="mb-2">
+          {Object.entries(current.choices).map(([label]) => {
+            const active = selectedChoice === label;
+            return (
+              <button
+                key={label}
+                onClick={() => setSelectedChoice(label)}
+                className={`block w-full text-left p-2 mb-2 border rounded ${
+                  active
+                    ? "bg-green-200 border-green-500"
+                    : "bg-gray-100 hover:bg-gray-200"
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
           <button
-            key={label}
-            onClick={() => handleNext(nextId, label)}
-            className="block w-full text-left p-2 mb-2 border rounded bg-green-100 hover:bg-green-200"
+            onClick={handleChoiceNext}
+            disabled={!selectedChoice}
+            className={`w-full px-4 py-2 mt-2 rounded text-white ${
+              selectedChoice
+                ? "bg-green-600 hover:bg-green-700"
+                : "bg-green-300 cursor-not-allowed"
+            }`}
           >
-            {label}
+            Next
           </button>
-        ))}
+        </div>
+      )}
+
+      {current.input === "number" && (
+        <div className="mb-2">
+          <input
+            type="number"
+            value={numberInput}
+            onChange={(e) => setNumberInput(e.target.value)}
+            className="border p-2 rounded w-full mb-2"
+            placeholder={`Enter ${current.unit || "value"}`}
+          />
+          <button
+            onClick={handleNumberNext}
+            className="w-full px-4 py-2 rounded text-white bg-green-600 hover:bg-green-700"
+          >
+            Next
+          </button>
+        </div>
+      )}
 
       {current.input === "yesno" && (
-        <div>
+        <div className="mb-2">
           <button
-            onClick={() => handleNext(current.pass, true)}
+            onClick={() => handleYesNo(current.pass, true)}
             className="block w-full p-2 mb-2 border rounded bg-green-100 hover:bg-green-200"
           >
             ✅ Yes
           </button>
           <button
-            onClick={() => handleNext(current.fail, false)}
+            onClick={() => handleYesNo(current.fail, false)}
             className="block w-full p-2 mb-2 border rounded bg-red-100 hover:bg-red-200"
           >
             ❌ No
@@ -75,68 +160,40 @@ function FlowRunner({ flow, onExit }) {
         </div>
       )}
 
-      {current.input === "number" && (
-        <div>
-          <input
-            type="number"
-            className="border p-2 rounded w-full mb-2"
-            placeholder={`Enter ${current.unit}`}
-            onBlur={(e) => {
-              const val = parseFloat(e.target.value);
-              if (
-                !isNaN(val) &&
-                val >= current.range[0] &&
-                val <= current.range[1]
-              ) {
-                handleNext(current.pass, val);
-              } else {
-                handleNext(current.fail, val);
-              }
-              e.target.value = ""; // clear after submit
-            }}
-          />
-        </div>
-      )}
-
       {current.input === "info" && (
         <button
-          onClick={() =>
-            current.terminal ? onExit?.() : handleNext(current.pass)
-          }
-          className="block w-full p-2 mb-2 border rounded bg-green-100 hover:bg-green-200"
+          onClick={handleInfoNext}
+          className="w-full px-4 py-2 rounded text-white bg-green-600 hover:bg-green-700"
         >
           ➡️ Next
         </button>
       )}
 
-      {/* Navigation */}
-      <div className="flex justify-between mt-4">
+      {/* Bottom nav */}
+      <div className="flex gap-2 mt-4">
         <button
-          onClick={() =>
-            Object.entries(flow.nodes).find(
-              ([, n]) => n.pass === currentId || n.fail === currentId
-            )?.[0] && setCurrentId(
-              Object.entries(flow.nodes).find(
-                ([, n]) => n.pass === currentId || n.fail === currentId
-              )[0]
-            )
-          }
-          className="px-4 py-2 bg-yellow-500 text-white rounded"
+          onClick={goBack}
+          disabled={history.length === 0}
+          className={`flex-1 px-4 py-2 rounded text-white ${
+            history.length === 0
+              ? "bg-yellow-300 cursor-not-allowed"
+              : "bg-yellow-500 hover:bg-yellow-600"
+          }`}
         >
           ⬅️ Back
         </button>
         <button
           onClick={() => onExit?.()}
-          className="px-4 py-2 bg-red-500 text-white rounded"
+          className="flex-1 px-4 py-2 rounded text-white bg-red-600 hover:bg-red-700"
         >
           ⏹ Exit
         </button>
       </div>
 
-      {/* Media at bottom */}
+      {/* Media viewer */}
       {mediaToShow && (
         <div id="media-section" className="mt-6">
-          {mediaToShow === "image" && current.media.image && (
+          {mediaToShow === "image" && current.media?.image && (
             <img
               src={current.media.image}
               alt="Step illustration"
@@ -144,11 +201,11 @@ function FlowRunner({ flow, onExit }) {
               onLoad={() =>
                 document
                   .getElementById("media-section")
-                  .scrollIntoView({ behavior: "smooth" })
+                  ?.scrollIntoView({ behavior: "smooth" })
               }
             />
           )}
-          {mediaToShow === "video" && current.media.video && (
+          {mediaToShow === "video" && current.media?.video && (
             <video
               src={current.media.video}
               controls
@@ -156,7 +213,7 @@ function FlowRunner({ flow, onExit }) {
               onLoadedData={() =>
                 document
                   .getElementById("media-section")
-                  .scrollIntoView({ behavior: "smooth" })
+                  ?.scrollIntoView({ behavior: "smooth" })
               }
             />
           )}
