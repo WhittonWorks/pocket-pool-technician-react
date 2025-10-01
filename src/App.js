@@ -3,9 +3,10 @@ import Layout from "./Layout";
 import FlowRunner from "./FlowRunner";
 import ErrorLookup from "./ErrorLookup";
 import SymptomLookup from "./SymptomLookup";
-import flows, { findFlow } from "./flows";  // ✅ import both flows + helper
 import errors from "./errors";
 import symptoms from "./symptoms";
+// eslint-disable-next-line no-unused-vars
+import flows, { findFlow } from "./flows";
 
 function App() {
   const [mode, setMode] = useState(null); // "diagnostics" | "errors" | "symptoms"
@@ -46,10 +47,7 @@ function App() {
         "TruClear (Placeholder)",
         "Fusion Soft (Placeholder)"
       ],
-      Lighting: [
-        "WaterColors LED",
-        "Nicheless LED (Placeholder)"
-      ],
+      Lighting: ["WaterColors LED", "Nicheless LED (Placeholder)"],
       Automation: [
         "AquaLink RS",
         "iQ20/iQ30",
@@ -57,7 +55,7 @@ function App() {
         "iAquaLink App (Placeholder)",
         "iQPUMP01 (Placeholder)",
         "Zodiac/Jandy Legacy Controls (Placeholder)"
-      ],
+      ]
     },
     Hayward: {
       Heaters: [
@@ -98,7 +96,7 @@ function App() {
         "ProLogic (Placeholder)",
         "AquaPlus (Placeholder)",
         "Sense & Dispense (Placeholder)"
-      ],
+      ]
     },
     Pentair: {
       Heaters: [
@@ -139,11 +137,10 @@ function App() {
         "SunTouch (Placeholder)",
         "ScreenLogic (Placeholder)",
         "Pentair Home App (Placeholder)"
-      ],
+      ]
     }
   };
 
-  // ✅ equipmentTypes stays the same
   const equipmentTypes = brand ? Object.keys(models[brand]) : [];
 
   function renderSidebar() {
@@ -261,24 +258,34 @@ function App() {
     <Layout sidebar={renderSidebar()}>
       <h1 className="text-2xl font-bold mb-4">Pocket Pool Technician 🚀</h1>
 
-{mode === "diagnostics" && model && (
-  <>
-    {(() => {
-      const flow = findFlow(brand, equipmentType, model);
-      if (flow) {
-        // ✅ add key so React resets FlowRunner whenever the flow changes
-        return <FlowRunner key={flow.id} flow={flow} />;
-      }
-      return (
-        <p>
-          ✅ You chose <strong>{brand}</strong> →{" "}
-          <strong>{equipmentType}</strong> → <strong>{model}</strong> — but
-          no diagnostic flow exists yet.
-        </p>
-      );
-    })()}
-  </>
-)}
+      {mode === "diagnostics" && model && (
+        <>
+          {(() => {
+            const flow = findFlow(brand, equipmentType, model);
+            if (flow) {
+              return (
+                <FlowRunner
+                  key={flow.id}
+                  flow={flow}
+                  onExit={() => {
+                    setStep("brand");
+                    setBrand(null);
+                    setEquipmentType(null);
+                    setModel(null);
+                  }}
+                />
+              );
+            }
+            return (
+              <p>
+                ✅ You chose <strong>{brand}</strong> →{" "}
+                <strong>{equipmentType}</strong> → <strong>{model}</strong> — but
+                no diagnostic flow exists yet.
+              </p>
+            );
+          })()}
+        </>
+      )}
 
       {mode === "errors" && (
         <h2 className="text-xl font-bold text-gray-700 mb-2">
@@ -306,13 +313,13 @@ const btnStyle = {
   background: "#333",
   color: "#fff",
   cursor: "pointer",
-  fontSize: "16px",
+  fontSize: "16px"
 };
 
 const backStyle = {
   ...btnStyle,
   background: "#555",
-  marginBottom: 12,
+  marginBottom: 12
 };
 
 export default App;
