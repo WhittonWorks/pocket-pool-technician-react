@@ -2,148 +2,108 @@ import React, { useState } from "react";
 
 function FlowRunner({ flow }) {
   const [currentId, setCurrentId] = useState(flow.start);
-  const [input, setInput] = useState("");
-  const [history, setHistory] = useState([]);
-
+  const [answers, setAnswers] = useState({});
   const current = flow.nodes[currentId];
 
-  function handleNext(value) {
-    let nextId = null;
-
-    if (current.input === "number") {
-      const num = parseFloat(value);
-      if (!isNaN(num)) {
-        if (num >= current.range[0] && num <= current.range[1]) {
-          nextId = current.pass;
-        } else {
-          nextId = current.fail;
-        }
-      }
-    } else if (current.input === "yesno") {
-      nextId = value ? current.pass : current.fail;
-    } else if (current.input === "choice") {
-      nextId = current.choices[value];
-    } else if (current.pass) {
-      nextId = current.pass;
+  function handleNext(nextId, value) {
+    if (value !== undefined) {
+      setAnswers((prev) => ({ ...prev, [currentId]: value }));
     }
-
-    if (nextId) {
-      setHistory([...history, currentId]);
+    if (flow.nodes[nextId]) {
       setCurrentId(nextId);
-      setInput(""); // clear input after moving
     }
   }
 
-  function handleBack() {
-    if (history.length > 0) {
-      const prev = history[history.length - 1];
-      setHistory(history.slice(0, -1));
-      setCurrentId(prev);
-      setInput("");
-    }
-  }
-
-  function handleRestart() {
-    setCurrentId(flow.start);
-    setHistory([]);
-    setInput("");
-  }
+  if (!current) return <p>⚠️ Invalid step.</p>;
 
   return (
     <div className="p-4 border rounded bg-white shadow text-gray-800">
-      <h2 className="text-xl font-bold mb-2">{flow.title}</h2>
-      <p className="mb-4">{current.text}</p>
-
-      {/* Input handling */}
-      {current.input === "number" && (
-        <div className="space-y-2">
-          <input
-            type="number"
-            value={input || ""}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder={`Enter value (${current.unit || ""})`}
-            className="border p-2 rounded w-full"
-          />
-          <button
-            onClick={() => handleNext(parseFloat(input))}
-            disabled={input === ""}
-            className={`px-4 py-2 rounded ${
-              input === ""
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-blue-600 text-white"
-            }`}
-          >
-            Next →
-          </button>
+      {/* 🔹 Media section (image/video) */}
+      {current.media && (
+        <div className="mb-4">
+          {current.media.image && (
+            <img
+              src={current.media.image}
+              alt="Step illustration"
+              className="mb-2 max-w-full rounded border"
+            />
+          )}
+          {current.media.video && (
+            <video
+              src={current.media.video}
+              controls
+              className="mb-2 max-w-full rounded border"
+            />
+          )}
         </div>
       )}
 
-      {current.input === "yesno" && (
-        <div className="space-x-2">
+      {/* Step text */}
+      <h3 className="font-bold mb-2">{current.text}</h3>
+
+      {/* Input handling */}
+      {current.input === "choice" &&
+        Object.entries(current.choices).map(([label, nextId]) => (
           <button
-            onClick={() => handleNext(true)}
-            className="bg-green-600 text-white px-4 py-2 rounded"
+            key={label}
+            onClick={() => handleNext(nextId, label)}
+            className="block w-full text-left p-2 mb-2 border rounded bg-gray-100 hover:bg-gray-200"
+          >
+            {label}
+          </button>
+        ))}
+
+      {current.input === "yesno" && (
+        <div>
+          <button
+            onClick={() => handleNext(current.pass, true)}
+            className="block w-full p-2 mb-2 border rounded bg-green-100 hover:bg-green-200"
           >
             ✅ Yes
           </button>
           <button
-            onClick={() => handleNext(false)}
-            className="bg-red-600 text-white px-4 py-2 rounded"
+            onClick={() => handleNext(current.fail, false)}
+            className="block w-full p-2 mb-2 border rounded bg-red-100 hover:bg-red-200"
           >
             ❌ No
           </button>
         </div>
       )}
 
-      {current.input === "choice" && (
-        <div className="space-y-2">
-          {Object.keys(current.choices).map((c) => (
-            <button
-              key={c}
-              onClick={() => handleNext(c)}
-              className="bg-blue-600 text-white px-4 py-2 rounded block w-full text-left"
-            >
-              {c}
-            </button>
-          ))}
+      {current.input === "number" && (
+        <div>
+          <input
+            type="number"
+            className="border p-2 rounded w-full mb-2"
+            placeholder={`Enter ${current.unit}`}
+            onBlur={(e) => {
+              const val = parseFloat(e.target.value);
+              if (
+                !isNaN(val) &&
+                val >= current.range[0] &&
+                val <= current.range[1]
+              ) {
+                handleNext(current.pass, val);
+              } else {
+                handleNext(current.fail, val);
+              }
+            }}
+          />
         </div>
       )}
 
       {current.input === "info" && (
-        <p className="text-gray-600 italic">ℹ️ {current.text}</p>
-      )}
-
-      {/* Terminal nodes */}
-      {current.terminal && (
-        <p
-          className={`font-bold mt-4 ${
-            current.success ? "text-green-600" : "text-red-600"
-          }`}
-        >
-          {current.success ? "✅ Success" : "❌ Failure"}
-        </p>
-      )}
-
-      {/* Controls */}
-      <div className="mt-6 space-x-2">
         <button
-          onClick={handleBack}
-          disabled={history.length === 0}
-          className={`px-4 py-2 rounded ${
-            history.length === 0
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "bg-gray-600 text-white"
-          }`}
+          onClick={() =>
+            current.terminal
+              ? console.log("End of flow")
+              : handleNext(current.pass)
+          }
+          className="block w-full p-2 mb-2 border rounded bg-blue-100 hover:bg-blue-200"
         >
-          🔄 Restart
+          ➡️ Next
         </button>
-        <button
-          onClick={handleRestart}
-          className="px-4 py-2 rounded bg-red-600 text-white"
-        >
-          🔄 Restart
-        </button>
-      </div>
+      )}
     </div>
   );
 }
