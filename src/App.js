@@ -57,6 +57,16 @@ function App() {
 
   const equipmentTypes = brand ? Object.keys(models[brand]) : [];
 
+  // 🔹 Reset everything back to home (for Exit button)
+  function resetToHome() {
+    setMode(null);
+    setStep("brand");
+    setBrand(null);
+    setEquipmentType(null);
+    setModel(null);
+    setSidebarCollapsed(false);
+  }
+
   function renderSidebar() {
     if (!mode) {
       return (
@@ -183,7 +193,13 @@ function App() {
           {(() => {
             const flow = findFlow(brand, equipmentType, model);
             if (flow) {
-              return <FlowRunner key={flow.id} flow={flow} />;
+              return (
+                <FlowRunner
+                  key={flow.id}
+                  flow={flow}
+                  onExit={resetToHome} // ✅ Exit brings you back to main menu
+                />
+              );
             }
             return (
               <p>
