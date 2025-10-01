@@ -1,12 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Layout from "./Layout";
 import FlowRunner from "./FlowRunner";
 import ErrorLookup from "./ErrorLookup";
 import SymptomLookup from "./SymptomLookup";
+import { findFlow } from "./flows";
 import errors from "./errors";
 import symptoms from "./symptoms";
-// eslint-disable-next-line no-unused-vars
-import flows, { findFlow } from "./flows";
 
 function App() {
   const [mode, setMode] = useState(null); // "diagnostics" | "errors" | "symptoms"
@@ -19,129 +18,39 @@ function App() {
 
   const models = {
     Jandy: {
-      Heaters: [
-        "JXi",
-        "JXiQ",
-        "HI-E2",
-        "VersaTemp",
-        "Legacy LRZE/LRZM (Placeholder)",
-        "LX/LT (Placeholder)"
-      ],
-      Pumps: [
-        "VS FloPro",
-        "ePump",
-        "Stealth (Placeholder)",
-        "PlusHP (Placeholder)",
-        "WaterFeature Pump (Placeholder)"
-      ],
-      Filters: [
-        "CL Cartridge",
-        "CV Cartridge",
-        "JS Sand (Placeholder)",
-        "DEV DE (Placeholder)",
-        "DEL DE (Placeholder)"
-      ],
-      WaterCare: [
-        "AquaPure",
-        "TruDose",
-        "TruClear (Placeholder)",
-        "Fusion Soft (Placeholder)"
-      ],
-      Lighting: ["WaterColors LED", "Nicheless LED (Placeholder)"],
-      Automation: [
-        "AquaLink RS",
-        "iQ20/iQ30",
-        "PDA (Placeholder)",
-        "iAquaLink App (Placeholder)",
-        "iQPUMP01 (Placeholder)",
-        "Zodiac/Jandy Legacy Controls (Placeholder)"
-      ]
+      Heaters: ["JXi", "JXiQ", "HI-E2", "VersaTemp"],
+      Pumps: ["VS FloPro", "ePump"],
+      Filters: ["CL Cartridge", "CV Cartridge"],
+      WaterCare: ["AquaPure", "TruDose"],
+      Lighting: ["WaterColors LED"],
+      Automation: ["AquaLink RS", "iQ20/iQ30"],
     },
     Hayward: {
-      Heaters: [
-        "Universal H-Series",
-        "HeatPro",
-        "H-Series Millivolt (Placeholder)",
-        "ED2/ED2T (Placeholder)"
-      ],
-      Pumps: [
-        "TriStar VS",
-        "Super Pump XE",
-        "MaxFlo VS (Placeholder)",
-        "NorthStar (Placeholder)",
-        "Booster Pump (Placeholder)"
-      ],
-      Filters: [
-        "SwimClear Cartridge",
-        "ProGrid DE (Placeholder)",
-        "StarClear Cartridge (Placeholder)",
-        "ProSeries Sand (Placeholder)"
-      ],
-      WaterCare: [
-        "AquaRite 900",
-        "AquaRite (Standard Placeholder)",
-        "AquaRite 1000 (Placeholder)",
-        "HydroRite Ozone (Placeholder)",
-        "CAT Controller (Placeholder)",
-        "Chlorine Feeder (Placeholder)"
-      ],
-      Lighting: [
-        "ColorLogic LED",
-        "CrystaLogic LED (Placeholder)",
-        "Universal ColorLogic (Placeholder)"
-      ],
-      Automation: [
-        "OmniLogic",
-        "OmniHub (Placeholder)",
-        "ProLogic (Placeholder)",
-        "AquaPlus (Placeholder)",
-        "Sense & Dispense (Placeholder)"
-      ]
+      Heaters: ["Universal H-Series", "HeatPro"],
+      Pumps: ["TriStar VS", "Super Pump XE"],
+      Filters: ["SwimClear Cartridge", "ProGrid DE"],
+      WaterCare: ["AquaRite 900", "CAT Controller"],
+      Lighting: ["ColorLogic LED"],
+      Automation: ["OmniLogic"],
     },
     Pentair: {
-      Heaters: [
-        "MasterTemp",
-        "UltraTemp",
-        "Max-E-Therm (Placeholder)",
-        "MiniMax NT (Placeholder)"
-      ],
-      Pumps: [
-        "IntelliFlo VSF",
-        "SuperFlo VS",
-        "WhisperFlo VST (Placeholder)",
-        "Challenger (Placeholder)",
-        "Booster Pump (Placeholder)"
-      ],
-      Filters: [
-        "Clean & Clear Plus",
-        "Quad DE (Placeholder)",
-        "FNS Plus DE (Placeholder)",
-        "Sand Dollar (Placeholder)",
-        "Tagelus Sand (Placeholder)"
-      ],
-      WaterCare: [
-        "Intellichlor",
-        "iChlor (Placeholder)",
-        "BioShield UV (Placeholder)",
-        "ChemCheck (Placeholder)",
-        "Acid Tank System (Placeholder)"
-      ],
-      Lighting: [
-        "IntelliBrite LED",
-        "Globrite LED (Placeholder)",
-        "MicroBrite LED (Placeholder)"
-      ],
-      Automation: [
-        "EasyTouch",
-        "IntelliCenter",
-        "SunTouch (Placeholder)",
-        "ScreenLogic (Placeholder)",
-        "Pentair Home App (Placeholder)"
-      ]
-    }
+      Heaters: ["MasterTemp", "UltraTemp"],
+      Pumps: ["IntelliFlo VSF", "SuperFlo VS"],
+      Filters: ["Clean & Clear Plus", "Quad DE"],
+      WaterCare: ["Intellichlor"],
+      Lighting: ["IntelliBrite LED"],
+      Automation: ["EasyTouch", "IntelliCenter"],
+    },
   };
 
   const equipmentTypes = brand ? Object.keys(models[brand]) : [];
+
+  // ✅ Auto-collapse menu on mobile when flow starts
+  useEffect(() => {
+    if (model && window.innerWidth < 768) {
+      setStep("brand"); // reset menu view
+    }
+  }, [model]);
 
   function renderSidebar() {
     if (!mode) {
@@ -218,11 +127,7 @@ function App() {
               {brand} {equipmentType}
             </h3>
             {models[brand][equipmentType].map((m) => (
-              <button
-                key={m}
-                onClick={() => setModel(m)}
-                style={btnStyle}
-              >
+              <button key={m} onClick={() => setModel(m)} style={btnStyle}>
                 {m}
               </button>
             ))}
@@ -263,18 +168,7 @@ function App() {
           {(() => {
             const flow = findFlow(brand, equipmentType, model);
             if (flow) {
-              return (
-                <FlowRunner
-                  key={flow.id}
-                  flow={flow}
-                  onExit={() => {
-                    setStep("brand");
-                    setBrand(null);
-                    setEquipmentType(null);
-                    setModel(null);
-                  }}
-                />
-              );
+              return <FlowRunner key={flow.id} flow={flow} />;
             }
             return (
               <p>
@@ -313,13 +207,13 @@ const btnStyle = {
   background: "#333",
   color: "#fff",
   cursor: "pointer",
-  fontSize: "16px"
+  fontSize: "16px",
 };
 
 const backStyle = {
   ...btnStyle,
   background: "#555",
-  marginBottom: 12
+  marginBottom: 12,
 };
 
 export default App;
