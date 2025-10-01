@@ -3,9 +3,9 @@ import Layout from "./Layout";
 import FlowRunner from "./FlowRunner";
 import ErrorLookup from "./ErrorLookup";
 import SymptomLookup from "./SymptomLookup";
-import { findFlow } from "./flows";
 import errors from "./errors";
 import symptoms from "./symptoms";
+import { findFlow } from "./flows";
 
 function App() {
   const [mode, setMode] = useState(null); // "diagnostics" | "errors" | "symptoms"
@@ -13,6 +13,17 @@ function App() {
   const [brand, setBrand] = useState(null);
   const [equipmentType, setEquipmentType] = useState(null);
   const [model, setModel] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // 🔹 Watch screen size to detect mobile vs desktop
+  useEffect(() => {
+    function handleResize() {
+      setIsMobile(window.innerWidth < 768); // mobile breakpoint
+    }
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const brands = ["Jandy", "Hayward", "Pentair"];
 
@@ -29,28 +40,21 @@ function App() {
       Heaters: ["Universal H-Series", "HeatPro"],
       Pumps: ["TriStar VS", "Super Pump XE"],
       Filters: ["SwimClear Cartridge", "ProGrid DE"],
-      WaterCare: ["AquaRite 900", "CAT Controller"],
+      WaterCare: ["AquaRite 900", "AquaRite"],
       Lighting: ["ColorLogic LED"],
-      Automation: ["OmniLogic"],
+      Automation: ["OmniLogic", "OmniHub"],
     },
     Pentair: {
       Heaters: ["MasterTemp", "UltraTemp"],
       Pumps: ["IntelliFlo VSF", "SuperFlo VS"],
       Filters: ["Clean & Clear Plus", "Quad DE"],
-      WaterCare: ["Intellichlor"],
+      WaterCare: ["Intellichlor", "iChlor"],
       Lighting: ["IntelliBrite LED"],
       Automation: ["EasyTouch", "IntelliCenter"],
-    },
+    }
   };
 
   const equipmentTypes = brand ? Object.keys(models[brand]) : [];
-
-  // ✅ Auto-collapse menu on mobile when flow starts
-  useEffect(() => {
-    if (model && window.innerWidth < 768) {
-      setStep("brand"); // reset menu view
-    }
-  }, [model]);
 
   function renderSidebar() {
     if (!mode) {
@@ -127,7 +131,17 @@ function App() {
               {brand} {equipmentType}
             </h3>
             {models[brand][equipmentType].map((m) => (
-              <button key={m} onClick={() => setModel(m)} style={btnStyle}>
+              <button
+                key={m}
+                onClick={() => {
+                  setModel(m);
+                  // 🔹 Auto-collapse on mobile
+                  if (isMobile) {
+                    setMode("collapsed");
+                  }
+                }}
+                style={btnStyle}
+              >
                 {m}
               </button>
             ))}
@@ -160,7 +174,7 @@ function App() {
   }
 
   return (
-    <Layout sidebar={renderSidebar()}>
+    <Layout sidebar={mode === "collapsed" ? null : renderSidebar()}>
       <h1 className="text-2xl font-bold mb-4">Pocket Pool Technician 🚀</h1>
 
       {mode === "diagnostics" && model && (
