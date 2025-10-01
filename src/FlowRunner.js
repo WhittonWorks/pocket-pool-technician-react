@@ -18,25 +18,37 @@ function FlowRunner({ flow }) {
 
   return (
     <div className="p-4 border rounded bg-white shadow text-gray-800">
-      {/* 🔹 Media section (image/video) */}
-      {current.media && (
+      {/* 🔹 Media section (image/video) with fallbacks */}
+      {current.media ? (
         <div className="mb-4">
-          {current.media.image && (
+          {current.media.image ? (
             <img
               src={current.media.image}
               alt="Step illustration"
               className="mb-2 max-w-full rounded border"
             />
+          ) : (
+            <p className="text-sm text-gray-500 mb-2">
+              📷 No image available for this step
+            </p>
           )}
-          {current.media.video && (
+          {current.media.video ? (
             <video
               src={current.media.video}
               controls
+              playsInline
+              muted
               className="mb-2 max-w-full rounded border"
-            />
+            >
+              Your browser does not support the video tag.
+            </video>
+          ) : (
+            <p className="text-sm text-gray-500">
+              🎥 No video available for this step
+            </p>
           )}
         </div>
-      )}
+      ) : null}
 
       {/* Step text */}
       <h3 className="font-bold mb-2">{current.text}</h3>
