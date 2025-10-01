@@ -5,8 +5,6 @@ function FlowRunner({ flow, onExit }) {
   const [answers, setAnswers] = useState({});
   const [history, setHistory] = useState([]); // back stack
   const [mediaToShow, setMediaToShow] = useState(null);
-
-  // local UI state for choice/number
   const [selectedChoice, setSelectedChoice] = useState(null);
   const [numberInput, setNumberInput] = useState("");
 
@@ -20,10 +18,11 @@ function FlowRunner({ flow, onExit }) {
   }
 
   function goTo(nextId, value) {
+    if (!flow.nodes[nextId]) return;
     setAnswers((prev) =>
       value !== undefined ? { ...prev, [currentId]: value } : prev
     );
-    setHistory((prev) => [...prev, currentId]); // push current step
+    setHistory((prev) => [...prev, currentId]); // push current onto stack
     setCurrentId(nextId);
     resetLocalUI();
   }
@@ -111,17 +110,19 @@ function FlowRunner({ flow, onExit }) {
               </button>
             );
           })}
-          <button
-            onClick={handleChoiceNext}
-            disabled={!selectedChoice}
-            className={`w-full px-4 py-2 mt-2 rounded text-white ${
-              selectedChoice
-                ? "bg-green-600 hover:bg-green-700"
-                : "bg-green-300 cursor-not-allowed"
-            }`}
-          >
-            Next
-          </button>
+          <div className="flex gap-2 mt-3">
+            <button
+              onClick={handleChoiceNext}
+              disabled={!selectedChoice}
+              className={`flex-1 px-4 py-2 rounded text-white ${
+                selectedChoice
+                  ? "bg-green-600 hover:bg-green-700"
+                  : "bg-green-300 cursor-not-allowed"
+              }`}
+            >
+              ➡️ Next
+            </button>
+          </div>
         </div>
       )}
 
@@ -134,12 +135,14 @@ function FlowRunner({ flow, onExit }) {
             className="border p-2 rounded w-full mb-2"
             placeholder={`Enter ${current.unit || "value"}`}
           />
-          <button
-            onClick={handleNumberNext}
-            className="w-full px-4 py-2 rounded text-white bg-green-600 hover:bg-green-700"
-          >
-            Next
-          </button>
+          <div className="flex gap-2 mt-2">
+            <button
+              onClick={handleNumberNext}
+              className="flex-1 px-4 py-2 rounded text-white bg-green-600 hover:bg-green-700"
+            >
+              ➡️ Next
+            </button>
+          </div>
         </div>
       )}
 
@@ -161,15 +164,17 @@ function FlowRunner({ flow, onExit }) {
       )}
 
       {current.input === "info" && (
-        <button
-          onClick={handleInfoNext}
-          className="w-full px-4 py-2 rounded text-white bg-green-600 hover:bg-green-700"
-        >
-          ➡️ Next
-        </button>
+        <div className="mb-2">
+          <button
+            onClick={handleInfoNext}
+            className="block w-full p-2 mb-2 border rounded bg-green-600 hover:bg-green-700 text-white"
+          >
+            ➡️ Next
+          </button>
+        </div>
       )}
 
-      {/* Bottom nav */}
+      {/* Bottom Nav */}
       <div className="flex gap-2 mt-4">
         <button
           onClick={goBack}
@@ -190,7 +195,7 @@ function FlowRunner({ flow, onExit }) {
         </button>
       </div>
 
-      {/* Media viewer */}
+      {/* Media viewer at bottom */}
       {mediaToShow && (
         <div id="media-section" className="mt-6">
           {mediaToShow === "image" && current.media?.image && (
