@@ -44,7 +44,11 @@
       "unit": "VAC",
       "range": [220, 252],
       "pass": "rev_g_step2",
-      "fail": "fix_power"
+      "fail": "fix_power",
+      "media": {
+        "image": "/media/jandy/jxi/mock.jxi.jpg",
+        "video": "/media/jandy/jxi/1.mp4"
+      }
     },
     "rev_g_step2": {
       "id": "rev_g_step2",
@@ -146,7 +150,11 @@
       "unit": "VAC",
       "range": [220, 252],
       "pass": "rev_h_step2",
-      "fail": "fix_power"
+      "fail": "fix_power",
+      "media": {
+        "image": "/media/jandy/jxi/mock.jxi.jpg",
+        "video": "/media/jandy/jxi/mock.jxi.mp4"
+      }
     },
     "rev_h_step2": {
       "id": "rev_h_step2",
