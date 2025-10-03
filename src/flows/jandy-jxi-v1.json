@@ -4,17 +4,32 @@
   "equipmentType": "Heaters",
   "model": "JXi",
   "title": "Jandy JXi Heater (Rev G & Rev H) — Guided Troubleshooting",
-  "start": "choose_revision",
+  "start": "enter_serial",
   "nodes": {
-    "choose_revision": {
-      "id": "choose_revision",
-      "text": "Select JXi Revision",
-      "input": "choice",
-      "choices": {
-        "Rev G or Earlier": "rev_g_start",
-        "Rev H": "rev_h_start"
-      }
+    "enter_serial": {
+      "id": "enter_serial",
+      "text": "Enter the full serial number from the JXi heater.\n\n- Rev G or earlier: starts with B (2017 & earlier)\n- Rev H or newer: starts with LB (2018+)",
+      "input": "text",
+      "logic": [
+        {
+          "if": "value.startsWith('B') && !value.startsWith('LB')",
+          "goto": "rev_g_start"
+        },
+        {
+          "if": "value.startsWith('LB')",
+          "goto": "rev_h_start"
+        }
+      ],
+      "default": "invalid_serial"
     },
+
+    "invalid_serial": {
+      "id": "invalid_serial",
+      "text": "❌ Invalid serial number. Please try again.\n\nExpected formats:\n- Rev G or earlier: starts with B\n- Rev H or newer: starts with LB",
+      "input": "info",
+      "pass": "enter_serial"
+    },
+
     "rev_g_start": {
       "id": "rev_g_start",
       "text": "Which input voltage is the JXi Rev G configured for?",
@@ -121,6 +136,7 @@
       "terminal": true,
       "success": true
     },
+
     "rev_h_start": {
       "id": "rev_h_start",
       "text": "Which input voltage is the JXi Rev H configured for?",
@@ -227,6 +243,7 @@
       "terminal": true,
       "success": true
     },
+
     "fix_power": {
       "id": "fix_power",
       "text": "Correct incoming power / breaker / wiring to heater.",

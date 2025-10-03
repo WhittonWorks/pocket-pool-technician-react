@@ -5,8 +5,11 @@ function FlowRunner({ flow, onExit }) {
   const [answers, setAnswers] = useState({});
   const [history, setHistory] = useState([]); // back stack
   const [mediaToShow, setMediaToShow] = useState(null);
+
+  // local UI state
   const [selectedChoice, setSelectedChoice] = useState(null);
   const [numberInput, setNumberInput] = useState("");
+  const [textInput, setTextInput] = useState("");
 
   const current = flow.nodes[currentId];
   if (!current) return <p>⚠️ Invalid step.</p>;
@@ -14,17 +17,22 @@ function FlowRunner({ flow, onExit }) {
   function resetLocalUI() {
     setSelectedChoice(null);
     setNumberInput("");
+    setTextInput("");
     setMediaToShow(null);
   }
 
   function goTo(nextId, value) {
-    if (!flow.nodes[nextId]) return;
+    if (!flow.nodes[nextId]) {
+      console.warn("❌ Tried to go to invalid node:", nextId);
+      return;
+    }
     setAnswers((prev) =>
       value !== undefined ? { ...prev, [currentId]: value } : prev
     );
-    setHistory((prev) => [...prev, currentId]); // push current onto stack
+    setHistory((prev) => [...prev, currentId]);
     setCurrentId(nextId);
     resetLocalUI();
+    console.log("➡️ Navigating to node:", nextId, "with value:", value);
   }
 
   function goBack() {
@@ -33,6 +41,7 @@ function FlowRunner({ flow, onExit }) {
     setHistory((h) => h.slice(0, -1));
     setCurrentId(prev);
     resetLocalUI();
+    console.log("⬅️ Going back to:", prev);
   }
 
   function handleYesNo(nextId, value) {
@@ -47,20 +56,57 @@ function FlowRunner({ flow, onExit }) {
       val >= current.range[0] &&
       val <= current.range[1];
     const nextId = inRange ? current.pass : current.fail;
+    console.log("🔢 Number input:", val, "-> next:", nextId);
     if (nextId) goTo(nextId, val);
   }
 
   function handleChoiceNext() {
     if (!selectedChoice) return;
     const nextId = current.choices[selectedChoice];
+    console.log("🟢 Choice selected:", selectedChoice, "-> next:", nextId);
     if (nextId) goTo(nextId, selectedChoice);
   }
 
   function handleInfoNext() {
     if (current.terminal) {
+      console.log("🏁 Terminal node reached:", current.id);
       onExit?.();
     } else if (current.pass) {
+      console.log("ℹ️ Info node advancing to:", current.pass);
       goTo(current.pass);
+    }
+  }
+
+  function handleTextNext() {
+    const val = textInput.trim();
+    if (!val) return;
+
+    console.log("⌨️ Entered text:", val);
+
+    // log answer
+    setAnswers((prev) => ({ ...prev, [currentId]: val }));
+
+    // evaluate logic if present
+    if (Array.isArray(current.logic)) {
+      for (const rule of current.logic) {
+        try {
+          const safeVal = JSON.stringify(val);
+          const condition = rule.if.replace(/value/g, safeVal);
+          console.log("🔍 Evaluating rule:", condition);
+          if (eval(condition)) {
+            console.log("✅ Rule matched, going to:", rule.goto);
+            return goTo(rule.goto, val);
+          }
+        } catch (err) {
+          console.error("⚠️ Logic eval error:", err, "for rule:", rule.if);
+        }
+      }
+    }
+
+    // fallback
+    if (current.default) {
+      console.log("❌ No rules matched. Going to default:", current.default);
+      goTo(current.default, val);
     }
   }
 
@@ -69,7 +115,7 @@ function FlowRunner({ flow, onExit }) {
       {/* Step text */}
       <h3 className="font-bold mb-3">{current.text}</h3>
 
-      {/* See Photo / See Video buttons */}
+      {/* Media controls */}
       {current.media && (
         <div className="mb-3">
           {current.media.image && (
@@ -110,19 +156,17 @@ function FlowRunner({ flow, onExit }) {
               </button>
             );
           })}
-          <div className="flex gap-2 mt-3">
-            <button
-              onClick={handleChoiceNext}
-              disabled={!selectedChoice}
-              className={`flex-1 px-4 py-2 rounded text-white ${
-                selectedChoice
-                  ? "bg-green-600 hover:bg-green-700"
-                  : "bg-green-300 cursor-not-allowed"
-              }`}
-            >
-              ➡️ Next
-            </button>
-          </div>
+          <button
+            onClick={handleChoiceNext}
+            disabled={!selectedChoice}
+            className={`w-full px-4 py-2 mt-2 rounded text-white ${
+              selectedChoice
+                ? "bg-green-600 hover:bg-green-700"
+                : "bg-green-300 cursor-not-allowed"
+            }`}
+          >
+            ➡️ Next
+          </button>
         </div>
       )}
 
@@ -135,14 +179,12 @@ function FlowRunner({ flow, onExit }) {
             className="border p-2 rounded w-full mb-2"
             placeholder={`Enter ${current.unit || "value"}`}
           />
-          <div className="flex gap-2 mt-2">
-            <button
-              onClick={handleNumberNext}
-              className="flex-1 px-4 py-2 rounded text-white bg-green-600 hover:bg-green-700"
-            >
-              ➡️ Next
-            </button>
-          </div>
+          <button
+            onClick={handleNumberNext}
+            className="w-full px-4 py-2 rounded text-white bg-green-600 hover:bg-green-700"
+          >
+            ➡️ Next
+          </button>
         </div>
       )}
 
@@ -163,18 +205,34 @@ function FlowRunner({ flow, onExit }) {
         </div>
       )}
 
-      {current.input === "info" && (
+      {current.input === "text" && (
         <div className="mb-2">
+          <input
+            type="text"
+            value={textInput}
+            onChange={(e) => setTextInput(e.target.value)}
+            className="border p-2 rounded w-full mb-2"
+            placeholder="Enter serial number"
+          />
           <button
-            onClick={handleInfoNext}
-            className="block w-full p-2 mb-2 border rounded bg-green-600 hover:bg-green-700 text-white"
+            onClick={handleTextNext}
+            className="w-full px-4 py-2 rounded text-white bg-green-600 hover:bg-green-700"
           >
             ➡️ Next
           </button>
         </div>
       )}
 
-      {/* Bottom Nav */}
+      {current.input === "info" && (
+        <button
+          onClick={handleInfoNext}
+          className="w-full px-4 py-2 rounded text-white bg-green-600 hover:bg-green-700"
+        >
+          ➡️ Next
+        </button>
+      )}
+
+      {/* Bottom nav */}
       <div className="flex gap-2 mt-4">
         <button
           onClick={goBack}
@@ -195,7 +253,7 @@ function FlowRunner({ flow, onExit }) {
         </button>
       </div>
 
-      {/* Media viewer at bottom */}
+      {/* Media viewer */}
       {mediaToShow && (
         <div id="media-section" className="mt-6">
           {mediaToShow === "image" && current.media?.image && (
