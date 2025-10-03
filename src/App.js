@@ -7,6 +7,58 @@ import errors from "./errors";
 import symptoms from "./symptoms";
 import { findFlow } from "./flows";
 
+// 📄 PDF tools
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+
+// 🖼️ handle report creation
+function handleFinishReport(answers) {
+  const doc = new jsPDF();
+
+  // --- Add Logo ---
+  const img = new Image();
+  img.src = "/logo-ppt.jpeg"; // logo placed in public/ folder
+
+  img.onload = () => {
+    // ✅ tell jsPDF it's a JPEG (not PNG)
+    doc.addImage(img, "JPEG", 10, 10, 40, 40);
+
+    // --- Header Text ---
+    doc.setFontSize(18);
+    doc.text("Pool Diagnostic Report", 60, 20);
+
+    doc.setFontSize(12);
+    doc.text("Whitton Works, LLC", 60, 30);
+    doc.text("3811 Poverty Creek Rd", 60, 36);
+    doc.text("Crestview, FL 32539", 60, 42);
+    doc.text("Phone: (850) 428-2186", 60, 48);
+    doc.text("Email: Whittonworksllc@gmail.com", 60, 54);
+    doc.text("Website: WhittonWorks.net", 60, 60);
+
+    // --- Date & Serial ---
+    doc.text(`Date: ${new Date().toLocaleString()}`, 10, 70);
+
+    if (answers.enter_serial) {
+      doc.text(`Heater Serial Number: ${answers.enter_serial}`, 10, 78);
+    }
+
+    // --- Build answers table ---
+    const rows = Object.entries(answers).map(([step, value]) => [step, value]);
+
+    autoTable(doc, {
+      startY: 90,
+      head: [["Step", "Result"]],
+      body: rows,
+      styles: { fontSize: 10, cellPadding: 3 },
+      headStyles: { fillColor: [11, 115, 255] }, // Whitton Works blue
+      alternateRowStyles: { fillColor: [240, 240, 240] }
+    });
+
+    // --- Save file ---
+    doc.save("diagnostic-report.pdf");
+  };
+}
+
 function App() {
   const [mode, setMode] = useState(null); // "diagnostics" | "errors" | "symptoms"
   const [step, setStep] = useState("brand");
@@ -16,7 +68,7 @@ function App() {
   const [isMobile, setIsMobile] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  // 🔹 Watch screen size to detect mobile vs desktop
+  // 🔹 Watch screen size
   useEffect(() => {
     function handleResize() {
       setIsMobile(window.innerWidth < 768);
@@ -29,135 +81,34 @@ function App() {
   const brands = ["Jandy", "Hayward", "Pentair"];
 
   const models = {
-  Jandy: {
-    Heaters: [
-      "JXi",
-      "JXiQ",
-      "HI-E2",
-      "VersaTemp",
-      "Legacy LRZE/LRZM (Placeholder)",
-      "LX/LT (Placeholder)"
-    ],
-    Pumps: [
-      "VS FloPro",
-      "ePump",
-      "Stealth (Placeholder)",
-      "PlusHP (Placeholder)",
-      "WaterFeature Pump (Placeholder)"
-    ],
-    Filters: [
-      "CL Cartridge",
-      "CV Cartridge",
-      "JS Sand (Placeholder)",
-      "DEV DE (Placeholder)",
-      "DEL DE (Placeholder)"
-    ],
-    WaterCare: [
-      "AquaPure",
-      "TruDose",
-      "TruClear (Placeholder)",
-      "Fusion Soft (Placeholder)"
-    ],
-    Lighting: [
-      "WaterColors LED",
-      "Nicheless LED (Placeholder)"
-    ],
-    Automation: [
-      "AquaLink RS",
-      "iQ20/iQ30",
-      "PDA (Placeholder)",
-      "iAquaLink App (Placeholder)",
-      "iQPUMP01 (Placeholder)",
-      "Zodiac/Jandy Legacy Controls (Placeholder)"
-    ],
-  },
-  Hayward: {
-    Heaters: [
-      "Universal H-Series",
-      "HeatPro",
-      "H-Series Millivolt (Placeholder)",
-      "ED2/ED2T (Placeholder)"
-    ],
-    Pumps: [
-      "TriStar VS",
-      "Super Pump XE",
-      "MaxFlo VS (Placeholder)",
-      "NorthStar (Placeholder)",
-      "Booster Pump (Placeholder)"
-    ],
-    Filters: [
-      "SwimClear Cartridge",
-      "ProGrid DE (Placeholder)",
-      "StarClear Cartridge (Placeholder)",
-      "ProSeries Sand (Placeholder)"
-    ],
-    WaterCare: [
-      "AquaRite 900",
-      "AquaRite (Standard Placeholder)",
-      "AquaRite 1000 (Placeholder)",
-      "HydroRite Ozone (Placeholder)",
-      "CAT Controller (Placeholder)",
-      "Chlorine Feeder (Placeholder)"
-    ],
-    Lighting: [
-      "ColorLogic LED",
-      "CrystaLogic LED (Placeholder)",
-      "Universal ColorLogic (Placeholder)"
-    ],
-    Automation: [
-      "OmniLogic",
-      "OmniHub (Placeholder)",
-      "ProLogic (Placeholder)",
-      "AquaPlus (Placeholder)",
-      "Sense & Dispense (Placeholder)"
-    ],
-  },
-  Pentair: {
-    Heaters: [
-      "MasterTemp",
-      "UltraTemp",
-      "Max-E-Therm (Placeholder)",
-      "MiniMax NT (Placeholder)"
-    ],
-    Pumps: [
-      "IntelliFlo VSF",
-      "SuperFlo VS",
-      "WhisperFlo VST (Placeholder)",
-      "Challenger (Placeholder)",
-      "Booster Pump (Placeholder)"
-    ],
-    Filters: [
-      "Clean & Clear Plus",
-      "Quad DE (Placeholder)",
-      "FNS Plus DE (Placeholder)",
-      "Sand Dollar (Placeholder)",
-      "Tagelus Sand (Placeholder)"
-    ],
-    WaterCare: [
-      "Intellichlor",
-      "iChlor (Placeholder)",
-      "BioShield UV (Placeholder)",
-      "ChemCheck (Placeholder)",
-      "Acid Tank System (Placeholder)"
-    ],
-    Lighting: [
-      "IntelliBrite LED",
-      "Globrite LED (Placeholder)",
-      "MicroBrite LED (Placeholder)"
-    ],
-    Automation: [
-      "EasyTouch",
-      "IntelliCenter",
-      "SunTouch (Placeholder)",
-      "ScreenLogic (Placeholder)",
-      "Pentair Home App (Placeholder)"
-    ],
-  }
-};
+    Jandy: {
+      Heaters: ["JXi", "JXiQ", "HI-E2", "VersaTemp"],
+      Pumps: ["VS FloPro", "ePump"],
+      Filters: ["CL Cartridge", "CV Cartridge"],
+      WaterCare: ["AquaPure", "TruDose"],
+      Lighting: ["WaterColors LED"],
+      Automation: ["AquaLink RS", "iQ20/iQ30"]
+    },
+    Hayward: {
+      Heaters: ["Universal H-Series", "HeatPro"],
+      Pumps: ["TriStar VS", "Super Pump XE"],
+      Filters: ["SwimClear Cartridge", "ProGrid DE"],
+      WaterCare: ["AquaRite 900", "AquaRite"],
+      Lighting: ["ColorLogic LED"],
+      Automation: ["OmniLogic", "OmniHub"]
+    },
+    Pentair: {
+      Heaters: ["MasterTemp", "UltraTemp"],
+      Pumps: ["IntelliFlo VSF", "SuperFlo VS"],
+      Filters: ["Clean & Clear Plus", "Quad DE"],
+      WaterCare: ["Intellichlor", "iChlor"],
+      Lighting: ["IntelliBrite LED"],
+      Automation: ["EasyTouch", "IntelliCenter"]
+    }
+  };
 
   const equipmentTypes = brand ? Object.keys(models[brand]) : [];
 
-  // 🔹 Reset everything back to home (for Exit button)
   function resetToHome() {
     setMode(null);
     setStep("brand");
@@ -246,10 +197,7 @@ function App() {
                 key={m}
                 onClick={() => {
                   setModel(m);
-                  // 🔹 Auto-collapse on mobile
-                  if (isMobile) {
-                    setSidebarCollapsed(true);
-                  }
+                  if (isMobile) setSidebarCollapsed(true);
                 }}
                 style={btnStyle}
               >
@@ -297,7 +245,8 @@ function App() {
                 <FlowRunner
                   key={flow.id}
                   flow={flow}
-                  onExit={resetToHome} // ✅ Exit brings you back to main menu
+                  onExit={resetToHome}
+                  onFinish={handleFinishReport} // 📄 export to PDF when finished
                 />
               );
             }
