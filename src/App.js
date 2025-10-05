@@ -11,61 +11,65 @@ import { findFlow } from "./flows";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
-// 🖼️ handle report creation
-function handleFinishReport(answers) {
+// 🧾 Handle report creation (logo removed for now)
+async function handleFinishReport(answers) {
   const doc = new jsPDF();
 
-  // --- Add Logo ---
-  const img = new Image();
-  img.src = "/logo-ppt.jpeg"; // logo placed in public/ folder
+  // --- Header ---
+  doc.setFontSize(18);
+  doc.text("Pool Diagnostic Report", 60, 20);
 
-  img.onload = () => {
-    // ✅ tell jsPDF it's a JPEG (not PNG)
-    doc.addImage(img, "JPEG", 10, 10, 40, 40);
+  doc.setFontSize(12);
+  doc.text("Whitton Works, LLC", 60, 30);
+  doc.text("3811 Poverty Creek Rd", 60, 36);
+  doc.text("Crestview, FL 32539", 60, 42);
+  doc.text("Phone: (850) 428-2186", 60, 48);
+  doc.text("Email: Whittonworksllc@gmail.com", 60, 54);
+  doc.text("Website: WhittonWorks.net", 60, 60);
 
-    // --- Header Text ---
-    doc.setFontSize(18);
-    doc.text("Pool Diagnostic Report", 60, 20);
+  // --- Date & Serial ---
+  doc.text(`Date: ${new Date().toLocaleString()}`, 10, 70);
+  if (answers.enter_serial) {
+    doc.text(`Heater Serial Number: ${answers.enter_serial}`, 10, 78);
+  }
 
-    doc.setFontSize(12);
-    doc.text("Whitton Works, LLC", 60, 30);
-    doc.text("3811 Poverty Creek Rd", 60, 36);
-    doc.text("Crestview, FL 32539", 60, 42);
-    doc.text("Phone: (850) 428-2186", 60, 48);
-    doc.text("Email: Whittonworksllc@gmail.com", 60, 54);
-    doc.text("Website: WhittonWorks.net", 60, 60);
+  // --- Build answers table ---
+  const rows = Object.entries(answers).map(([step, value]) => [
+    step,
+    String(value),
+  ]);
 
-    // --- Date & Serial ---
-    doc.text(`Date: ${new Date().toLocaleString()}`, 10, 70);
+  autoTable(doc, {
+    startY: 90,
+    head: [["Step", "Result"]],
+    body: rows,
+    styles: { fontSize: 10, cellPadding: 3 },
+    headStyles: { fillColor: [11, 115, 255] },
+    alternateRowStyles: { fillColor: [240, 240, 240] },
+  });
 
-    if (answers.enter_serial) {
-      doc.text(`Heater Serial Number: ${answers.enter_serial}`, 10, 78);
-    }
+  // --- Save file ---
+  const timestamp = new Date()
+    .toISOString()
+    .replace("T", "_")
+    .replace(/:/g, "-")
+    .split(".")[0];
+  const outcome = answers.outcome || "Unknown";
+  const fileName = `diagnostic-report_${outcome}_${timestamp}.pdf`;
 
-    // --- Build answers table ---
-    const rows = Object.entries(answers).map(([step, value]) => [step, value]);
-
-    autoTable(doc, {
-      startY: 90,
-      head: [["Step", "Result"]],
-      body: rows,
-      styles: { fontSize: 10, cellPadding: 3 },
-      headStyles: { fillColor: [11, 115, 255] }, // Whitton Works blue
-      alternateRowStyles: { fillColor: [240, 240, 240] }
-    });
-
-    // --- Save file ---
-    doc.save("diagnostic-report.pdf");
-  };
+  doc.save(fileName);
+  alert("✅ PDF report generated successfully!");
 }
 
 function App() {
-  const [mode, setMode] = useState(null); // "diagnostics" | "errors" | "symptoms"
+  const [mode, setMode] = useState(null);
   const [step, setStep] = useState("brand");
   const [brand, setBrand] = useState(null);
   const [equipmentType, setEquipmentType] = useState(null);
   const [model, setModel] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+
+  // ✅ Force sidebar open by default for testing
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // 🔹 Watch screen size
@@ -78,6 +82,11 @@ function App() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // ✅ Log sidebar state on page load
+  useEffect(() => {
+    console.log("📋 Sidebar collapsed state on load:", sidebarCollapsed);
+  }, [sidebarCollapsed]);
+
   const brands = ["Jandy", "Hayward", "Pentair"];
 
   const models = {
@@ -87,7 +96,7 @@ function App() {
       Filters: ["CL Cartridge", "CV Cartridge"],
       WaterCare: ["AquaPure", "TruDose"],
       Lighting: ["WaterColors LED"],
-      Automation: ["AquaLink RS", "iQ20/iQ30"]
+      Automation: ["AquaLink RS", "iQ20/iQ30"],
     },
     Hayward: {
       Heaters: ["Universal H-Series", "HeatPro"],
@@ -95,7 +104,7 @@ function App() {
       Filters: ["SwimClear Cartridge", "ProGrid DE"],
       WaterCare: ["AquaRite 900", "AquaRite"],
       Lighting: ["ColorLogic LED"],
-      Automation: ["OmniLogic", "OmniHub"]
+      Automation: ["OmniLogic", "OmniHub"],
     },
     Pentair: {
       Heaters: ["MasterTemp", "UltraTemp"],
@@ -103,8 +112,8 @@ function App() {
       Filters: ["Clean & Clear Plus", "Quad DE"],
       WaterCare: ["Intellichlor", "iChlor"],
       Lighting: ["IntelliBrite LED"],
-      Automation: ["EasyTouch", "IntelliCenter"]
-    }
+      Automation: ["EasyTouch", "IntelliCenter"],
+    },
   };
 
   const equipmentTypes = brand ? Object.keys(models[brand]) : [];
@@ -122,14 +131,52 @@ function App() {
     if (!mode) {
       return (
         <div>
+          {/* 🧾 TEMP: PDF test button (always visible) */}
+          <button
+            style={{
+              ...btnStyle,
+              background: "#007bff",
+              marginBottom: 16,
+            }}
+            onClick={() =>
+              handleFinishReport({
+                enter_serial: "B12345678",
+                outcome: "Success",
+                result: "Heater operating normally",
+                step1: "Power verified",
+                step2: "Transformer output 24VAC",
+              })
+            }
+          >
+            🧾 Generate Test PDF
+          </button>
+
           <h3 className="font-bold mb-2">Choose Mode</h3>
-          <button style={btnStyle} onClick={() => { setMode("diagnostics"); setSidebarCollapsed(false); }}>
+          <button
+            style={btnStyle}
+            onClick={() => {
+              setMode("diagnostics");
+              setSidebarCollapsed(false);
+            }}
+          >
             🔍 Guided Diagnostics
           </button>
-          <button style={btnStyle} onClick={() => { setMode("errors"); setSidebarCollapsed(false); }}>
+          <button
+            style={btnStyle}
+            onClick={() => {
+              setMode("errors");
+              setSidebarCollapsed(false);
+            }}
+          >
             ⚡ Error Code Lookup
           </button>
-          <button style={btnStyle} onClick={() => { setMode("symptoms"); setSidebarCollapsed(false); }}>
+          <button
+            style={btnStyle}
+            onClick={() => {
+              setMode("symptoms");
+              setSidebarCollapsed(false);
+            }}
+          >
             🩺 Symptom Lookup
           </button>
         </div>
@@ -246,7 +293,7 @@ function App() {
                   key={flow.id}
                   flow={flow}
                   onExit={resetToHome}
-                  onFinish={handleFinishReport} // 📄 export to PDF when finished
+                  onFinish={handleFinishReport}
                 />
               );
             }

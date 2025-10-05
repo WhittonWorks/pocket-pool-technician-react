@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 
-function FlowRunner({ flow, onExit }) {
+function FlowRunner({ flow, onExit, onFinish }) {
   const [currentId, setCurrentId] = useState(flow.start);
-  const [answers, setAnswers] = useState({});
+  const [answers, setAnswers] = useState({ model: flow.model }); // ✅ include model
   const [history, setHistory] = useState([]); // back stack
   const [mediaToShow, setMediaToShow] = useState(null);
 
@@ -67,9 +67,29 @@ function FlowRunner({ flow, onExit }) {
     if (nextId) goTo(nextId, selectedChoice);
   }
 
+  // ✅ Handle final info nodes (both success + failure)
   function handleInfoNext() {
     if (current.terminal) {
       console.log("🏁 Terminal node reached:", current.id);
+
+      // ✅ Add final outcome + result text for the PDF
+      const finalAnswers = {
+        ...answers,
+        result: current.text,
+        outcome: current.success ? "Success" : "Failure",
+      };
+
+      // ✅ Trigger PDF generation
+      try {
+        if (typeof onFinish === "function") {
+          console.log("🧾 Sending final answers for PDF:", finalAnswers);
+          onFinish(finalAnswers);
+        }
+      } catch (err) {
+        console.error("⚠️ Error during onFinish:", err);
+      }
+
+      // ✅ Return to home afterwards
       onExit?.();
     } else if (current.pass) {
       console.log("ℹ️ Info node advancing to:", current.pass);
