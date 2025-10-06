@@ -68,8 +68,6 @@ function App() {
   const [equipmentType, setEquipmentType] = useState(null);
   const [model, setModel] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
-
-  // ✅ Force sidebar open by default for testing
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // 🔹 Watch screen size
@@ -81,11 +79,6 @@ function App() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
-  // ✅ Log sidebar state on page load
-  useEffect(() => {
-    console.log("📋 Sidebar collapsed state on load:", sidebarCollapsed);
-  }, [sidebarCollapsed]);
 
   const brands = ["Jandy", "Hayward", "Pentair"];
 
@@ -127,11 +120,32 @@ function App() {
     setSidebarCollapsed(false);
   }
 
+  // 🧭 Jump to flow from symptom
+  function launchFlowFromSymptom(flowTarget) {
+    const { brand, equipmentType, model, startNode } = flowTarget;
+    const flow = findFlow(brand, equipmentType, model);
+    if (!flow) {
+      alert("⚠️ Diagnostic flow not found for this symptom.");
+      return;
+    }
+
+    // Override starting node if specified
+    if (startNode) {
+      flow.start = startNode;
+    }
+
+    setBrand(brand);
+    setEquipmentType(equipmentType);
+    setModel(model);
+    setMode("diagnostics");
+  }
+
+  // 🧭 Sidebar navigation
   function renderSidebar() {
     if (!mode) {
       return (
         <div>
-          {/* 🧾 TEMP: PDF test button (always visible) */}
+          {/* TEMP: PDF test button */}
           <button
             style={{
               ...btnStyle,
@@ -273,12 +287,16 @@ function App() {
           <button onClick={() => setMode(null)} style={backStyle}>
             ← Back
           </button>
-          <SymptomLookup symptoms={symptoms} />
+          <SymptomLookup
+            symptoms={symptoms}
+            onSelectSymptom={launchFlowFromSymptom}
+          />
         </div>
       );
     }
   }
 
+  // 🧩 Main render
   return (
     <Layout sidebar={sidebarCollapsed ? null : renderSidebar()}>
       <h1 className="text-2xl font-bold mb-4">Pocket Pool Test🚀</h1>
@@ -323,6 +341,7 @@ function App() {
   );
 }
 
+// 🔹 Styling
 const btnStyle = {
   display: "block",
   width: "100%",

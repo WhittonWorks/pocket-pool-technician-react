@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function SymptomLookup({ symptoms }) {
+function SymptomLookup({ symptoms, onSelectSymptom }) {
   const [query, setQuery] = useState("");
 
   // Flatten all symptom files into one list
@@ -11,6 +11,7 @@ function SymptomLookup({ symptoms }) {
     }))
   );
 
+  // Filter results by search query
   const filtered = allSymptoms.filter(
     (s) =>
       s.symptom &&
@@ -24,13 +25,13 @@ function SymptomLookup({ symptoms }) {
       {/* Search bar */}
       <input
         type="text"
-        placeholder="🔍 Search symptoms (e.g. 'low chlorine', 'no flow')"
+        placeholder="🔍 Search symptoms (e.g. 'no heat', 'low pressure')"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         className="border p-2 rounded w-full bg-white text-gray-900 placeholder-gray-500"
       />
 
-      {/* Messages */}
+      {/* Feedback messages */}
       {query && filtered.length === 0 && (
         <p className="text-red-600 mt-4">❌ No symptoms found.</p>
       )}
@@ -38,45 +39,48 @@ function SymptomLookup({ symptoms }) {
         <p className="text-gray-500 mt-4">⚠️ No symptom data loaded.</p>
       )}
 
-      {/* Results */}
-      {filtered.map((s, idx) => {
-        // Normalize: prefer "actions" if present, else use "action"
-        const recommendedActions = s.actions || s.action;
+      {/* Symptom results */}
+      {filtered.map((s, idx) => (
+        <div
+          key={idx}
+          className="mt-4 p-3 border rounded bg-gray-50 shadow-sm hover:bg-gray-100 cursor-pointer"
+          onClick={() => {
+            if (s.flowTarget) {
+              console.log("🧭 Jumping into flow:", s.flowTarget);
+              onSelectSymptom(s.flowTarget);
+            } else {
+              alert("No linked diagnostic flow for this symptom yet.");
+            }
+          }}
+        >
+          <h3 className="font-bold text-lg">{s.symptom}</h3>
+          <p className="text-sm text-gray-500 mb-2">
+            <em>Source: {s.source}</em>
+          </p>
 
-        return (
-          <div
-            key={idx}
-            className="mt-4 p-3 border rounded bg-gray-50 shadow-sm"
-          >
-            <h3 className="font-bold text-lg">{s.symptom}</h3>
-            <p className="text-sm text-gray-500 mb-2">
-              <em>Source: {s.source}</em>
-            </p>
+          {s.causes && (
+            <div className="mb-2">
+              <strong>Possible Causes:</strong>
+              <ul className="list-disc ml-5">
+                {s.causes.map((c, i) => (
+                  <li key={i}>{c}</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-            {s.causes && (
-              <div className="mb-2">
-                <strong>Possible Causes:</strong>
-                <ul className="list-disc ml-5">
-                  {s.causes.map((c, i) => (
-                    <li key={i}>{c}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {recommendedActions && (
-              <div>
-                <strong>Recommended Actions:</strong>
-                <ul className="list-disc ml-5">
-                  {recommendedActions.map((a, i) => (
-                    <li key={i}>{a}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        );
-      })}
+          {s.actions && (
+            <div>
+              <strong>Recommended Actions:</strong>
+              <ul className="list-disc ml-5">
+                {s.actions.map((a, i) => (
+                  <li key={i}>{a}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 }
