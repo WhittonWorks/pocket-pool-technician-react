@@ -299,17 +299,17 @@ function App() {
           </button>
           <SymptomLookup
             symptoms={symptoms}
-            onNavigateToFlow={launchFlowFromSymptom}
+            onSelectSymptom={launchFlowFromSymptom}  
           />
         </div>
       );
     }
-  } 
+  }
 
   // 🧩 Main render
   return (
     <Layout sidebar={sidebarCollapsed ? null : renderSidebar()}>
-      <h1 className="text-2xl font-bold mb-4">Pocket Pool Test🚀</h1>
+      <h1 className="text-2xl font-bold mb-4">Pocket Pool Technician 🚀</h1>
 
       {mode === "diagnostics" && model && (
         <>
