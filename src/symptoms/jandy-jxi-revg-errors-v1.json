@@ -2,19 +2,25 @@
   "id": "jandy-jxi-revg-symptoms-v1",
   "title": "Jandy JXi (Rev G and earlier) — Common Symptoms",
   "symptoms": [
-    {
-      "symptom": "Heater will not power on",
-      "causes": [
-        "No incoming line voltage",
-        "Blown fuse",
-        "Defective transformer"
-      ],
-      "actions": [
-        "Verify 120/240 VAC at input terminals",
-        "Check fuse on PIB and replace if blown",
-        "Measure transformer secondary (22–26 VAC); replace if out of range"
-      ]
-    },
+{
+  "symptom": "Heater will not power on",
+  "causes": [
+    "No incoming line voltage",
+    "Blown fuse",
+    "Defective transformer"
+  ],
+  "actions": [
+    "Verify 120/240 VAC at input terminals",
+    "Check fuse on PIB and replace if blown",
+    "Measure transformer secondary (22–26 VAC); replace if out of range"
+  ],
+  "flowLink": {
+    "brand": "Jandy",
+    "equipmentType": "Heaters",
+    "model": "JXi",
+    "startNode": "rev_g_120"
+  }
+},
     {
       "symptom": "Blower not operating",
       "causes": [
