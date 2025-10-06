@@ -120,19 +120,29 @@ function App() {
     setSidebarCollapsed(false);
   }
 
-  // 🧭 Jump to flow from symptom
+  // 🧭 Jump to flow directly from symptom
   function launchFlowFromSymptom(flowTarget) {
+    if (!flowTarget) return alert("⚠️ Invalid symptom data.");
+
     const { brand, equipmentType, model, startNode } = flowTarget;
     const flow = findFlow(brand, equipmentType, model);
+
     if (!flow) {
       alert("⚠️ Diagnostic flow not found for this symptom.");
       return;
     }
 
-    // Override starting node if specified
-    if (startNode) {
+    // override the starting node for this flow
+    if (startNode && flow.nodes[startNode]) {
       flow.start = startNode;
     }
+
+    console.log("🚀 Launching flow:", {
+      brand,
+      equipmentType,
+      model,
+      startNode,
+    });
 
     setBrand(brand);
     setEquipmentType(equipmentType);
@@ -299,7 +309,7 @@ function App() {
   // 🧩 Main render
   return (
     <Layout sidebar={sidebarCollapsed ? null : renderSidebar()}>
-      <h1 className="text-2xl font-bold mb-4">Pocket Pool Test🚀</h1>
+      <h1 className="text-2xl font-bold mb-4">Pocket Pool Technician 🚀</h1>
 
       {mode === "diagnostics" && model && (
         <>

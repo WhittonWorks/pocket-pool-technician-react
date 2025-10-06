@@ -3,7 +3,7 @@ import React, { useState } from "react";
 function SymptomLookup({ symptoms, onSelectSymptom }) {
   const [query, setQuery] = useState("");
 
-  // Flatten all symptom files into one list
+  // 🔹 Flatten all symptom files into one searchable list
   const allSymptoms = Object.values(symptoms).flatMap((file) =>
     file.symptoms.map((s) => ({
       ...s,
@@ -11,12 +11,40 @@ function SymptomLookup({ symptoms, onSelectSymptom }) {
     }))
   );
 
-  // Filter results by search query
-  const filtered = allSymptoms.filter(
-    (s) =>
-      s.symptom &&
-      s.symptom.toLowerCase().includes(query.trim().toLowerCase())
-  );
+  // 🔹 Basic synonym map for common technician wording
+  const synonymMap = {
+    didnt: ["did not", "won't", "wont", "fails to", "no"],
+    fire: ["ignite", "light", "burn"],
+    ignite: ["fire", "light"],
+    heat: ["warm", "burn"],
+    flow: ["water flow", "pressure", "circulation"],
+    sensor: ["probe", "igniter", "flame sensor"],
+    power: ["voltage", "energize"],
+  };
+
+  // 🔍 Fuzzy filter that matches any part of the symptom text
+  const filtered = allSymptoms.filter((s) => {
+    const q = query.trim().toLowerCase();
+    if (!q) return true;
+
+    // Split the user’s input into words (ignore punctuation)
+    const terms = q.split(/\s+/).filter(Boolean);
+
+    // Combine searchable text from multiple fields
+    const searchableText = [
+      s.symptom,
+      ...(s.causes || []),
+      ...(s.actions || []),
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    // Expand each term with its synonyms
+    const expandedTerms = terms.flatMap((t) => [t, ...(synonymMap[t] || [])]);
+
+    // ✅ Match if ANY expanded term appears anywhere in the text
+    return expandedTerms.some((t) => searchableText.includes(t));
+  });
 
   return (
     <div className="p-4 border rounded bg-white shadow text-gray-800">
@@ -25,7 +53,7 @@ function SymptomLookup({ symptoms, onSelectSymptom }) {
       {/* Search bar */}
       <input
         type="text"
-        placeholder="🔍 Search symptoms (e.g. 'no heat', 'low pressure')"
+        placeholder="🔍 Search symptoms (e.g. 'didn't fire', 'no flow', 'sensor')"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         className="border p-2 rounded w-full bg-white text-gray-900 placeholder-gray-500"
