@@ -11,34 +11,29 @@
       "text": "Enter the full serial number from the JXi heater.\n\n- Rev G or earlier: starts with B (2017 & earlier)\n- Rev H or newer: starts with LB (2018+)",
       "input": "text",
       "logic": [
-        {
-          "if": "value.startsWith('B') && !value.startsWith('LB')",
-          "goto": "rev_g_start"
-        },
-        {
-          "if": "value.startsWith('LB')",
-          "goto": "rev_h_start"
-        }
+        { "if": "value.startsWith('B') && !value.startsWith('LB')", "goto": "rev_g_start" },
+        { "if": "value.startsWith('LB')", "goto": "rev_h_start" }
       ],
       "default": "invalid_serial"
     },
 
     "invalid_serial": {
       "id": "invalid_serial",
-      "text": "❌ Invalid serial number. Please try again.\n\nExpected formats:\n- Rev G or earlier: starts with B\n- Rev H or newer: starts with LB",
+      "text": "❌ Invalid serial number. Try again.\nExpected formats:\n- Rev G or earlier = B#####\n- Rev H or newer = LB#####",
       "input": "info",
       "pass": "enter_serial"
     },
 
+    /* ────────────────────────────────
+       🔹 REV G FLOW
+       ──────────────────────────────── */
     "rev_g_start": {
       "id": "rev_g_start",
       "text": "Which input voltage is the JXi Rev G configured for?",
       "input": "choice",
-      "choices": {
-        "120V": "rev_g_120",
-        "240V": "rev_g_240"
-      }
+      "choices": { "120 V": "rev_g_120", "240 V": "rev_g_240" }
     },
+
     "rev_g_120": {
       "id": "rev_g_120",
       "text": "Measure power at Distribution Board (Black C → Red B). Expect 110–126 VAC.",
@@ -47,10 +42,7 @@
       "range": [110, 126],
       "pass": "rev_g_step2",
       "fail": "fix_power",
-      "media": {
-        "image": "/media/jandy/jxi/mock.jxi.jpg",
-        "video": "/media/jandy/jxi/1.mp4"
-      }
+      "isEntryPoint": true
     },
     "rev_g_240": {
       "id": "rev_g_240",
@@ -60,27 +52,33 @@
       "range": [220, 252],
       "pass": "rev_g_step2",
       "fail": "fix_power",
-      "media": {
-        "image": "/media/jandy/jxi/mock.jxi.jpg",
-        "video": "/media/jandy/jxi/1.mp4"
-      }
+      "isEntryPoint": true
     },
+
     "rev_g_step2": {
       "id": "rev_g_step2",
-      "text": "Measure Transformer: 24 VAC between Red (2) & Yellow (1). Expect 22–26 VAC.",
+      "text": "Measure transformer output (Red 2 → Yellow 1). Expect 22–26 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
       "pass": "rev_g_step3",
-      "fail": "replace_transformer"
+      "fail": "rev_g_step2_check_input"
     },
+    "rev_g_step2_check_input": {
+      "id": "rev_g_step2_check_input",
+      "text": "Measured transformer output below 22 VAC.\n\nVerify incoming voltage (110–126 or 220–252 VAC). If input correct and output low → replace transformer.",
+      "input": "info",
+      "pass": "rev_g_step3"
+    },
+
     "rev_g_step3": {
       "id": "rev_g_step3",
       "text": "Check PIB fuse continuity. Good?",
       "input": "yesno",
       "pass": "rev_g_step4",
-      "fail": "replace_fuse"
+      "fail": "rev_g_step2"
     },
+
     "rev_g_step4": {
       "id": "rev_g_step4",
       "text": "Check Water Pressure Switch: 24 VAC Purple (4) → Yellow (1). Expect 22–26 VAC.",
@@ -88,8 +86,9 @@
       "unit": "VAC",
       "range": [22, 26],
       "pass": "rev_g_step5",
-      "fail": "replace_pressure_switch"
+      "fail": "rev_g_step3"
     },
+
     "rev_g_step5": {
       "id": "rev_g_step5",
       "text": "Check Fusible Link chain: Orange (6), Blue (7), Black (8). All 22–26 VAC?",
@@ -97,55 +96,91 @@
       "unit": "VAC",
       "range": [22, 26],
       "pass": "rev_g_blower",
-      "fail": "safety_chain_fault"
+      "fail": "rev_g_step4"
     },
+
     "rev_g_blower": {
       "id": "rev_g_blower",
       "text": "Does the blower motor run?",
       "input": "yesno",
       "pass": "rev_g_igniter",
-      "fail": "check_blower"
+      "fail": "rev_g_step5",
+      "isEntryPoint": true
     },
+
     "rev_g_igniter": {
       "id": "rev_g_igniter",
       "text": "After blower starts, does the Hot Surface Igniter glow?",
       "input": "yesno",
       "pass": "rev_g_gas",
-      "fail": "test_ignitor"
+      "fail": "rev_g_igniter_check_input",
+      "isEntryPoint": true
     },
+    "rev_g_igniter_check_input": {
+      "id": "rev_g_igniter_check_input",
+      "text": "Measure voltage at Ignition Control K & I terminals during ignition. Expect 105–130 VAC.\n\nIf no voltage → verify 24 VAC to board.\nIf voltage present → check ignitor continuity.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [105, 130],
+      "pass": "rev_g_igniter_check_continuity",
+      "fail": "rev_g_igniter_no_power"
+    },
+    "rev_g_igniter_check_continuity": {
+      "id": "rev_g_igniter_check_continuity",
+      "text": "With power off and ignitor cool, check continuity between ignitor leads.\n\n✅ Continuity present → ignitor intact.\n❌ Open circuit → replace ignitor.\n(Optional) Cold resistance ≈ 40–75 Ω; > 90 Ω = weak element.",
+      "input": "yesno",
+      "pass": "rev_g_gas",
+      "fail": "replace_ignitor"
+    },
+    "rev_g_igniter_no_power": {
+      "id": "rev_g_igniter_no_power",
+      "text": "No 120 VAC to ignitor. Verify ignition control receives 24 VAC and ground. If 24 VAC present but no output, replace ignition control.",
+      "input": "info",
+      "terminal": true
+    },
+    "replace_ignitor": {
+      "id": "replace_ignitor",
+      "text": "Replace Hot Surface Ignitor. Verify connections and ceramic integrity before restart.",
+      "input": "info",
+      "terminal": true
+    },
+
     "rev_g_gas": {
       "id": "rev_g_gas",
-      "text": "Check for 24 VAC at Brown (gas valve) → Yellow. Is it present?",
+      "text": "Check for 24 VAC at Brown (gas valve) → Yellow. Present?",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
       "pass": "rev_g_flame",
-      "fail": "replace_gas_valve"
+      "fail": "rev_g_igniter"
     },
+
     "rev_g_flame": {
       "id": "rev_g_flame",
-      "text": "Do burners ignite and stay lit beyond 7s?",
+      "text": "Do burners ignite and stay lit > 7 s?",
       "input": "yesno",
       "pass": "rev_g_success",
-      "fail": "check_flame"
+      "fail": "rev_g_gas"
     },
+
     "rev_g_success": {
       "id": "rev_g_success",
-      "text": "Rev G Heater operating normally ✅",
+      "text": "✅ Rev G heater operating normally.",
       "input": "info",
       "terminal": true,
       "success": true
     },
 
+    /* ────────────────────────────────
+       🔹 REV H FLOW
+       ──────────────────────────────── */
     "rev_h_start": {
       "id": "rev_h_start",
       "text": "Which input voltage is the JXi Rev H configured for?",
       "input": "choice",
-      "choices": {
-        "120V": "rev_h_120",
-        "240V": "rev_h_240"
-      }
+      "choices": { "120 V": "rev_h_120", "240 V": "rev_h_240" }
     },
+
     "rev_h_120": {
       "id": "rev_h_120",
       "text": "Measure power at Distribution Board (Black C → Red B). Expect 110–126 VAC.",
@@ -154,10 +189,7 @@
       "range": [110, 126],
       "pass": "rev_h_step2",
       "fail": "fix_power",
-      "media": {
-        "image": "/media/jandy/jxi/mock.jxi.jpg",
-        "video": "/media/jandy/jxi/mock.jxi.mp4"
-      }
+      "isEntryPoint": true
     },
     "rev_h_240": {
       "id": "rev_h_240",
@@ -167,27 +199,33 @@
       "range": [220, 252],
       "pass": "rev_h_step2",
       "fail": "fix_power",
-      "media": {
-        "image": "/media/jandy/jxi/mock.jxi.jpg",
-        "video": "/media/jandy/jxi/mock.jxi.mp4"
-      }
+      "isEntryPoint": true
     },
+
     "rev_h_step2": {
       "id": "rev_h_step2",
-      "text": "Measure Transformer: 24 VAC Red (2) → Yellow (1). Expect 22–26 VAC.",
+      "text": "Measure transformer output (Red 2 → Yellow 1). Expect 22–26 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
       "pass": "rev_h_step3",
-      "fail": "replace_transformer"
+      "fail": "rev_h_step2_check_input"
     },
+    "rev_h_step2_check_input": {
+      "id": "rev_h_step2_check_input",
+      "text": "Measured transformer output below 22 VAC.\n\nVerify incoming voltage (110–126 / 220–252 VAC). If input correct and output low → replace transformer.",
+      "input": "info",
+      "pass": "rev_h_step3"
+    },
+
     "rev_h_step3": {
       "id": "rev_h_step3",
       "text": "Check PIB fuse continuity. Good?",
       "input": "yesno",
       "pass": "rev_h_step4",
-      "fail": "replace_fuse"
+      "fail": "rev_h_step2"
     },
+
     "rev_h_step4": {
       "id": "rev_h_step4",
       "text": "Check Water Pressure Switch: 24 VAC Purple (4) → Yellow (1). Expect 22–26 VAC.",
@@ -195,8 +233,9 @@
       "unit": "VAC",
       "range": [22, 26],
       "pass": "rev_h_step5",
-      "fail": "replace_pressure_switch"
+      "fail": "rev_h_step3"
     },
+
     "rev_h_step5": {
       "id": "rev_h_step5",
       "text": "Check Fusible Link chain: Orange (6), Blue (7), Black (8). All 22–26 VAC?",
@@ -204,41 +243,70 @@
       "unit": "VAC",
       "range": [22, 26],
       "pass": "rev_h_blower",
-      "fail": "safety_chain_fault"
+      "fail": "rev_h_step4"
     },
+
     "rev_h_blower": {
       "id": "rev_h_blower",
       "text": "Does the blower motor run?",
       "input": "yesno",
       "pass": "rev_h_igniter",
-      "fail": "check_blower"
+      "fail": "rev_h_step5",
+      "isEntryPoint": true
     },
+
     "rev_h_igniter": {
       "id": "rev_h_igniter",
       "text": "After blower starts, does the Hot Surface Igniter glow?",
       "input": "yesno",
       "pass": "rev_h_gas",
-      "fail": "test_ignitor"
+      "fail": "rev_h_igniter_check_input",
+      "isEntryPoint": true
     },
+    "rev_h_igniter_check_input": {
+      "id": "rev_h_igniter_check_input",
+      "text": "Measure voltage at Ignition Control K & I terminals during ignition. Expect 105–130 VAC.\n\nIf no voltage → verify 24 VAC supply.\nIf voltage present → check ignitor continuity.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [105, 130],
+      "pass": "rev_h_igniter_check_continuity",
+      "fail": "rev_h_igniter_no_power"
+    },
+    "rev_h_igniter_check_continuity": {
+      "id": "rev_h_igniter_check_continuity",
+      "text": "With power off and ignitor cool, check continuity between ignitor leads.\n\n✅ Continuity present → ignitor intact.\n❌ Open circuit → replace ignitor.",
+      "input": "yesno",
+      "pass": "rev_h_gas",
+      "fail": "replace_ignitor"
+    },
+    "rev_h_igniter_no_power": {
+      "id": "rev_h_igniter_no_power",
+      "text": "No 120 VAC to ignitor. Verify ignition control receives 24 VAC and ground. If 24 VAC present but no output, replace ignition control.",
+      "input": "info",
+      "terminal": true
+    },
+
     "rev_h_gas": {
       "id": "rev_h_gas",
-      "text": "Check for 24 VAC at Brown (gas valve) → Yellow. Is it present?",
+      "text": "Check for 24 VAC at Brown (gas valve) → Yellow. Present?",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
       "pass": "rev_h_flame",
-      "fail": "replace_gas_valve"
+      "fail": "rev_h_igniter"
     },
+
     "rev_h_flame": {
       "id": "rev_h_flame",
-      "text": "Do burners ignite and stay lit beyond 7s?",
+      "text": "Do burners ignite and stay lit > 7 s?",
       "input": "yesno",
       "pass": "rev_h_success",
-      "fail": "check_flame"
+      "fail": "rev_h_gas"
     },
+
     "rev_h_success": {
       "id": "rev_h_success",
-      "text": "Rev H Heater operating normally ✅",
+      "text": "✅ Rev H heater operating normally.",
       "input": "info",
       "terminal": true,
       "success": true
@@ -246,55 +314,7 @@
 
     "fix_power": {
       "id": "fix_power",
-      "text": "Correct incoming power / breaker / wiring to heater.",
-      "input": "info",
-      "terminal": true
-    },
-    "replace_transformer": {
-      "id": "replace_transformer",
-      "text": "Replace transformer and recheck system.",
-      "input": "info",
-      "terminal": true
-    },
-    "replace_fuse": {
-      "id": "replace_fuse",
-      "text": "Replace fuse. Look for shorts or overloads before restarting.",
-      "input": "info",
-      "terminal": true
-    },
-    "replace_pressure_switch": {
-      "id": "replace_pressure_switch",
-      "text": "If pressure > 2 PSI and switch doesn’t close, replace Pressure Switch.",
-      "input": "info",
-      "terminal": true
-    },
-    "safety_chain_fault": {
-      "id": "safety_chain_fault",
-      "text": "Open in fusible link / vent / limit switch chain. Inspect and replace faulty component.",
-      "input": "info",
-      "terminal": true
-    },
-    "check_blower": {
-      "id": "check_blower",
-      "text": "Blower not running. Check wiring, relay, or replace blower motor.",
-      "input": "info",
-      "terminal": true
-    },
-    "test_ignitor": {
-      "id": "test_ignitor",
-      "text": "Disconnect ignitor, measure resistance (40–75 Ω). Replace ignitor if open/out of spec.",
-      "input": "info",
-      "terminal": true
-    },
-    "replace_gas_valve": {
-      "id": "replace_gas_valve",
-      "text": "Replace gas valve if not energizing with 24 VAC present.",
-      "input": "info",
-      "terminal": true
-    },
-    "check_flame": {
-      "id": "check_flame",
-      "text": "Flame not sustained. Check rectification: ground, flame sensor cleanliness, gas pressure, ignitor condition, wiring.",
+      "text": "Correct incoming power / breaker / wiring to heater before continuing.",
       "input": "info",
       "terminal": true
     }

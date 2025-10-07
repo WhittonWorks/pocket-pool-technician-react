@@ -2,11 +2,11 @@ import React, { useState } from "react";
 
 function FlowRunner({ flow, onExit, onFinish }) {
   const [currentId, setCurrentId] = useState(flow.start);
-  const [answers, setAnswers] = useState({ model: flow.model }); // ✅ include model
-  const [history, setHistory] = useState([]); // back stack
+  const [answers, setAnswers] = useState({ model: flow.model });
+  const [history, setHistory] = useState([]); // holds node history with UI state
   const [mediaToShow, setMediaToShow] = useState(null);
 
-  // local UI state
+  // Local UI state
   const [selectedChoice, setSelectedChoice] = useState(null);
   const [numberInput, setNumberInput] = useState("");
   const [textInput, setTextInput] = useState("");
@@ -21,27 +21,48 @@ function FlowRunner({ flow, onExit, onFinish }) {
     setMediaToShow(null);
   }
 
+  // ✅ Improved goTo with history + state preservation
   function goTo(nextId, value) {
     if (!flow.nodes[nextId]) {
       console.warn("❌ Tried to go to invalid node:", nextId);
       return;
     }
+
+    // Save answer if provided
     setAnswers((prev) =>
       value !== undefined ? { ...prev, [currentId]: value } : prev
     );
-    setHistory((prev) => [...prev, currentId]);
+
+    // Push current node & UI state to history
+    setHistory((prev) => [
+      ...prev,
+      {
+        id: currentId,
+        selectedChoice,
+        numberInput,
+        textInput,
+      },
+    ]);
+
+    // Move forward
     setCurrentId(nextId);
     resetLocalUI();
     console.log("➡️ Navigating to node:", nextId, "with value:", value);
   }
 
+  // ✅ Improved goBack restores node & inputs
   function goBack() {
     if (history.length === 0) return;
-    const prev = history[history.length - 1];
+
+    const last = history[history.length - 1];
+
+    setCurrentId(last.id);
+    setSelectedChoice(last.selectedChoice || null);
+    setNumberInput(last.numberInput || "");
+    setTextInput(last.textInput || "");
     setHistory((h) => h.slice(0, -1));
-    setCurrentId(prev);
-    resetLocalUI();
-    console.log("⬅️ Going back to:", prev);
+
+    console.log("⬅️ Going back to:", last.id);
   }
 
   function handleYesNo(nextId, value) {
@@ -51,10 +72,12 @@ function FlowRunner({ flow, onExit, onFinish }) {
   function handleNumberNext() {
     const val = parseFloat(numberInput);
     if (isNaN(val)) return;
+
     const inRange =
       Array.isArray(current.range) &&
       val >= current.range[0] &&
       val <= current.range[1];
+
     const nextId = inRange ? current.pass : current.fail;
     console.log("🔢 Number input:", val, "-> next:", nextId);
     if (nextId) goTo(nextId, val);
@@ -67,19 +90,17 @@ function FlowRunner({ flow, onExit, onFinish }) {
     if (nextId) goTo(nextId, selectedChoice);
   }
 
-  // ✅ Handle final info nodes (both success + failure)
+  // ✅ Handle terminal info nodes (Success / Failure)
   function handleInfoNext() {
     if (current.terminal) {
       console.log("🏁 Terminal node reached:", current.id);
 
-      // ✅ Add final outcome + result text for the PDF
       const finalAnswers = {
         ...answers,
         result: current.text,
         outcome: current.success ? "Success" : "Failure",
       };
 
-      // ✅ Trigger PDF generation
       try {
         if (typeof onFinish === "function") {
           console.log("🧾 Sending final answers for PDF:", finalAnswers);
@@ -89,7 +110,6 @@ function FlowRunner({ flow, onExit, onFinish }) {
         console.error("⚠️ Error during onFinish:", err);
       }
 
-      // ✅ Return to home afterwards
       onExit?.();
     } else if (current.pass) {
       console.log("ℹ️ Info node advancing to:", current.pass);
@@ -102,17 +122,13 @@ function FlowRunner({ flow, onExit, onFinish }) {
     if (!val) return;
 
     console.log("⌨️ Entered text:", val);
-
-    // log answer
     setAnswers((prev) => ({ ...prev, [currentId]: val }));
 
-    // evaluate logic if present
     if (Array.isArray(current.logic)) {
       for (const rule of current.logic) {
         try {
           const safeVal = JSON.stringify(val);
           const condition = rule.if.replace(/value/g, safeVal);
-          console.log("🔍 Evaluating rule:", condition);
           if (eval(condition)) {
             console.log("✅ Rule matched, going to:", rule.goto);
             return goTo(rule.goto, val);
@@ -123,7 +139,6 @@ function FlowRunner({ flow, onExit, onFinish }) {
       }
     }
 
-    // fallback
     if (current.default) {
       console.log("❌ No rules matched. Going to default:", current.default);
       goTo(current.default, val);
