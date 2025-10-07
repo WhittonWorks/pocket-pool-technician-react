@@ -120,6 +120,13 @@ function App() {
     setSidebarCollapsed(false);
   }
 
+function handleNavigateToFlow(link) {
+  // Example: link = { brand: "Jandy", type: "Heaters", model: "JXi" }
+  setBrand(link.brand);
+  setEquipmentType(link.type);
+  setModel(link.model);
+  setStep("model"); // optional, helps align sidebar state
+  setMode("diagnostics");
   // 🧭 Jump to flow directly from symptom
   function launchFlowFromSymptom(flowTarget) {
     if (!flowTarget) return alert("⚠️ Invalid symptom data.");
