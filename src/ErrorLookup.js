@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import ErrorLookupCard from "./components/ErrorLookupCard";
 
-function ErrorLookup({ errors }) {
+function ErrorLookup({ errors, onSelectError }) {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState(null);
 
@@ -57,29 +58,10 @@ function ErrorLookup({ errors }) {
 
       {/* Result */}
       {selected && (
-        <div className="mt-4 p-3 border rounded bg-white shadow text-gray-800">
-          <h3 className="font-bold text-lg">
-            {selected.code} — {selected.title}
-          </h3>
-          {selected.meaning && (
-            <p>
-              <strong>Meaning:</strong> {selected.meaning}
-            </p>
-          )}
-          {selected.description && (
-            <p>
-              <strong>Description:</strong> {selected.description}
-            </p>
-          )}
-          {selected.fix && (
-            <p>
-              <strong>Fix:</strong> {selected.fix}
-            </p>
-          )}
-          <p className="text-sm text-gray-500 mt-2">
-            <em>Source: {selected.source}</em>
-          </p>
-        </div>
+        <ErrorLookupCard
+          error={selected}
+          onStartDiagnosis={onSelectError}
+        />
       )}
 
       {/* No match */}

@@ -11,7 +11,7 @@ import { findFlow } from "./flows";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
-// 🧾 Handle report creation (logo removed for now)
+// 🧾 Generate diagnostic report
 async function handleFinishReport(answers) {
   const doc = new jsPDF();
 
@@ -33,7 +33,7 @@ async function handleFinishReport(answers) {
     doc.text(`Heater Serial Number: ${answers.enter_serial}`, 10, 78);
   }
 
-  // --- Build answers table ---
+  // --- Table of answers ---
   const rows = Object.entries(answers).map(([step, value]) => [
     step,
     String(value),
@@ -48,7 +48,7 @@ async function handleFinishReport(answers) {
     alternateRowStyles: { fillColor: [240, 240, 240] },
   });
 
-  // --- Save file ---
+  // --- Save ---
   const timestamp = new Date()
     .toISOString()
     .replace("T", "_")
@@ -70,11 +70,9 @@ function App() {
   const [isMobile, setIsMobile] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  // 🔹 Watch screen size
+  // 🔹 Handle responsive layout
   useEffect(() => {
-    function handleResize() {
-      setIsMobile(window.innerWidth < 768);
-    }
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -120,19 +118,19 @@ function App() {
     setSidebarCollapsed(false);
   }
 
-  // 🧭 Jump to flow directly from symptom
+  // 🧭 Launch a diagnostic flow directly from a symptom or error
   function launchFlowFromSymptom(flowTarget) {
-    if (!flowTarget) return alert("⚠️ Invalid symptom data.");
+    if (!flowTarget) return alert("⚠️ Invalid data.");
 
     const { brand, equipmentType, model, startNode } = flowTarget;
     const flow = findFlow(brand, equipmentType, model);
 
     if (!flow) {
-      alert("⚠️ Diagnostic flow not found for this symptom.");
+      alert("⚠️ Diagnostic flow not found for this equipment.");
       return;
     }
 
-    // override the starting node for this flow
+    // Override flow starting node if provided
     if (startNode && flow.nodes[startNode]) {
       flow.start = startNode;
     }
@@ -155,13 +153,8 @@ function App() {
     if (!mode) {
       return (
         <div>
-          {/* TEMP: PDF test button */}
           <button
-            style={{
-              ...btnStyle,
-              background: "#007bff",
-              marginBottom: 16,
-            }}
+            style={{ ...btnStyle, background: "#007bff", marginBottom: 16 }}
             onClick={() =>
               handleFinishReport({
                 enter_serial: "B12345678",
@@ -286,7 +279,10 @@ function App() {
           <button onClick={() => setMode(null)} style={backStyle}>
             ← Back
           </button>
-          <ErrorLookup errors={errors} />
+          <ErrorLookup
+            errors={errors}
+            onSelectError={launchFlowFromSymptom}
+          />
         </div>
       );
     }
@@ -299,7 +295,7 @@ function App() {
           </button>
           <SymptomLookup
             symptoms={symptoms}
-            onSelectSymptom={launchFlowFromSymptom}  
+            onSelectSymptom={launchFlowFromSymptom}
           />
         </div>
       );

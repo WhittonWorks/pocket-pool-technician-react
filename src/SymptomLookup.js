@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import SymptomLookupCard from "./components/SymptomLookupCard";
 
 function SymptomLookup({ symptoms, onSelectSymptom }) {
   const [query, setQuery] = useState("");
@@ -27,10 +28,7 @@ function SymptomLookup({ symptoms, onSelectSymptom }) {
     const q = query.trim().toLowerCase();
     if (!q) return true;
 
-    // Split the user’s input into words (ignore punctuation)
     const terms = q.split(/\s+/).filter(Boolean);
-
-    // Combine searchable text from multiple fields
     const searchableText = [
       s.symptom,
       ...(s.causes || []),
@@ -39,10 +37,8 @@ function SymptomLookup({ symptoms, onSelectSymptom }) {
       .join(" ")
       .toLowerCase();
 
-    // Expand each term with its synonyms
     const expandedTerms = terms.flatMap((t) => [t, ...(synonymMap[t] || [])]);
 
-    // ✅ Match if ANY expanded term appears anywhere in the text
     return expandedTerms.some((t) => searchableText.includes(t));
   });
 
@@ -50,7 +46,7 @@ function SymptomLookup({ symptoms, onSelectSymptom }) {
     <div className="p-4 border rounded bg-white shadow text-gray-800">
       <h2 className="text-xl font-bold mb-2">Symptom Lookup</h2>
 
-      {/* Search bar */}
+      {/* 🔍 Search bar */}
       <input
         type="text"
         placeholder="🔍 Search symptoms (e.g. 'didn't fire', 'no flow', 'sensor')"
@@ -59,7 +55,7 @@ function SymptomLookup({ symptoms, onSelectSymptom }) {
         className="border p-2 rounded w-full bg-white text-gray-900 placeholder-gray-500"
       />
 
-      {/* Feedback messages */}
+      {/* ⚠️ Feedback messages */}
       {query && filtered.length === 0 && (
         <p className="text-red-600 mt-4">❌ No symptoms found.</p>
       )}
@@ -67,47 +63,13 @@ function SymptomLookup({ symptoms, onSelectSymptom }) {
         <p className="text-gray-500 mt-4">⚠️ No symptom data loaded.</p>
       )}
 
-      {/* Symptom results */}
+      {/* 🩺 Render results using SymptomLookupCard */}
       {filtered.map((s, idx) => (
-        <div
+        <SymptomLookupCard
           key={idx}
-          className="mt-4 p-3 border rounded bg-gray-50 shadow-sm hover:bg-gray-100 cursor-pointer"
-          onClick={() => {
-            if (s.flowTarget) {
-              console.log("🧭 Jumping into flow:", s.flowTarget);
-              onSelectSymptom(s.flowTarget);
-            } else {
-              alert("No linked diagnostic flow for this symptom yet.");
-            }
-          }}
-        >
-          <h3 className="font-bold text-lg">{s.symptom}</h3>
-          <p className="text-sm text-gray-500 mb-2">
-            <em>Source: {s.source}</em>
-          </p>
-
-          {s.causes && (
-            <div className="mb-2">
-              <strong>Possible Causes:</strong>
-              <ul className="list-disc ml-5">
-                {s.causes.map((c, i) => (
-                  <li key={i}>{c}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {s.actions && (
-            <div>
-              <strong>Recommended Actions:</strong>
-              <ul className="list-disc ml-5">
-                {s.actions.map((a, i) => (
-                  <li key={i}>{a}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
+          symptom={s}
+          onSelectSymptom={onSelectSymptom}
+        />
       ))}
     </div>
   );
