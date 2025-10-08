@@ -118,13 +118,6 @@ function App() {
     setSidebarCollapsed(false);
   }
 
-function handleNavigateToFlow(link) {
-  // Example: link = { brand: "Jandy", type: "Heaters", model: "JXi" }
-  setBrand(link.brand);
-  setEquipmentType(link.type);
-  setModel(link.model);
-  setStep("model"); // optional, helps align sidebar state
-  setMode("diagnostics");
   // 🧭 Launch a diagnostic flow directly from a symptom or error
   function launchFlowFromSymptom(flowTarget) {
     if (!flowTarget) return alert("⚠️ Invalid data.");
@@ -137,7 +130,6 @@ function handleNavigateToFlow(link) {
       return;
     }
 
-    // Override flow starting node if provided
     if (startNode && flow.nodes[startNode]) {
       flow.start = startNode;
     }
