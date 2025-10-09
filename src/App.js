@@ -391,4 +391,4 @@ const backStyle = {
   marginBottom: 12,
 };
 
-  export default App;}
+  export default App;
