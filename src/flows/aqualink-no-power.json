@@ -1,0 +1,50 @@
+{
+  "id": "aqualink-no-power-v1",
+  "title": "AquaLink RS — Control Panel: No Power",
+  "start": "s1",
+  "nodes": {
+    "s1": {
+      "id": "s1",
+      "text": "Measure transformer secondary (VAC). Expected: 24–28 VAC.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [24, 28],
+      "pass": "check_fuse",
+      "fail": "s1_low"
+    },
+    "s1_low": {
+      "id": "s1_low",
+      "text": "Is VAC < 21 and fuse good? If yes → replace transformer. If VAC is low due to primary/line, correct primary voltage first.",
+      "input": "choice",
+      "choices": {
+        "Replace transformer": "terminal_replace_xfmr",
+        "Correct primary voltage then retest": "s1"
+      }
+    },
+    "terminal_replace_xfmr": {
+      "id": "terminal_replace_xfmr",
+      "text": "Replace transformer and retest.",
+      "input": "info",
+      "terminal": true
+    },
+    "check_fuse": {
+      "id": "check_fuse",
+      "text": "Check continuity of the fuse (3/4\" 3.15A). Fuse blown?",
+      "input": "yesno",
+      "yes": "fuse_blown_path",
+      "no": "replace_pcb_if_needed"
+    },
+    "fuse_blown_path": {
+      "id": "fuse_blown_path",
+      "text": "Investigate why the fuse blew: check JVAs for shorts, verify valve moves smoothly, measure relay coil resistance (300–400Ω for 3 HP relay). Then replace fuse with correct rating.",
+      "input": "info",
+      "terminal": true
+    },
+    "replace_pcb_if_needed": {
+      "id": "replace_pcb_if_needed",
+      "text": "If fuse keeps opening with everything removed (re-add low-voltage connectors one at a time), replace PCB.",
+      "input": "info",
+      "terminal": true
+    }
+  }
+}
