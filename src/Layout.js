@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
+import FeedbackButton from "./components/FeedbackButton";
 
 function Layout({ sidebar, children }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  // Keep track of resize events so it adapts
+  // 📱 Keep track of resize events for responsive behavior
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", handleResize);
@@ -12,8 +13,8 @@ function Layout({ sidebar, children }) {
   }, []);
 
   return (
-    <div className="flex h-screen flex-col md:flex-row">
-      {/* Mobile top bar */}
+    <div className="flex h-screen flex-col md:flex-row relative">
+      {/* 🧭 Mobile top bar */}
       {isMobile && (
         <header className="bg-gray-900 text-white flex items-center justify-between px-4 py-3">
           <span className="font-bold">PPT</span>
@@ -26,15 +27,20 @@ function Layout({ sidebar, children }) {
         </header>
       )}
 
-      {/* Sidebar */}
+      {/* 📋 Sidebar */}
       {(menuOpen || !isMobile) && (
         <aside className="w-full md:w-64 bg-gray-900 text-white p-4">
           {sidebar}
         </aside>
       )}
 
-      {/* Main content */}
-      <main className="flex-1 p-4 bg-gray-100 overflow-auto">{children}</main>
+      {/* 🧩 Main content area */}
+      <main className="flex-1 p-4 bg-gray-100 overflow-auto relative">
+        {children}
+      </main>
+
+      {/* 🧠 Global Feedback Button (fixed position, always visible) */}
+      <FeedbackButton />
     </div>
   );
 }

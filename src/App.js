@@ -3,6 +3,7 @@ import Layout from "./Layout";
 import FlowRunner from "./FlowRunner";
 import ErrorLookup from "./ErrorLookup";
 import SymptomLookup from "./SymptomLookup";
+import FeedbackLog from "./components/FeedbackLog"; // 🧠 New import
 import errors from "./errors";
 import symptoms from "./symptoms";
 import { findFlow } from "./flows";
@@ -195,6 +196,15 @@ function App() {
           >
             🩺 Symptom Lookup
           </button>
+          <button
+            style={{ ...btnStyle, background: "#FFD300", color: "#000" }}
+            onClick={() => {
+              setMode("feedback");
+              setSidebarCollapsed(false);
+            }}
+          >
+            🧠 Feedback Log
+          </button>
         </div>
       );
     }
@@ -278,10 +288,7 @@ function App() {
           <button onClick={() => setMode(null)} style={backStyle}>
             ← Back
           </button>
-          <ErrorLookup
-            errors={errors}
-            onSelectError={launchFlowFromSymptom}
-          />
+          <ErrorLookup errors={errors} onSelectError={launchFlowFromSymptom} />
         </div>
       );
     }
@@ -296,6 +303,17 @@ function App() {
             symptoms={symptoms}
             onSelectSymptom={launchFlowFromSymptom}
           />
+        </div>
+      );
+    }
+
+    if (mode === "feedback") {
+      return (
+        <div>
+          <button onClick={() => setMode(null)} style={backStyle}>
+            ← Back
+          </button>
+          <FeedbackLog />
         </div>
       );
     }
@@ -340,6 +358,12 @@ function App() {
       {mode === "symptoms" && (
         <h2 className="text-xl font-bold text-gray-700 mb-2">
           🩺 Symptom Lookup Mode
+        </h2>
+      )}
+
+      {mode === "feedback" && (
+        <h2 className="text-xl font-bold text-gray-700 mb-2">
+          🧠 Feedback Log
         </h2>
       )}
     </Layout>
