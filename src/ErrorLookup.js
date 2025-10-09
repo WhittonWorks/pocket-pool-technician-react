@@ -15,10 +15,10 @@ function ErrorLookup({ errors, onSelectError }) {
 
   // 🔹 Synonyms for tech language
   const synonymMap = {
-    flow: ["circulation", "pressure", "pump", "low flow", "switch"],
+    flow: ["circulation", "pressure", "pump", "low flow", "switch", "no flow"],
     ignite: ["fire", "light", "flame", "burn"],
-    heat: ["warm", "temperature", "high limit", "burner"],
-    sensor: ["probe", "temperature", "limit", "flame sensor"],
+    heat: ["warm", "temperature", "high limit", "burner", "hot"],
+    sensor: ["probe", "temperature", "limit", "flame sensor", "thermistor"],
     power: ["voltage", "energize", "relay", "transformer"],
   };
 
