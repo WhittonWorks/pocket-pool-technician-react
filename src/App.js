@@ -3,7 +3,7 @@ import Layout from "./Layout";
 import FlowRunner from "./FlowRunner";
 import ErrorLookup from "./ErrorLookup";
 import SymptomLookup from "./SymptomLookup";
-import FeedbackLog from "./components/FeedbackLog"; // 🧠 New import
+import FeedbackLog from "./components/FeedbackLog"; 
 import errors from "./errors";
 import symptoms from "./symptoms";
 import { findFlow } from "./flows";
@@ -12,7 +12,7 @@ import { findFlow } from "./flows";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
-// 🧾 Generate diagnostic report
+// 🧾 Generate readable, structured diagnostic report
 async function handleFinishReport(answers) {
   const doc = new jsPDF();
 
@@ -29,25 +29,78 @@ async function handleFinishReport(answers) {
   doc.text("Website: WhittonWorks.net", 60, 60);
 
   // --- Date & Serial ---
-  doc.text(`Date: ${new Date().toLocaleString()}`, 10, 70);
+  const yStart = 70;
+  doc.text(`Date: ${new Date().toLocaleString()}`, 10, yStart);
   if (answers.enter_serial) {
-    doc.text(`Heater Serial Number: ${answers.enter_serial}`, 10, 78);
+    doc.text(`Heater Serial Number: ${answers.enter_serial}`, 10, yStart + 8);
   }
 
-  // --- Table of answers ---
-  const rows = Object.entries(answers).map(([step, value]) => [
-    step,
-    String(value),
-  ]);
+  // --- Outcome Summary ---
+  const outcome = answers.outcome || "Unknown";
+  const result = answers.result || "No result recorded";
+  doc.setFontSize(14);
+  doc.text(`Outcome: ${outcome}`, 10, yStart + 20);
+  doc.setFontSize(12);
+  doc.text(`Summary: ${result}`, 10, yStart + 28);
 
+  // --- Table Heading ---
+  const tableStartY = yStart + 40;
+
+  // Create formatted rows
+  const formattedRows = Object.entries(answers)
+    .filter(([key]) => !["outcome", "result", "enter_serial"].includes(key))
+    .map(([key, value], index) => {
+      // Parse range if it's in the answer
+      let expectedRange = "";
+      if (typeof value === "string" && value.match(/^\d+(\.\d+)?\s*-\s*\d+(\.\d+)?/)) {
+        expectedRange = value;
+      }
+
+      // Try to format “Pass/Fail” readings
+      const actualValue = String(value).match(/pass/i)
+        ? "✅ Pass"
+        : String(value).match(/fail/i)
+        ? "❌ Fail"
+        : String(value);
+
+      return [
+        index + 1,
+        key.replace(/_/g, " "), // step name
+        expectedRange || "—",
+        actualValue,
+        actualValue.includes("✅") ? "PASS" : actualValue.includes("❌") ? "FAIL" : "—",
+      ];
+    });
+
+  // --- AutoTable for Detailed Steps ---
   autoTable(doc, {
-    startY: 90,
-    head: [["Step", "Result"]],
-    body: rows,
-    styles: { fontSize: 10, cellPadding: 3 },
-    headStyles: { fillColor: [11, 115, 255] },
-    alternateRowStyles: { fillColor: [240, 240, 240] },
+    startY: tableStartY,
+    head: [["#", "Test / Step", "Expected Range / Condition", "Actual Reading", "Result"]],
+    body: formattedRows,
+    styles: {
+      fontSize: 9,
+      cellPadding: 3,
+      valign: "middle",
+    },
+    headStyles: {
+      fillColor: [11, 115, 255],
+      textColor: 255,
+      halign: "center",
+    },
+    columnStyles: {
+      0: { halign: "center", cellWidth: 8 },
+      1: { cellWidth: 50 },
+      2: { cellWidth: 45 },
+      3: { cellWidth: 35 },
+      4: { halign: "center", cellWidth: 15 },
+    },
+    alternateRowStyles: { fillColor: [245, 245, 245] },
   });
+
+  // --- Footer ---
+  const pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+  doc.setFontSize(10);
+  doc.text("Whitton Works © 2025 — Compact Pool Technician", 10, pageHeight - 10);
 
   // --- Save ---
   const timestamp = new Date()
@@ -55,7 +108,6 @@ async function handleFinishReport(answers) {
     .replace("T", "_")
     .replace(/:/g, "-")
     .split(".")[0];
-  const outcome = answers.outcome || "Unknown";
   const fileName = `diagnostic-report_${outcome}_${timestamp}.pdf`;
 
   doc.save(fileName);
@@ -162,6 +214,8 @@ function App() {
                 result: "Heater operating normally",
                 step1: "Power verified",
                 step2: "Transformer output 24VAC",
+                step3: "Igniter resistance 48.3 Ω (Pass)",
+                step4: "Gas valve output 24 VAC present",
               })
             }
           >
@@ -391,4 +445,4 @@ const backStyle = {
   marginBottom: 12,
 };
 
-  export default App;
+export default App;
