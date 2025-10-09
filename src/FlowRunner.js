@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import FeedbackModal from "./components/FeedbackModal";
+import AppSettings from "./config/appSettings"; // 🧠 Centralized config import
 
 function FlowRunner({ flow, onExit, onFinish }) {
   const [currentId, setCurrentId] = useState(flow.start);
   const [answers, setAnswers] = useState({ model: flow.model });
-  const [history, setHistory] = useState([]); // holds node history with UI state
+  const [history, setHistory] = useState([]);
   const [mediaToShow, setMediaToShow] = useState(null);
+  const [showFeedback, setShowFeedback] = useState(false);
 
-  // Local UI state
   const [selectedChoice, setSelectedChoice] = useState(null);
   const [numberInput, setNumberInput] = useState("");
   const [textInput, setTextInput] = useState("");
@@ -21,48 +23,30 @@ function FlowRunner({ flow, onExit, onFinish }) {
     setMediaToShow(null);
   }
 
-  // ✅ Improved goTo with history + state preservation
   function goTo(nextId, value) {
-    if (!flow.nodes[nextId]) {
-      console.warn("❌ Tried to go to invalid node:", nextId);
-      return;
-    }
+    if (!flow.nodes[nextId]) return console.warn("❌ Invalid node:", nextId);
 
-    // Save answer if provided
     setAnswers((prev) =>
       value !== undefined ? { ...prev, [currentId]: value } : prev
     );
 
-    // Push current node & UI state to history
     setHistory((prev) => [
       ...prev,
-      {
-        id: currentId,
-        selectedChoice,
-        numberInput,
-        textInput,
-      },
+      { id: currentId, selectedChoice, numberInput, textInput },
     ]);
 
-    // Move forward
     setCurrentId(nextId);
     resetLocalUI();
-    console.log("➡️ Navigating to node:", nextId, "with value:", value);
   }
 
-  // ✅ Improved goBack restores node & inputs
   function goBack() {
     if (history.length === 0) return;
-
     const last = history[history.length - 1];
-
     setCurrentId(last.id);
     setSelectedChoice(last.selectedChoice || null);
     setNumberInput(last.numberInput || "");
     setTextInput(last.textInput || "");
     setHistory((h) => h.slice(0, -1));
-
-    console.log("⬅️ Going back to:", last.id);
   }
 
   function handleYesNo(nextId, value) {
@@ -72,29 +56,22 @@ function FlowRunner({ flow, onExit, onFinish }) {
   function handleNumberNext() {
     const val = parseFloat(numberInput);
     if (isNaN(val)) return;
-
     const inRange =
       Array.isArray(current.range) &&
       val >= current.range[0] &&
       val <= current.range[1];
-
     const nextId = inRange ? current.pass : current.fail;
-    console.log("🔢 Number input:", val, "-> next:", nextId);
     if (nextId) goTo(nextId, val);
   }
 
   function handleChoiceNext() {
     if (!selectedChoice) return;
     const nextId = current.choices[selectedChoice];
-    console.log("🟢 Choice selected:", selectedChoice, "-> next:", nextId);
     if (nextId) goTo(nextId, selectedChoice);
   }
 
-  // ✅ Handle terminal info nodes (Success / Failure)
   function handleInfoNext() {
     if (current.terminal) {
-      console.log("🏁 Terminal node reached:", current.id);
-
       const finalAnswers = {
         ...answers,
         result: current.text,
@@ -102,26 +79,23 @@ function FlowRunner({ flow, onExit, onFinish }) {
       };
 
       try {
-        if (typeof onFinish === "function") {
-          console.log("🧾 Sending final answers for PDF:", finalAnswers);
-          onFinish(finalAnswers);
-        }
+        if (typeof onFinish === "function") onFinish(finalAnswers);
       } catch (err) {
         console.error("⚠️ Error during onFinish:", err);
       }
 
-      onExit?.();
-    } else if (current.pass) {
-      console.log("ℹ️ Info node advancing to:", current.pass);
-      goTo(current.pass);
-    }
+      // 🔧 Centralized toggle
+      if (AppSettings.FEEDBACK_MODAL_ENABLED) {
+        setShowFeedback(true);
+      } else {
+        onExit?.();
+      }
+    } else if (current.pass) goTo(current.pass);
   }
 
   function handleTextNext() {
     const val = textInput.trim();
     if (!val) return;
-
-    console.log("⌨️ Entered text:", val);
     setAnswers((prev) => ({ ...prev, [currentId]: val }));
 
     if (Array.isArray(current.logic)) {
@@ -129,28 +103,21 @@ function FlowRunner({ flow, onExit, onFinish }) {
         try {
           const safeVal = JSON.stringify(val);
           const condition = rule.if.replace(/value/g, safeVal);
-          if (eval(condition)) {
-            console.log("✅ Rule matched, going to:", rule.goto);
-            return goTo(rule.goto, val);
-          }
+          // eslint-disable-next-line no-eval
+          if (eval(condition)) return goTo(rule.goto, val);
         } catch (err) {
           console.error("⚠️ Logic eval error:", err, "for rule:", rule.if);
         }
       }
     }
 
-    if (current.default) {
-      console.log("❌ No rules matched. Going to default:", current.default);
-      goTo(current.default, val);
-    }
+    if (current.default) goTo(current.default, val);
   }
 
   return (
     <div className="p-4 border rounded bg-white shadow text-gray-800">
-      {/* Step text */}
       <h3 className="font-bold mb-3">{current.text}</h3>
 
-      {/* Media controls */}
       {current.media && (
         <div className="mb-3">
           {current.media.image && (
@@ -172,7 +139,6 @@ function FlowRunner({ flow, onExit, onFinish }) {
         </div>
       )}
 
-      {/* Inputs */}
       {current.input === "choice" && (
         <div className="mb-2">
           {Object.entries(current.choices).map(([label]) => {
@@ -267,7 +233,6 @@ function FlowRunner({ flow, onExit, onFinish }) {
         </button>
       )}
 
-      {/* Bottom nav */}
       <div className="flex gap-2 mt-4">
         <button
           onClick={goBack}
@@ -288,7 +253,6 @@ function FlowRunner({ flow, onExit, onFinish }) {
         </button>
       </div>
 
-      {/* Media viewer */}
       {mediaToShow && (
         <div id="media-section" className="mt-6">
           {mediaToShow === "image" && current.media?.image && (
@@ -316,6 +280,25 @@ function FlowRunner({ flow, onExit, onFinish }) {
             />
           )}
         </div>
+      )}
+
+      {showFeedback && (
+        <FeedbackModal
+          visible={showFeedback}
+          onClose={() => {
+            setShowFeedback(false);
+            onExit?.();
+          }}
+          onSubmit={() => {
+            console.log("✅ Feedback submitted after diagnostic.");
+            setShowFeedback(false);
+            onExit?.();
+          }}
+          brand={flow.brand || "Unknown"}
+          equipmentType={flow.equipmentType || "Unknown"}
+          model={flow.model || "Unknown"}
+          outcome={answers.outcome || "Unknown"}
+        />
       )}
     </div>
   );
