@@ -304,7 +304,7 @@ function App() {
   // 🧩 Main render
   return (
     <Layout sidebar={sidebarCollapsed ? null : renderSidebar()}>
-      <h1 className="text-2xl font-bold mb-4">Pocket Pool Technician 🚀</h1>
+      <h1 className="text-2xl font-bold mb-4">Pocket Pool Test 🚀</h1>
 
       {mode === "diagnostics" && model && (
         <>
@@ -367,4 +367,4 @@ const backStyle = {
   marginBottom: 12,
 };
 
-export default App;
+  export default App;}
