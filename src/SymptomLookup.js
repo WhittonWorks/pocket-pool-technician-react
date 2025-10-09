@@ -24,8 +24,8 @@ function SymptomLookup({ symptoms, onSelectSymptom }) {
   const synonymMap = {
     didnt: ["did not", "won't", "wont", "fails to", "no"],
     fire: ["ignite", "light", "burn"],
-    ignite: ["fire", "light"],
-    heat: ["warm", "burn"],
+    ignite: ["fire", "light", "burn"],
+    heat: ["warm", "hot"],
     flow: ["water flow", "pressure", "circulation"],
     sensor: ["probe", "igniter", "flame sensor"],
     power: ["voltage", "energize"],
