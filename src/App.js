@@ -9,25 +9,29 @@ import symptoms from "./symptoms";
 import { findFlow } from "./flows";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import branding from "./config/branding"; // 🧩 NEW IMPORT
 
 // 🧾 Generate professional, self-cleaning diagnostic report
 async function handleFinishReport(answers, flow = null) {
   const doc = new jsPDF();
 
-  // --- 🧹 1. Cleanup utilities ---
-  const cleanText = (text) => {
-    if (!text) return "—";
-    return String(text)
-      .replace(/\s+/g, " ")
-      .replace(/['"`]+/g, "")
-      .replace(/\s*:\s*/g, ": ")
-      .trim();
-  };
+  // --- Load Active Branding ---
+  const activeProfile =
+    branding.profiles?.[branding.activeProfile] || branding;
+
+  const cleanText = (text) =>
+    !text
+      ? "—"
+      : String(text)
+          .replace(/\s+/g, " ")
+          .replace(/['"`]+/g, "")
+          .replace(/\s*:\s*/g, ": ")
+          .trim();
 
   const prettifyStep = (key) =>
     key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
-  // --- 🧩 2. Filter & normalize data ---
+  // --- Filter & normalize data ---
   const filtered = Object.entries(answers).filter(
     ([key, val]) =>
       val &&
@@ -44,7 +48,7 @@ async function handleFinishReport(answers, flow = null) {
     }
   }
 
-  // --- 🧩 3. Prepare clean table rows ---
+  // --- Build clean rows ---
   const rows = unique.map(([key, val], i) => {
     const node = flow?.nodes?.[key];
     const step = node?.text ? cleanText(node.text) : prettifyStep(key);
@@ -53,28 +57,37 @@ async function handleFinishReport(answers, flow = null) {
         ? `${node.range.join(" – ")} ${node.unit || ""}`
         : "—";
     const actual = cleanText(val);
-
     let result = "—";
     if (/pass|true|success/i.test(actual)) result = "PASS";
     if (/fail|false|error/i.test(actual)) result = "FAIL";
-
     return [i + 1, step, expected, actual, result];
   });
 
-  // --- 🧩 4. Header (Generic Pool Company Template) ---
+  // --- 🧾 Header using Branding.js (now with auto line breaks) ---
   doc.setFontSize(18);
   doc.text("Pool Diagnostic Report", 60, 20);
 
   doc.setFontSize(12);
-  doc.text("Your Pool Company, LLC", 60, 30);
-  doc.text("123 Main Street", 60, 36);
-  doc.text("Anytown, USA 12345", 60, 42);
-  doc.text("Phone: (555) 555-5555", 60, 48);
-  doc.text("Email: info@yourpoolcompany.com", 60, 54);
-  doc.text("Website: www.yourpoolcompany.com", 60, 60);
+  let y = 30; // dynamic y-position for spacing
 
-  // --- 🧾 5. Report metadata ---
-  const yStart = 70;
+  doc.text(activeProfile.companyName || "Your Pool Company, LLC", 60, y);
+  y += 6;
+
+  // ✅ Split multiline address correctly
+  const addressLines = (activeProfile.address || "123 Main Street\nAnytown, USA 12345").split("\n");
+  addressLines.forEach((line) => {
+    doc.text(line.trim(), 60, y);
+    y += 6;
+  });
+
+  doc.text(`Phone: ${activeProfile.phone || "(555) 555-5555"}`, 60, y);
+  y += 6;
+  doc.text(`Email: ${activeProfile.email || "info@yourpoolcompany.com"}`, 60, y);
+  y += 6;
+  doc.text(`Website: ${activeProfile.website || "www.yourpoolcompany.com"}`, 60, y);
+
+  // --- Report metadata ---
+  const yStart = y + 16;
   doc.setFontSize(11);
   doc.text(`Date: ${new Date().toLocaleString()}`, 10, yStart);
   if (answers.enter_serial)
@@ -84,7 +97,7 @@ async function handleFinishReport(answers, flow = null) {
     doc.text(`Model: ${flow.model || "N/A"}`, 10, yStart + 24);
   }
 
-  // --- 🟩 6. Outcome summary ---
+  // --- Outcome summary ---
   const outcome = cleanText(answers.outcome || "Unknown");
   const summary = cleanText(answers.result || "No summary provided.");
   const isPass = /pass|success/i.test(outcome);
@@ -96,7 +109,7 @@ async function handleFinishReport(answers, flow = null) {
   doc.setFontSize(12);
   doc.text(`Summary: ${summary}`, 10, yStart + 44);
 
-  // --- 📊 7. Results table ---
+  // --- Results table ---
   autoTable(doc, {
     startY: yStart + 58,
     head: [["#", "Step / Test", "Expected Range / Condition", "Actual Reading", "Result"]],
@@ -107,7 +120,11 @@ async function handleFinishReport(answers, flow = null) {
       overflow: "linebreak",
       valign: "middle",
     },
-    headStyles: { fillColor: [11, 115, 255], textColor: 255, halign: "center" },
+    headStyles: {
+      fillColor: [11, 115, 255],
+      textColor: 255,
+      halign: "center",
+    },
     columnStyles: {
       0: { halign: "center", cellWidth: 8 },
       1: { cellWidth: 70 },
@@ -125,20 +142,26 @@ async function handleFinishReport(answers, flow = null) {
     },
   });
 
-  // --- 🧾 8. Footer ---
+  // --- Footer (branded) ---
   const pageHeight = doc.internal.pageSize.height;
   doc.setDrawColor(180);
   doc.line(10, pageHeight - 15, 200, pageHeight - 15);
   doc.setFontSize(10);
-  doc.text("Your Pool Company © 2025 — Compact Pool Technician", 10, pageHeight - 8);
+  doc.text(activeProfile.copyright || branding.copyright, 10, pageHeight - 8);
 
-  // --- 💾 9. Save ---
-  const timestamp = new Date().toISOString().replace("T", "_").replace(/:/g, "-").split(".")[0];
+  // --- Save ---
+  const timestamp = new Date()
+    .toISOString()
+    .replace("T", "_")
+    .replace(/:/g, "-")
+    .split(".")[0];
   const fileName = `diagnostic-report_${outcome}_${timestamp}.pdf`;
 
   doc.save(fileName);
   alert("✅ PDF report generated successfully!");
 }
+
+// ... [rest of your file remains unchanged below this point]
 
 function App() {
   const [mode, setMode] = useState(null);
@@ -149,7 +172,6 @@ function App() {
   const [isMobile, setIsMobile] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  // 🔹 Handle responsive layout
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
@@ -158,7 +180,6 @@ function App() {
   }, []);
 
   const brands = ["Jandy", "Hayward", "Pentair"];
-
   const models = {
     Jandy: {
       Heaters: ["JXi", "JXiQ", "HI-E2", "VersaTemp"],
