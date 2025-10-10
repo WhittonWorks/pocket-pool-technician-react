@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from "react";
 
 /**
- * 🧾 Feedback Log Viewer
- * Displays all saved feedback items stored locally
- * Allows exporting and clearing feedback
+ * 🧠 Feedback Log Viewer
+ * Displays all locally saved feedback
+ * Supports export (JSON/CSV) and clearing
  */
 function FeedbackLog() {
   const [feedbackList, setFeedbackList] = useState([]);
 
-  // Load feedback from localStorage on mount
+  // Load feedback on mount
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("ppt_feedback") || "[]");
     setFeedbackList(stored);
   }, []);
 
-  // Clear all feedback
+  // Clear feedback
   const handleClear = () => {
     if (window.confirm("Are you sure you want to clear all feedback?")) {
       localStorage.removeItem("ppt_feedback");
@@ -23,16 +23,70 @@ function FeedbackLog() {
     }
   };
 
-  // Export as JSON
-  const handleExport = () => {
+  // Export JSON
+  const handleExportJSON = () => {
     const data = JSON.stringify(feedbackList, null, 2);
     const blob = new Blob([data], { type: "application/json" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `ppt_feedback_${new Date()
-      .toISOString()
-      .split("T")[0]}.json`;
+    link.download = `ppt_feedback_${new Date().toISOString().split("T")[0]}.json`;
     link.click();
+  };
+
+  // Export CSV
+  const handleExportCSV = () => {
+    if (feedbackList.length === 0) {
+      alert("No feedback to export.");
+      return;
+    }
+
+    const headers = [
+      "Date",
+      "Brand",
+      "Model",
+      "Outcome",
+      "Rating",
+      "Notes",
+      "Name",
+      "Contact",
+    ];
+
+    const csvRows = [
+      headers.join(","),
+      ...feedbackList.map((item) =>
+        [
+          item.date || "",
+          item.brand || "",
+          item.model || "",
+          item.outcome || "",
+          item.rating || "",
+          `"${(item.notes || "").replace(/"/g, '""')}"`,
+          item.name || "",
+          item.contact || "",
+        ].join(",")
+      ),
+    ];
+
+    const blob = new Blob([csvRows.join("\n")], { type: "text/csv" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `ppt_feedback_${new Date().toISOString().split("T")[0]}.csv`;
+    link.click();
+  };
+
+  // Share via email
+  const handleShare = () => {
+    if (feedbackList.length === 0) {
+      alert("No feedback to share.");
+      return;
+    }
+
+    const body = encodeURIComponent(
+      `Attached below is exported feedback from the Compact Pool Technician alpha test.\n\nTotal Entries: ${feedbackList.length}\nDate: ${new Date().toLocaleString()}\n\nPlease find attached the exported file for review.`
+    );
+
+    // Opens user’s email app
+    window.location.href = `mailto:Whittonworksllc@gmail.com?subject=PPT Alpha Feedback Submission&body=${body}`;
   };
 
   return (
@@ -43,16 +97,29 @@ function FeedbackLog() {
         <p className="text-gray-500">No feedback has been submitted yet.</p>
       ) : (
         <>
-          <div className="flex justify-between items-center mb-4">
+          {/* Top Bar */}
+          <div className="flex flex-wrap justify-between items-center mb-4 gap-2">
             <p className="text-sm text-gray-600">
               Total Feedback: {feedbackList.length}
             </p>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <button
-                onClick={handleExport}
+                onClick={handleExportJSON}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
               >
                 💾 Export JSON
+              </button>
+              <button
+                onClick={handleExportCSV}
+                className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded"
+              >
+                📊 Export CSV
+              </button>
+              <button
+                onClick={handleShare}
+                className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
+              >
+                📤 Share via Email
               </button>
               <button
                 onClick={handleClear}
@@ -75,17 +142,30 @@ function FeedbackLog() {
                 >
                   <div className="flex justify-between items-center mb-1">
                     <h3 className="font-semibold">
-                      {item.category}{" "}
-                      {item.brand && item.model
-                        ? `(${item.brand} ${item.model})`
-                        : item.brand || ""}
+                      {item.brand || "Unknown"} {item.model || ""}
                     </h3>
                     <span className="text-xs text-gray-500">
-                      {item.timestamp}
+                      {item.date || "—"}
                     </span>
                   </div>
-                  <p className="text-gray-700 whitespace-pre-line">
-                    {item.message}
+
+                  <p className="text-sm text-gray-700 mb-1">
+                    <strong>Outcome:</strong> {item.outcome || "N/A"}
+                  </p>
+                  <p className="text-sm text-gray-700 mb-1">
+                    <strong>Rating:</strong> {item.rating || "N/A"}
+                  </p>
+                  <p className="text-sm text-gray-700 mb-1 whitespace-pre-line">
+                    <strong>Notes:</strong> {item.notes || "—"}
+                  </p>
+
+                  <hr className="my-2" />
+
+                  <p className="text-xs text-gray-600">
+                    <strong>Name:</strong> {item.name || "Anonymous"}{" "}
+                    <span className="ml-3">
+                      <strong>Contact:</strong> {item.contact || "N/A"}
+                    </span>
                   </p>
                 </div>
               ))}

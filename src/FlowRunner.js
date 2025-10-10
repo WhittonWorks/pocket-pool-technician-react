@@ -84,8 +84,9 @@ function FlowRunner({ flow, onExit, onFinish }) {
         console.error("⚠️ Error during onFinish:", err);
       }
 
-      // 🔧 Centralized toggle
+      // 🧠 Automatically show feedback modal when flow ends
       if (AppSettings.FEEDBACK_MODAL_ENABLED) {
+        console.log("🧠 Triggering feedback modal automatically...");
         setShowFeedback(true);
       } else {
         onExit?.();
@@ -112,6 +113,16 @@ function FlowRunner({ flow, onExit, onFinish }) {
     }
 
     if (current.default) goTo(current.default, val);
+  }
+
+  // 🧾 Feedback submission handler
+  function handleFeedbackSubmit() {
+    console.log("✅ Feedback submitted after diagnostic.");
+    alert(
+      "✅ Feedback received — thank you for helping us improve the Compact Pool Technician!"
+    );
+    setShowFeedback(false);
+    onExit?.();
   }
 
   return (
@@ -289,11 +300,7 @@ function FlowRunner({ flow, onExit, onFinish }) {
             setShowFeedback(false);
             onExit?.();
           }}
-          onSubmit={() => {
-            console.log("✅ Feedback submitted after diagnostic.");
-            setShowFeedback(false);
-            onExit?.();
-          }}
+          onSubmit={handleFeedbackSubmit}
           brand={flow.brand || "Unknown"}
           equipmentType={flow.equipmentType || "Unknown"}
           model={flow.model || "Unknown"}
