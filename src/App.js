@@ -10,11 +10,58 @@ import { findFlow } from "./flows";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
-// 🧾 Generate professional, template-based diagnostic report
+// 🧾 Generate professional, self-cleaning diagnostic report
 async function handleFinishReport(answers, flow = null) {
   const doc = new jsPDF();
 
-  // --- Header (Template Pool Company Info) ---
+  // --- 🧹 1. Cleanup utilities ---
+  const cleanText = (text) => {
+    if (!text) return "—";
+    return String(text)
+      .replace(/\s+/g, " ")
+      .replace(/['"`]+/g, "")
+      .replace(/\s*:\s*/g, ": ")
+      .trim();
+  };
+
+  const prettifyStep = (key) =>
+    key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
+  // --- 🧩 2. Filter & normalize data ---
+  const filtered = Object.entries(answers).filter(
+    ([key, val]) =>
+      val &&
+      !["outcome", "result", "enter_serial"].includes(key) &&
+      String(val).trim() !== ""
+  );
+
+  const unique = [];
+  const seen = new Set();
+  for (const [k, v] of filtered) {
+    if (!seen.has(k)) {
+      seen.add(k);
+      unique.push([k, v]);
+    }
+  }
+
+  // --- 🧩 3. Prepare clean table rows ---
+  const rows = unique.map(([key, val], i) => {
+    const node = flow?.nodes?.[key];
+    const step = node?.text ? cleanText(node.text) : prettifyStep(key);
+    const expected =
+      Array.isArray(node?.range) && node.range.length
+        ? `${node.range.join(" – ")} ${node.unit || ""}`
+        : "—";
+    const actual = cleanText(val);
+
+    let result = "—";
+    if (/pass|true|success/i.test(actual)) result = "PASS";
+    if (/fail|false|error/i.test(actual)) result = "FAIL";
+
+    return [i + 1, step, expected, actual, result];
+  });
+
+  // --- 🧩 4. Header (Generic Pool Company Template) ---
   doc.setFontSize(18);
   doc.text("Pool Diagnostic Report", 60, 20);
 
@@ -26,97 +73,67 @@ async function handleFinishReport(answers, flow = null) {
   doc.text("Email: info@yourpoolcompany.com", 60, 54);
   doc.text("Website: www.yourpoolcompany.com", 60, 60);
 
-  // --- Date & Equipment Info ---
+  // --- 🧾 5. Report metadata ---
   const yStart = 70;
+  doc.setFontSize(11);
   doc.text(`Date: ${new Date().toLocaleString()}`, 10, yStart);
-
-  if (answers.enter_serial) {
-    doc.text(`Heater Serial Number: ${answers.enter_serial}`, 10, yStart + 8);
-  }
-
+  if (answers.enter_serial)
+    doc.text(`Heater Serial Number: ${cleanText(answers.enter_serial)}`, 10, yStart + 8);
   if (flow) {
     doc.text(`Brand: ${flow.brand || "N/A"}`, 10, yStart + 16);
     doc.text(`Model: ${flow.model || "N/A"}`, 10, yStart + 24);
   }
 
-  // --- Outcome Summary ---
-  const outcome = answers.outcome || "Unknown";
-  const result = answers.result || "No result recorded";
-  doc.setFontSize(14);
+  // --- 🟩 6. Outcome summary ---
+  const outcome = cleanText(answers.outcome || "Unknown");
+  const summary = cleanText(answers.result || "No summary provided.");
+  const isPass = /pass|success/i.test(outcome);
+
+  doc.setFontSize(13);
+  doc.setTextColor(isPass ? 0 : 200, isPass ? 150 : 0, 0);
   doc.text(`Outcome: ${outcome}`, 10, yStart + 36);
+  doc.setTextColor(0, 0, 0);
   doc.setFontSize(12);
-  doc.text(`Summary: ${result}`, 10, yStart + 44);
+  doc.text(`Summary: ${summary}`, 10, yStart + 44);
 
-  // --- Table Data ---
-  const tableStartY = yStart + 58;
-
-  const formattedRows = Object.entries(answers)
-    .filter(([key]) => !["outcome", "result", "enter_serial"].includes(key))
-    .map(([key, value], index) => {
-      const actualValue = String(value).match(/pass/i)
-        ? "✅ Pass"
-        : String(value).match(/fail/i)
-        ? "❌ Fail"
-        : String(value);
-
-      // Get readable step name if possible
-      const readableStep =
-        flow?.nodes?.[key]?.text?.replace(/\s+/g, " ").trim() ||
-        key.replace(/_/g, " ");
-
-      // Expected range, if provided in flow
-      let expectedRange = "";
-      if (flow?.nodes?.[key]?.range) {
-        expectedRange = `${flow.nodes[key].range.join(" – ")} ${
-          flow.nodes[key].unit || ""
-        }`;
-      }
-
-      return [
-        index + 1,
-        readableStep,
-        expectedRange || "—",
-        actualValue,
-        actualValue.includes("✅") ? "PASS" : actualValue.includes("❌") ? "FAIL" : "—",
-      ];
-    });
-
-  // --- AutoTable for Detailed Steps ---
+  // --- 📊 7. Results table ---
   autoTable(doc, {
-    startY: tableStartY,
-    head: [["#", "Step / Test", "Expected Range", "Actual Reading", "Result"]],
-    body: formattedRows,
+    startY: yStart + 58,
+    head: [["#", "Step / Test", "Expected Range / Condition", "Actual Reading", "Result"]],
+    body: rows,
     styles: {
       fontSize: 9,
       cellPadding: 3,
+      overflow: "linebreak",
       valign: "middle",
     },
-    headStyles: {
-      fillColor: [11, 115, 255],
-      textColor: 255,
-      halign: "center",
-    },
+    headStyles: { fillColor: [11, 115, 255], textColor: 255, halign: "center" },
     columnStyles: {
       0: { halign: "center", cellWidth: 8 },
-      1: { cellWidth: 60 },
-      2: { cellWidth: 40 },
+      1: { cellWidth: 70 },
+      2: { cellWidth: 45 },
       3: { cellWidth: 35 },
-      4: { halign: "center", cellWidth: 15 },
+      4: { halign: "center", cellWidth: 20 },
     },
     alternateRowStyles: { fillColor: [245, 245, 245] },
+    didParseCell: (data) => {
+      if (data.section === "body" && data.column.index === 4) {
+        const val = String(data.cell.text).toLowerCase();
+        if (val.includes("pass")) data.cell.styles.textColor = [0, 128, 0];
+        if (val.includes("fail")) data.cell.styles.textColor = [200, 0, 0];
+      }
+    },
   });
 
-  // --- Footer ---
-  const pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+  // --- 🧾 8. Footer ---
+  const pageHeight = doc.internal.pageSize.height;
+  doc.setDrawColor(180);
+  doc.line(10, pageHeight - 15, 200, pageHeight - 15);
   doc.setFontSize(10);
-  doc.text("Compact Pool Technician — © 2025 Your Pool Company", 10, pageHeight - 10);
+  doc.text("Your Pool Company © 2025 — Compact Pool Technician", 10, pageHeight - 8);
 
-  // --- Save ---
-  const timestamp = new Date()
-    .toISOString()
-    .replace("T", "_")
-    .replace(/:/g, "-")
-    .split(".")[0];
+  // --- 💾 9. Save ---
+  const timestamp = new Date().toISOString().replace("T", "_").replace(/:/g, "-").split(".")[0];
   const fileName = `diagnostic-report_${outcome}_${timestamp}.pdf`;
 
   doc.save(fileName);
@@ -182,21 +199,10 @@ function App() {
 
   function launchFlowFromSymptom(flowTarget) {
     if (!flowTarget) return alert("⚠️ Invalid data.");
-
     const { brand, equipmentType, model, startNode } = flowTarget;
     const flow = findFlow(brand, equipmentType, model);
-
-    if (!flow) {
-      alert("⚠️ Diagnostic flow not found for this equipment.");
-      return;
-    }
-
-    if (startNode && flow.nodes[startNode]) {
-      flow.start = startNode;
-    }
-
-    console.log("🚀 Launching flow:", { brand, equipmentType, model, startNode });
-
+    if (!flow) return alert("⚠️ Diagnostic flow not found.");
+    if (startNode && flow.nodes[startNode]) flow.start = startNode;
     setBrand(brand);
     setEquipmentType(equipmentType);
     setModel(model);
