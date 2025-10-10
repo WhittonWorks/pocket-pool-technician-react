@@ -3,69 +3,78 @@ import Layout from "./Layout";
 import FlowRunner from "./FlowRunner";
 import ErrorLookup from "./ErrorLookup";
 import SymptomLookup from "./SymptomLookup";
-import FeedbackLog from "./components/FeedbackLog"; 
+import FeedbackLog from "./components/FeedbackLog";
 import errors from "./errors";
 import symptoms from "./symptoms";
 import { findFlow } from "./flows";
-
-// 📄 PDF tools
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
-// 🧾 Generate readable, structured diagnostic report
-async function handleFinishReport(answers) {
+// 🧾 Generate professional, template-based diagnostic report
+async function handleFinishReport(answers, flow = null) {
   const doc = new jsPDF();
 
-  // --- Header ---
+  // --- Header (Template Pool Company Info) ---
   doc.setFontSize(18);
   doc.text("Pool Diagnostic Report", 60, 20);
 
   doc.setFontSize(12);
-  doc.text("Whitton Works, LLC", 60, 30);
-  doc.text("3811 Poverty Creek Rd", 60, 36);
-  doc.text("Crestview, FL 32539", 60, 42);
-  doc.text("Phone: (850) 428-2186", 60, 48);
-  doc.text("Email: Whittonworksllc@gmail.com", 60, 54);
-  doc.text("Website: WhittonWorks.net", 60, 60);
+  doc.text("Your Pool Company, LLC", 60, 30);
+  doc.text("123 Main Street", 60, 36);
+  doc.text("Anytown, USA 12345", 60, 42);
+  doc.text("Phone: (555) 555-5555", 60, 48);
+  doc.text("Email: info@yourpoolcompany.com", 60, 54);
+  doc.text("Website: www.yourpoolcompany.com", 60, 60);
 
-  // --- Date & Serial ---
+  // --- Date & Equipment Info ---
   const yStart = 70;
   doc.text(`Date: ${new Date().toLocaleString()}`, 10, yStart);
+
   if (answers.enter_serial) {
     doc.text(`Heater Serial Number: ${answers.enter_serial}`, 10, yStart + 8);
+  }
+
+  if (flow) {
+    doc.text(`Brand: ${flow.brand || "N/A"}`, 10, yStart + 16);
+    doc.text(`Model: ${flow.model || "N/A"}`, 10, yStart + 24);
   }
 
   // --- Outcome Summary ---
   const outcome = answers.outcome || "Unknown";
   const result = answers.result || "No result recorded";
   doc.setFontSize(14);
-  doc.text(`Outcome: ${outcome}`, 10, yStart + 20);
+  doc.text(`Outcome: ${outcome}`, 10, yStart + 36);
   doc.setFontSize(12);
-  doc.text(`Summary: ${result}`, 10, yStart + 28);
+  doc.text(`Summary: ${result}`, 10, yStart + 44);
 
-  // --- Table Heading ---
-  const tableStartY = yStart + 40;
+  // --- Table Data ---
+  const tableStartY = yStart + 58;
 
-  // Create formatted rows
   const formattedRows = Object.entries(answers)
     .filter(([key]) => !["outcome", "result", "enter_serial"].includes(key))
     .map(([key, value], index) => {
-      // Parse range if it's in the answer
-      let expectedRange = "";
-      if (typeof value === "string" && value.match(/^\d+(\.\d+)?\s*-\s*\d+(\.\d+)?/)) {
-        expectedRange = value;
-      }
-
-      // Try to format “Pass/Fail” readings
       const actualValue = String(value).match(/pass/i)
         ? "✅ Pass"
         : String(value).match(/fail/i)
         ? "❌ Fail"
         : String(value);
 
+      // Get readable step name if possible
+      const readableStep =
+        flow?.nodes?.[key]?.text?.replace(/\s+/g, " ").trim() ||
+        key.replace(/_/g, " ");
+
+      // Expected range, if provided in flow
+      let expectedRange = "";
+      if (flow?.nodes?.[key]?.range) {
+        expectedRange = `${flow.nodes[key].range.join(" – ")} ${
+          flow.nodes[key].unit || ""
+        }`;
+      }
+
       return [
         index + 1,
-        key.replace(/_/g, " "), // step name
+        readableStep,
         expectedRange || "—",
         actualValue,
         actualValue.includes("✅") ? "PASS" : actualValue.includes("❌") ? "FAIL" : "—",
@@ -75,7 +84,7 @@ async function handleFinishReport(answers) {
   // --- AutoTable for Detailed Steps ---
   autoTable(doc, {
     startY: tableStartY,
-    head: [["#", "Test / Step", "Expected Range / Condition", "Actual Reading", "Result"]],
+    head: [["#", "Step / Test", "Expected Range", "Actual Reading", "Result"]],
     body: formattedRows,
     styles: {
       fontSize: 9,
@@ -89,8 +98,8 @@ async function handleFinishReport(answers) {
     },
     columnStyles: {
       0: { halign: "center", cellWidth: 8 },
-      1: { cellWidth: 50 },
-      2: { cellWidth: 45 },
+      1: { cellWidth: 60 },
+      2: { cellWidth: 40 },
       3: { cellWidth: 35 },
       4: { halign: "center", cellWidth: 15 },
     },
@@ -100,7 +109,7 @@ async function handleFinishReport(answers) {
   // --- Footer ---
   const pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
   doc.setFontSize(10);
-  doc.text("Whitton Works © 2025 — Compact Pool Technician", 10, pageHeight - 10);
+  doc.text("Compact Pool Technician — © 2025 Your Pool Company", 10, pageHeight - 10);
 
   // --- Save ---
   const timestamp = new Date()
@@ -171,7 +180,6 @@ function App() {
     setSidebarCollapsed(false);
   }
 
-  // 🧭 Launch a diagnostic flow directly from a symptom or error
   function launchFlowFromSymptom(flowTarget) {
     if (!flowTarget) return alert("⚠️ Invalid data.");
 
@@ -187,12 +195,7 @@ function App() {
       flow.start = startNode;
     }
 
-    console.log("🚀 Launching flow:", {
-      brand,
-      equipmentType,
-      model,
-      startNode,
-    });
+    console.log("🚀 Launching flow:", { brand, equipmentType, model, startNode });
 
     setBrand(brand);
     setEquipmentType(equipmentType);
@@ -200,7 +203,6 @@ function App() {
     setMode("diagnostics");
   }
 
-  // 🧭 Sidebar navigation
   function renderSidebar() {
     if (!mode) {
       return (
@@ -208,54 +210,36 @@ function App() {
           <button
             style={{ ...btnStyle, background: "#007bff", marginBottom: 16 }}
             onClick={() =>
-              handleFinishReport({
-                enter_serial: "B12345678",
-                outcome: "Success",
-                result: "Heater operating normally",
-                step1: "Power verified",
-                step2: "Transformer output 24VAC",
-                step3: "Igniter resistance 48.3 Ω (Pass)",
-                step4: "Gas valve output 24 VAC present",
-              })
+              handleFinishReport(
+                {
+                  enter_serial: "B1234567",
+                  outcome: "Success",
+                  result: "Rev G heater operating normally.",
+                  rev_g_start: "240 V",
+                  rev_g_240: "220 V",
+                  rev_g_step2: "22 V (✅ pass)",
+                  rev_g_flame: "true",
+                },
+                { brand: "Jandy", model: "JXi" }
+              )
             }
           >
             🧾 Generate Test PDF
           </button>
 
           <h3 className="font-bold mb-2">Choose Mode</h3>
-          <button
-            style={btnStyle}
-            onClick={() => {
-              setMode("diagnostics");
-              setSidebarCollapsed(false);
-            }}
-          >
+          <button style={btnStyle} onClick={() => setMode("diagnostics")}>
             🔍 Guided Diagnostics
           </button>
-          <button
-            style={btnStyle}
-            onClick={() => {
-              setMode("errors");
-              setSidebarCollapsed(false);
-            }}
-          >
+          <button style={btnStyle} onClick={() => setMode("errors")}>
             ⚡ Error Code Lookup
           </button>
-          <button
-            style={btnStyle}
-            onClick={() => {
-              setMode("symptoms");
-              setSidebarCollapsed(false);
-            }}
-          >
+          <button style={btnStyle} onClick={() => setMode("symptoms")}>
             🩺 Symptom Lookup
           </button>
           <button
             style={{ ...btnStyle, background: "#FFD300", color: "#000" }}
-            onClick={() => {
-              setMode("feedback");
-              setSidebarCollapsed(false);
-            }}
+            onClick={() => setMode("feedback")}
           >
             🧠 Feedback Log
           </button>
@@ -272,14 +256,7 @@ function App() {
             </button>
             <h3 className="font-bold mb-2">Choose Brand</h3>
             {brands.map((b) => (
-              <button
-                key={b}
-                onClick={() => {
-                  setBrand(b);
-                  setStep("type");
-                }}
-                style={btnStyle}
-              >
+              <button key={b} onClick={() => { setBrand(b); setStep("type"); }} style={btnStyle}>
                 {b}
               </button>
             ))}
@@ -295,14 +272,7 @@ function App() {
             </button>
             <h3 className="font-bold mb-2">{brand} Equipment</h3>
             {equipmentTypes.map((t) => (
-              <button
-                key={t}
-                onClick={() => {
-                  setEquipmentType(t);
-                  setStep("model");
-                }}
-                style={btnStyle}
-              >
+              <button key={t} onClick={() => { setEquipmentType(t); setStep("model"); }} style={btnStyle}>
                 {t}
               </button>
             ))}
@@ -316,18 +286,9 @@ function App() {
             <button onClick={() => setStep("type")} style={backStyle}>
               ← Back
             </button>
-            <h3 className="font-bold mb-2">
-              {brand} {equipmentType}
-            </h3>
+            <h3 className="font-bold mb-2">{brand} {equipmentType}</h3>
             {models[brand][equipmentType].map((m) => (
-              <button
-                key={m}
-                onClick={() => {
-                  setModel(m);
-                  if (isMobile) setSidebarCollapsed(true);
-                }}
-                style={btnStyle}
-              >
+              <button key={m} onClick={() => { setModel(m); if (isMobile) setSidebarCollapsed(true); }} style={btnStyle}>
                 {m}
               </button>
             ))}
@@ -336,44 +297,31 @@ function App() {
       }
     }
 
-    if (mode === "errors") {
+    if (mode === "errors")
       return (
         <div>
-          <button onClick={() => setMode(null)} style={backStyle}>
-            ← Back
-          </button>
+          <button onClick={() => setMode(null)} style={backStyle}>← Back</button>
           <ErrorLookup errors={errors} onSelectError={launchFlowFromSymptom} />
         </div>
       );
-    }
 
-    if (mode === "symptoms") {
+    if (mode === "symptoms")
       return (
         <div>
-          <button onClick={() => setMode(null)} style={backStyle}>
-            ← Back
-          </button>
-          <SymptomLookup
-            symptoms={symptoms}
-            onSelectSymptom={launchFlowFromSymptom}
-          />
+          <button onClick={() => setMode(null)} style={backStyle}>← Back</button>
+          <SymptomLookup symptoms={symptoms} onSelectSymptom={launchFlowFromSymptom} />
         </div>
       );
-    }
 
-    if (mode === "feedback") {
+    if (mode === "feedback")
       return (
         <div>
-          <button onClick={() => setMode(null)} style={backStyle}>
-            ← Back
-          </button>
+          <button onClick={() => setMode(null)} style={backStyle}>← Back</button>
           <FeedbackLog />
         </div>
       );
-    }
   }
 
-  // 🧩 Main render
   return (
     <Layout sidebar={sidebarCollapsed ? null : renderSidebar()}>
       <h1 className="text-2xl font-bold mb-4">Compact Pool Technician 🚀</h1>
@@ -382,49 +330,23 @@ function App() {
         <>
           {(() => {
             const flow = findFlow(brand, equipmentType, model);
-            if (flow) {
-              return (
-                <FlowRunner
-                  key={flow.id}
-                  flow={flow}
-                  onExit={resetToHome}
-                  onFinish={handleFinishReport}
-                />
-              );
-            }
-            return (
-              <p>
-                ✅ You chose <strong>{brand}</strong> →{" "}
-                <strong>{equipmentType}</strong> → <strong>{model}</strong> — but
-                no diagnostic flow exists yet.
-              </p>
+            return flow ? (
+              <FlowRunner
+                key={flow.id}
+                flow={flow}
+                onExit={resetToHome}
+                onFinish={(answers) => handleFinishReport(answers, flow)}
+              />
+            ) : (
+              <p>✅ You chose <strong>{brand}</strong> → <strong>{equipmentType}</strong> → <strong>{model}</strong> — but no diagnostic flow exists yet.</p>
             );
           })()}
         </>
-      )}
-
-      {mode === "errors" && (
-        <h2 className="text-xl font-bold text-gray-700 mb-2">
-          ⚡ Error Code Lookup Mode
-        </h2>
-      )}
-
-      {mode === "symptoms" && (
-        <h2 className="text-xl font-bold text-gray-700 mb-2">
-          🩺 Symptom Lookup Mode
-        </h2>
-      )}
-
-      {mode === "feedback" && (
-        <h2 className="text-xl font-bold text-gray-700 mb-2">
-          🧠 Feedback Log
-        </h2>
       )}
     </Layout>
   );
 }
 
-// 🔹 Styling
 const btnStyle = {
   display: "block",
   width: "100%",
