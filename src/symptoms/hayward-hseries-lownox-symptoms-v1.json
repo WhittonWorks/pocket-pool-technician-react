@@ -1,0 +1,115 @@
+{
+  "id": "hayward-universal-hseries-symptoms-v1",
+  "brand": "Hayward",
+  "equipmentType": "Heaters",
+  "model": "Universal H-Series",
+  "title": "Hayward Universal H-Series — Symptom Lookup",
+  "symptoms": [
+    {
+      "symptom": "Heater will not power on",
+      "causes": [
+        "No incoming 120/240V supply",
+        "Open 3A fuse or failed transformer",
+        "Defective control board"
+      ],
+      "actions": [
+        "Check power at terminal block and transformer output (24–28 VAC)",
+        "Replace blown fuse or faulty transformer",
+        "Replace control board if unresponsive"
+      ],
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "Universal H-Series",
+        "startNode": "no_power"
+      }
+    },
+    {
+      "symptom": "Displays LO or does not fire",
+      "causes": [
+        "Low water flow",
+        "Open pressure switch or blocked internal bypass"
+      ],
+      "actions": [
+        "Ensure circulation pump is on",
+        "Clean or replace filter and pressure switch"
+      ],
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "Universal H-Series",
+        "startNode": "code_lo"
+      }
+    },
+    {
+      "symptom": "Displays IF or fails to ignite",
+      "causes": [
+        "Ignition failure",
+        "Weak flame signal",
+        "Defective igniter or control module"
+      ],
+      "actions": [
+        "Verify 120V at igniter during start",
+        "Check flame sensor signal (>1.5 µA)",
+        "Replace igniter or ignition control if defective"
+      ],
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "Universal H-Series",
+        "startNode": "code_if"
+      }
+    },
+    {
+      "symptom": "Burners ignite then shut off",
+      "causes": [
+        "Weak or intermittent flame signal",
+        "Improper ground connection"
+      ],
+      "actions": [
+        "Clean flame sensor",
+        "Verify proper heater grounding and wiring"
+      ],
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "Universal H-Series",
+        "startNode": "flame_loss"
+      }
+    },
+    {
+      "symptom": "Displays HS or HI fault",
+      "causes": [
+        "High limit tripped due to flow restriction",
+        "Defective temperature sensor"
+      ],
+      "actions": [
+        "Check for restricted flow or bypass blockage",
+        "Replace high limit sensor if out of spec"
+      ],
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "Universal H-Series",
+        "startNode": "code_hi"
+      }
+    },
+    {
+      "symptom": "Heater short cycles or turns off too quickly",
+      "causes": [
+        "Flow fluctuation or thermostat calibration issue",
+        "Gas valve cycling irregularly"
+      ],
+      "actions": [
+        "Clean filter and check bypass valve",
+        "Replace thermostat or gas valve if inconsistent"
+      ],
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "Universal H-Series",
+        "startNode": "short_cycle"
+      }
+    }
+  ]
+}

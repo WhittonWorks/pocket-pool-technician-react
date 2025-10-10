@@ -1,0 +1,181 @@
+{
+  "id": "hayward-hfdn-v1",
+  "brand": "Hayward",
+  "equipmentType": "Heaters",
+  "model": "HFDN",
+  "title": "Hayward Universal H-Series Digital (HFDN) — Guided Troubleshooting",
+  "version": "1.0",
+  "description": "Guided diagnostic flow for Hayward Universal H-Series Digital gas heaters (HFDN/FDN models with LCD display). Uses onboard error codes and voltage checks to isolate faults.",
+  "start": "enter_code",
+  "nodes": {
+    "enter_code": {
+      "id": "enter_code",
+      "text": "Select the error code currently displayed on the heater:",
+      "input": "choice",
+      "choices": {
+        "AO — Blower Vacuum Switch Open": "code_ao",
+        "AC — Blower Vacuum Switch Closed": "code_ac",
+        "IF — Ignition Failure": "code_if",
+        "HS — High Limit or Overheat": "code_hs",
+        "LO — Water Pressure or Limit Fault": "code_lo",
+        "PF — Polarity / Voltage Fault": "code_pf",
+        "CE — Communication Error": "code_ce",
+        "EE — Bad Board": "code_ee",
+        "HF — Flame Present w/o Gas": "code_hf",
+        "SF — Sensor Failure": "code_sf",
+        "Other / No Code": "end_other"
+      },
+      "isEntryPoint": true
+    },
+
+    "code_ao": {
+      "id": "code_ao",
+      "text": "AO = Blower vacuum switch open when it should be closed.\n\nCheck:\n- Does the blower start?\n- Verify vacuum hose to switch is connected and clear.\n- During blower run, check continuity across vacuum switch — should be CLOSED (0 Ω).\n\nIf open, replace the blower vacuum switch.",
+      "input": "yesno",
+      "pass": "end_success",
+      "fail": "replace_vacuum_switch"
+    },
+
+    "code_ac": {
+      "id": "code_ac",
+      "text": "AC = Blower vacuum switch closed when it should be open.\n\nPossible stuck or shorted pressure switch. Disconnect one lead and test continuity — should read OPEN when blower is off.",
+      "input": "yesno",
+      "pass": "end_success",
+      "fail": "replace_vacuum_switch"
+    },
+
+    "code_if": {
+      "id": "code_if",
+      "text": "IF = Ignition failure.\n\nCheck:\n- Igniter receives 120 VAC during ignition attempt.\n- Verify gas supply and pressure.\n- Flame sensor clean and positioned properly.\n- Check flame rectification current ≥ 1.5 µA DC.\n\nIf all checks pass and code persists → replace ignition control board.",
+      "input": "yesno",
+      "pass": "end_success",
+      "fail": "replace_ignition_control"
+    },
+
+    "code_hs": {
+      "id": "code_hs",
+      "text": "HS = High limit or overheat detected.\n\nCheck for:\n- Restricted water flow or dirty filter.\n- Faulty high-limit sensor (should read closed under 135 °F).\n\nIf open circuit persists when water is cool → replace high-limit sensor.",
+      "input": "yesno",
+      "pass": "end_success",
+      "fail": "replace_high_limit"
+    },
+
+    "code_lo": {
+      "id": "code_lo",
+      "text": "LO = Water pressure or limit switch fault.\n\nCheck:\n- Ensure pump is on and system is primed.\n- Test pressure switch for continuity with pump running — should be CLOSED.\n- If open, clean/replace filter or switch.",
+      "input": "yesno",
+      "pass": "end_success",
+      "fail": "replace_pressure_switch"
+    },
+
+    "code_pf": {
+      "id": "code_pf",
+      "text": "PF = Polarity or low voltage fault.\n\nCheck:\n- Verify correct line and neutral wiring.\n- Confirm ground connection to heater chassis.\n- Measure line voltage (should be 120 V ± 10%).\n\nIf polarity correct and voltage stable, replace control board.",
+      "input": "yesno",
+      "pass": "end_success",
+      "fail": "replace_board"
+    },
+
+    "code_ce": {
+      "id": "code_ce",
+      "text": "CE = Communication error between display and control board.\n\nCheck ribbon cable connection between main board and display.\nInspect for corrosion or pin damage.\n\nIf connection good but code persists → replace display interface.",
+      "input": "yesno",
+      "pass": "end_success",
+      "fail": "replace_display"
+    },
+
+    "code_ee": {
+      "id": "code_ee",
+      "text": "EE = Control board fault.\n\nCycle power to reset. If error returns immediately, replace main control board.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "code_hf": {
+      "id": "code_hf",
+      "text": "HF = Flame detected when gas valve not energized.\n\nCheck:\n- Flame signal wire shorted to ground.\n- Gas valve stuck open or leaking.\n- Replace gas valve if voltage absent but flame detected.",
+      "input": "yesno",
+      "pass": "end_success",
+      "fail": "replace_gas_valve"
+    },
+
+    "code_sf": {
+      "id": "code_sf",
+      "text": "SF = Temperature sensor (thermistor) failure.\n\nCheck resistance of inlet and outlet sensors:\n- 77 °F ≈ 10 kΩ\n- 104 °F ≈ 6 kΩ\n\nIf reading out of range or open, replace affected sensor.",
+      "input": "yesno",
+      "pass": "end_success",
+      "fail": "replace_sensor"
+    },
+
+    "replace_vacuum_switch": {
+      "id": "replace_vacuum_switch",
+      "text": "Replace blower vacuum (pressure) switch. Ensure tubing and fittings are free of debris or water after installation.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_ignition_control": {
+      "id": "replace_ignition_control",
+      "text": "Replace ignition control board. Verify correct wiring and retry ignition sequence.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_pressure_switch": {
+      "id": "replace_pressure_switch",
+      "text": "Replace water pressure switch and verify proper water flow through heater.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_high_limit": {
+      "id": "replace_high_limit",
+      "text": "Replace high-limit sensor(s) and confirm normal temperature cutoff near 135 °F.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_board": {
+      "id": "replace_board",
+      "text": "Replace main control board. Reconnect wiring and retest system.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_display": {
+      "id": "replace_display",
+      "text": "Replace display interface assembly (front control). Ensure communication cable is properly seated.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_gas_valve": {
+      "id": "replace_gas_valve",
+      "text": "Replace gas valve and perform leak check before restarting heater.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_sensor": {
+      "id": "replace_sensor",
+      "text": "Replace defective temperature sensor (thermistor) and confirm normal readings at room temperature.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "end_success": {
+      "id": "end_success",
+      "text": "✅ Fault cleared. Heater operating normally after corrective action.",
+      "input": "info",
+      "terminal": true,
+      "success": true
+    },
+
+    "end_other": {
+      "id": "end_other",
+      "text": "If no code displayed or issue persists, document findings and contact Hayward Technical Support for further diagnosis.",
+      "input": "info",
+      "terminal": true
+    }
+  }
+}
