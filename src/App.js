@@ -190,7 +190,7 @@ function App() {
       Automation: ["AquaLink RS", "iQ20/iQ30"],
     },
     Hayward: {
-      Heaters: ["Universal H-Series", "HeatPro"],
+      Heaters: ["Universal H-Series", "Universal H-Series Digital (HFDN)", "HeatPro"],
       Pumps: ["TriStar VS", "Super Pump XE"],
       Filters: ["SwimClear Cartridge", "ProGrid DE"],
       WaterCare: ["AquaRite 900", "AquaRite"],

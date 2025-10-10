@@ -2,7 +2,7 @@
   "id": "hayward-hfdn-v1",
   "brand": "Hayward",
   "equipmentType": "Heaters",
-  "model": "HFDN",
+  "model": "Universal H-Series Digital (HFDN)",
   "title": "Hayward Universal H-Series Digital (HFDN) — Guided Troubleshooting",
   "version": "1.0",
   "description": "Guided diagnostic flow for Hayward Universal H-Series Digital gas heaters (HFDN/FDN models with LCD display). Uses onboard error codes and voltage checks to isolate faults.",
