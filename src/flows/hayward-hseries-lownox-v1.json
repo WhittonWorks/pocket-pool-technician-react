@@ -1,0 +1,271 @@
+{
+  "id": "hayward-hseries-lownox-v1",
+  "brand": "Hayward",
+  "equipmentType": "Heaters",
+  "model": "H-Series Low NOx",
+  "title": "Hayward H-Series Low NOx Heater — Guided Troubleshooting",
+  "version": "1.0",
+  "description": "Guided diagnostic flow for Hayward H-Series Low NOx gas heaters (models H150FD–H400FD).",
+  "start": "choose_symptom",
+  "nodes": {
+    "choose_symptom": {
+      "id": "choose_symptom",
+      "text": "Select the symptom or fault code you are diagnosing:",
+      "input": "choice",
+      "choices": {
+        "Heater will not power on": "no_power",
+        "Displays 'LO' error": "code_lo",
+        "Displays 'IF' error": "code_if",
+        "Displays 'HS' or 'HI' error": "code_hi",
+        "Burner ignites but shuts down": "flame_loss",
+        "Heater cycles repeatedly": "short_cycle",
+        "Other / unknown": "end_other"
+      },
+      "isEntryPoint": true
+    },
+
+    "no_power": {
+      "id": "no_power",
+      "text": "Verify incoming power and control fuse integrity.",
+      "input": "choice",
+      "choices": {
+        "120V / 240V present, display still blank": "check_transformer",
+        "No incoming power": "end_power_issue"
+      }
+    },
+
+    "check_transformer": {
+      "id": "check_transformer",
+      "text": "Check transformer output between secondary leads — should measure 24–28 VAC.",
+      "input": "number",
+      "range": [24, 28],
+      "unit": "VAC",
+      "pass": "check_fuse",
+      "fail": "replace_transformer"
+    },
+
+    "check_fuse": {
+      "id": "check_fuse",
+      "text": "Inspect 3A fuse on control board. Is it intact?",
+      "input": "yesno",
+      "pass": "check_display",
+      "fail": "replace_fuse"
+    },
+
+    "check_display": {
+      "id": "check_display",
+      "text": "Is the display or LED now powered and readable?",
+      "input": "yesno",
+      "pass": "end_retest",
+      "fail": "replace_board"
+    },
+
+    "code_lo": {
+      "id": "code_lo",
+      "text": "The 'LO' fault indicates low water flow or an open pressure switch. Ensure the system is primed and circulating water.",
+      "input": "yesno",
+      "pass": "check_pressure_switch",
+      "fail": "end_pump_off"
+    },
+
+    "check_pressure_switch": {
+      "id": "check_pressure_switch",
+      "text": "With pump running, test continuity across the pressure switch. Should read CLOSED (0 Ω).",
+      "input": "choice",
+      "choices": {
+        "Closed (good)": "check_filter_blockage",
+        "Open (bad)": "replace_pressure_switch"
+      }
+    },
+
+    "check_filter_blockage": {
+      "id": "check_filter_blockage",
+      "text": "Check filter, valves, and heater bypass for restriction.",
+      "input": "choice",
+      "choices": {
+        "Flow restored and 'LO' cleared": "end_success",
+        "No change": "replace_flow_related_components"
+      }
+    },
+
+    "code_if": {
+      "id": "code_if",
+      "text": "The 'IF' fault indicates ignition failure. Begin by verifying igniter voltage at ignition control module (should be 120 VAC).",
+      "input": "number",
+      "range": [110, 130],
+      "unit": "VAC",
+      "pass": "check_flame_signal",
+      "fail": "replace_ignition_control"
+    },
+
+    "check_flame_signal": {
+      "id": "check_flame_signal",
+      "text": "Measure flame rectification signal at control board. Minimum 1.5 µA DC required for stable flame sense.",
+      "input": "number",
+      "range": [1.5, 10],
+      "unit": "µA",
+      "pass": "end_success",
+      "fail": "clean_flame_sensor"
+    },
+
+    "code_hi": {
+      "id": "code_hi",
+      "text": "The 'HS' or 'HI' fault means water temperature exceeded safe limit. Check water flow and high-limit sensor.",
+      "input": "choice",
+      "choices": {
+        "Flow issue found and corrected": "end_success",
+        "No flow issue — test limit sensor": "test_high_limit"
+      }
+    },
+
+    "test_high_limit": {
+      "id": "test_high_limit",
+      "text": "Test both high-limit sensors for continuity (should read closed under 135°F).",
+      "input": "yesno",
+      "pass": "end_success",
+      "fail": "replace_high_limit"
+    },
+
+    "flame_loss": {
+      "id": "flame_loss",
+      "text": "Burners ignite but shut down after a few seconds — likely poor flame sense or ground.",
+      "input": "choice",
+      "choices": {
+        "Cleaned flame sensor": "check_ground",
+        "Already clean": "check_flame_signal"
+      }
+    },
+
+    "check_ground": {
+      "id": "check_ground",
+      "text": "Verify heater has solid earth ground and ground continuity to control board.",
+      "input": "yesno",
+      "pass": "end_success",
+      "fail": "repair_ground"
+    },
+
+    "short_cycle": {
+      "id": "short_cycle",
+      "text": "Heater turns on and off frequently — may indicate thermostat or flow instability.",
+      "input": "choice",
+      "choices": {
+        "Filter dirty or low flow": "check_filter_blockage",
+        "Thermostat calibration issue": "replace_thermostat",
+        "Gas valve cycling irregularly": "replace_gas_valve"
+      }
+    },
+
+    "end_power_issue": {
+      "id": "end_power_issue",
+      "text": "⚠️ Restore power source or verify breaker and wiring. Heater will not operate until 120/240V is present.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_transformer": {
+      "id": "replace_transformer",
+      "text": "Replace the 24V transformer. Confirm output within 24–28 VAC after installation.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_fuse": {
+      "id": "replace_fuse",
+      "text": "Replace the 3A fuse on the board and recheck display operation.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_board": {
+      "id": "replace_board",
+      "text": "Replace control board and verify display initialization.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_pressure_switch": {
+      "id": "replace_pressure_switch",
+      "text": "Replace defective pressure switch and re-test system.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_flow_related_components": {
+      "id": "replace_flow_related_components",
+      "text": "Consider replacing pressure switch, internal bypass, or inspect header manifold for debris.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_ignition_control": {
+      "id": "replace_ignition_control",
+      "text": "Replace ignition control module. Verify proper voltage to igniter and retry ignition sequence.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "clean_flame_sensor": {
+      "id": "clean_flame_sensor",
+      "text": "Clean flame sensor with emery cloth and verify signal above 1.5 µA DC.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_high_limit": {
+      "id": "replace_high_limit",
+      "text": "Replace faulty high-limit sensor(s) and verify heater shuts off properly near 135°F.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "repair_ground": {
+      "id": "repair_ground",
+      "text": "Restore or reattach ground connection between heater chassis and electrical system.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_thermostat": {
+      "id": "replace_thermostat",
+      "text": "Replace main thermostat or temperature control board.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_gas_valve": {
+      "id": "replace_gas_valve",
+      "text": "Replace gas valve if cycling irregularly or pressure inconsistent.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "end_success": {
+      "id": "end_success",
+      "text": "✅ Heater operating normally after corrective action.",
+      "input": "info",
+      "terminal": true,
+      "success": true
+    },
+
+    "end_pump_off": {
+      "id": "end_pump_off",
+      "text": "Ensure circulation pump is turned on and primed before testing again.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "end_other": {
+      "id": "end_other",
+      "text": "Document observed issue for further review or manufacturer support.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "end_retest": {
+      "id": "end_retest",
+      "text": "Re-test heater operation after restoring power and controls.",
+      "input": "info",
+      "terminal": true
+    }
+  }
+}

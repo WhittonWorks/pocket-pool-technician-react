@@ -1,84 +1,111 @@
 {
   "id": "hayward-hfdn-errors-v1",
-  "title": "Hayward HFDN — Error Codes",
+  "brand": "Hayward",
+  "equipmentType": "Heaters",
+  "model": "H-Series Low NOx",
+  "title": "Hayward H-Series Low NOx — Error Codes",
   "errors": [
     {
       "code": "AC",
       "title": "Blower Vacuum Switch closed",
       "meaning": "Blower vacuum switch is detected closed when it should not be.",
-      "fix": ""
+      "fix": "Check blower vacuum switch wiring and tubing for blockage or sticking. Replace switch if necessary."
     },
     {
       "code": "AO",
       "title": "Blower Vacuum Switch open",
       "meaning": "Blower vacuum switch is detected open when it should be closed.",
-      "fix": ""
+      "fix": "Check blower operation, hose integrity, and switch continuity."
     },
     {
       "code": "BD",
       "title": "Bad board or secondary high voltage fault",
       "meaning": "The control board has failed or detected a secondary high-voltage fault.",
-      "fix": ""
+      "fix": "Inspect wiring and voltage; replace control board if fault persists."
     },
     {
       "code": "CE",
       "title": "Communication Error",
-      "meaning": "Communication error between the Control Module and Display Interface Assembly.",
-      "fix": ""
+      "meaning": "Communication error between Control Module and Display Interface Assembly.",
+      "fix": "Inspect communication cable for continuity and corrosion. Replace board or display as needed."
     },
     {
       "code": "EE",
       "title": "Bad board",
       "meaning": "Control board has failed.",
-      "fix": ""
+      "fix": "Replace main control board."
     },
     {
       "code": "HF",
       "title": "Flame present with Gas Valve not energized",
       "meaning": "Flame signal detected when gas valve is not energized.",
-      "fix": ""
+      "fix": "Inspect flame sensor and gas valve operation; replace ignition control if issue repeats."
     },
     {
       "code": "HS",
       "title": "Maximum return water temperature exceeded",
       "meaning": "Return water exceeded maximum safe temperature and/or rapid rise detected.",
-      "fix": ""
+      "fix": "Check for restricted water flow or faulty temperature sensor.",
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "H-Series Low NOx",
+        "startNode": "code_hi"
+      }
     },
     {
       "code": "IF",
       "title": "Ignition Failure",
       "meaning": "Ignition sequence failed — flame was not established.",
-      "fix": ""
+      "fix": "Inspect igniter, gas supply, and ignition control. Verify 120 VAC to igniter.",
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "H-Series Low NOx",
+        "startNode": "code_if"
+      }
     },
     {
       "code": "IO",
       "title": "Igniter Circuit Open",
       "meaning": "Igniter circuit is open or not connected.",
-      "fix": ""
+      "fix": "Check igniter continuity. Replace igniter if open.",
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "H-Series Low NOx",
+        "startNode": "code_if"
+      }
     },
     {
       "code": "LO",
       "title": "Pressure/Limit Switch Fault",
       "meaning": "Water Pressure Switch, Vent Pressure Switch, or Temperature Limit Switch fault.",
-      "fix": ""
+      "fix": "Check water flow, verify pressure switch continuity, and inspect limit switches.",
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "H-Series Low NOx",
+        "startNode": "code_lo"
+      }
     },
     {
       "code": "PF",
       "title": "Polarity/Voltage Fault",
       "meaning": "Voltage polarity reversed or low voltage detected.",
-      "fix": ""
+      "fix": "Check wiring polarity and supply voltage. Correct as necessary."
     },
     {
       "code": "SB",
       "title": "Keypad failure",
       "meaning": "Keypad not responding or failed.",
-      "fix": ""
+      "fix": "Replace keypad/display assembly."
     },
     {
       "code": "SF",
       "title": "Temperature Sensor failure",
       "meaning": "Temperature sensor (thermistor) input failure.",
-      "fix": ""
+      "fix": "Replace water temperature sensor (thermistor)."
     }
   ]
 }
