@@ -1,0 +1,196 @@
+{
+  "id": "hayward-hseries-digital-hfdn-symptoms-v1",
+  "brand": "Hayward",
+  "equipmentType": "Heaters",
+  "model": "Universal H-Series Digital (HFDN)",
+  "title": "Hayward Universal H-Series Digital (HFDN) — Symptom Lookup",
+  "symptoms": [
+    {
+      "symptom": "Heater display is blank or will not power on",
+      "causes": [
+        "No incoming 120/240V power to heater",
+        "Blown 3A control fuse",
+        "Faulty transformer or control board"
+      ],
+      "actions": [
+        "Verify 120/240V power at terminal block",
+        "Check transformer output (24–28 VAC)",
+        "Replace fuse or control board if no response"
+      ],
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "Universal H-Series Digital (HFDN)",
+        "startNode": "enter_code"
+      }
+    },
+    {
+      "symptom": "Displays AO or AC fault",
+      "causes": [
+        "Blower vacuum switch not responding correctly",
+        "Vacuum hose disconnected or blocked",
+        "Blower not running or weak"
+      ],
+      "actions": [
+        "Check blower operation and hose connection",
+        "Measure continuity across vacuum switch during blower run",
+        "Replace vacuum switch if contacts do not open/close correctly"
+      ],
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "Universal H-Series Digital (HFDN)",
+        "startNode": "code_ao"
+      }
+    },
+    {
+      "symptom": "Displays IF or heater fails to ignite",
+      "causes": [
+        "Ignition control not receiving voltage",
+        "Defective igniter or improper flame signal",
+        "No gas supply or low pressure"
+      ],
+      "actions": [
+        "Check 120V to igniter during ignition sequence",
+        "Verify flame rectification current ≥ 1.5 µA DC",
+        "Clean flame sensor and confirm gas valve operation"
+      ],
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "Universal H-Series Digital (HFDN)",
+        "startNode": "code_if"
+      }
+    },
+    {
+      "symptom": "Displays HS or heater shuts off on high limit",
+      "causes": [
+        "High-limit sensor open due to overheating",
+        "Restricted water flow",
+        "Faulty temperature sensor"
+      ],
+      "actions": [
+        "Check filter, bypass, and plumbing for flow restriction",
+        "Verify high-limit continuity below 135°F",
+        "Replace faulty limit sensor"
+      ],
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "Universal H-Series Digital (HFDN)",
+        "startNode": "code_hs"
+      }
+    },
+    {
+      "symptom": "Displays LO fault",
+      "causes": [
+        "Low water flow or pressure switch open",
+        "Dirty filter or blocked bypass",
+        "Defective pressure switch"
+      ],
+      "actions": [
+        "Ensure circulation pump is running and primed",
+        "Check and clean filter",
+        "Replace pressure switch if it does not close under normal flow"
+      ],
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "Universal H-Series Digital (HFDN)",
+        "startNode": "code_lo"
+      }
+    },
+    {
+      "symptom": "Displays PF or electrical fault",
+      "causes": [
+        "Reversed line and neutral wires",
+        "Low incoming voltage",
+        "Improper or missing ground"
+      ],
+      "actions": [
+        "Verify correct line polarity",
+        "Confirm ground continuity",
+        "Measure 110–130 VAC supply"
+      ],
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "Universal H-Series Digital (HFDN)",
+        "startNode": "code_pf"
+      }
+    },
+    {
+      "symptom": "Displays CE or keypad unresponsive",
+      "causes": [
+        "Communication failure between display and main board",
+        "Corroded or loose ribbon cable",
+        "Failed display interface"
+      ],
+      "actions": [
+        "Inspect ribbon cable and connectors",
+        "Clean corrosion and reseat plug",
+        "Replace display if communication error persists"
+      ],
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "Universal H-Series Digital (HFDN)",
+        "startNode": "code_ce"
+      }
+    },
+    {
+      "symptom": "Displays HF or flame detected when off",
+      "causes": [
+        "Flame sensor shorted or miswired",
+        "Gas valve leaking or stuck open",
+        "Control board fault"
+      ],
+      "actions": [
+        "Check flame sense wire for short to ground",
+        "Verify gas valve operation and replace if necessary",
+        "Inspect control board for relay fault"
+      ],
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "Universal H-Series Digital (HFDN)",
+        "startNode": "code_hf"
+      }
+    },
+    {
+      "symptom": "Displays SF or temperature reading error",
+      "causes": [
+        "Thermistor open or out of calibration",
+        "Defective temperature sensor wiring",
+        "Failed control board input"
+      ],
+      "actions": [
+        "Check resistance of inlet/outlet sensors (77°F ≈ 10 kΩ)",
+        "Replace bad sensor and retest operation"
+      ],
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "Universal H-Series Digital (HFDN)",
+        "startNode": "code_sf"
+      }
+    },
+    {
+      "symptom": "No code displayed but heater will not fire",
+      "causes": [
+        "System flow or thermostat setpoint issue",
+        "Internal safety circuit open"
+      ],
+      "actions": [
+        "Verify proper flow and temperature setpoint",
+        "Check safety circuit wiring and fuses"
+      ],
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "Universal H-Series Digital (HFDN)",
+        "startNode": "enter_code"
+      }
+    }
+  ]
+}

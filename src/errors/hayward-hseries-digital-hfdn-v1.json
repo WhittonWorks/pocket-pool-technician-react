@@ -1,0 +1,130 @@
+{
+  "id": "hayward-hseries-digital-hfdn-v1",
+  "brand": "Hayward",
+  "equipmentType": "Heaters",
+  "model": "Universal H-Series Digital (HFDN)",
+  "title": "Hayward Universal H-Series Digital (HFDN) — Error Codes",
+  "description": "Reference list of diagnostic error codes for Hayward Universal H-Series Digital gas heaters (FDN/HFDN models with LCD display). Includes common causes, fixes, and direct flow links for guided troubleshooting.",
+  "errors": [
+    {
+      "code": "AO",
+      "title": "Blower Vacuum Switch Open",
+      "meaning": "Blower vacuum switch is open when it should be closed during blower operation.",
+      "fix": "Check blower start-up, vacuum hose for blockage, and switch continuity (should read closed when blower is running). Replace switch if open.",
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "Universal H-Series Digital (HFDN)",
+        "startNode": "code_ao"
+      }
+    },
+    {
+      "code": "AC",
+      "title": "Blower Vacuum Switch Closed",
+      "meaning": "Blower vacuum switch detected closed when blower is off.",
+      "fix": "Verify switch opens when blower is off. If not, switch may be shorted or stuck closed. Replace blower vacuum switch if necessary.",
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "Universal H-Series Digital (HFDN)",
+        "startNode": "code_ac"
+      }
+    },
+    {
+      "code": "IF",
+      "title": "Ignition Failure",
+      "meaning": "Ignition sequence failed — flame not detected after ignition attempt.",
+      "fix": "Check 120 VAC to igniter during startup, verify gas supply and pressure, ensure flame sensor clean and in position. Replace ignition control if issue persists.",
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "Universal H-Series Digital (HFDN)",
+        "startNode": "code_if"
+      }
+    },
+    {
+      "code": "HS",
+      "title": "High Limit or Overheat",
+      "meaning": "Heater detected excessive water temperature or open high-limit sensor.",
+      "fix": "Verify flow through system, clean filter, and inspect high-limit sensor for open condition below 135°F. Replace high-limit if open when cool.",
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "Universal H-Series Digital (HFDN)",
+        "startNode": "code_hs"
+      }
+    },
+    {
+      "code": "LO",
+      "title": "Water Pressure / Limit Fault",
+      "meaning": "Low water flow or open pressure switch detected.",
+      "fix": "Ensure pump is running, clean filter, verify pressure switch closes with pump on. Replace switch if no continuity under flow.",
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "Universal H-Series Digital (HFDN)",
+        "startNode": "code_lo"
+      }
+    },
+    {
+      "code": "PF",
+      "title": "Polarity / Voltage Fault",
+      "meaning": "Heater detected reversed line/neutral or low voltage supply.",
+      "fix": "Confirm correct wiring polarity and stable 110–130 VAC input. Verify ground connection to heater chassis.",
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "Universal H-Series Digital (HFDN)",
+        "startNode": "code_pf"
+      }
+    },
+    {
+      "code": "CE",
+      "title": "Communication Error",
+      "meaning": "Display and main control board communication failure.",
+      "fix": "Inspect and reseat ribbon cable between display and control board. Clean corrosion and check connector pins. Replace display if persistent.",
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "Universal H-Series Digital (HFDN)",
+        "startNode": "code_ce"
+      }
+    },
+    {
+      "code": "EE",
+      "title": "Bad Control Board",
+      "meaning": "Main control board has failed or internal memory error detected.",
+      "fix": "Cycle power. If fault returns immediately, replace main control board.",
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "Universal H-Series Digital (HFDN)",
+        "startNode": "code_ee"
+      }
+    },
+    {
+      "code": "HF",
+      "title": "Flame Present without Gas",
+      "meaning": "Flame signal detected while gas valve not energized.",
+      "fix": "Check flame sense wire for short to ground. Verify gas valve is not leaking or stuck open. Replace valve if necessary.",
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "Universal H-Series Digital (HFDN)",
+        "startNode": "code_hf"
+      }
+    },
+    {
+      "code": "SF",
+      "title": "Sensor Failure",
+      "meaning": "Temperature sensor (thermistor) input out of range or open circuit.",
+      "fix": "Measure resistance of inlet/outlet sensors (77°F ≈ 10 kΩ, 104°F ≈ 6 kΩ). Replace faulty sensor.",
+      "flowTarget": {
+        "brand": "Hayward",
+        "equipmentType": "Heaters",
+        "model": "Universal H-Series Digital (HFDN)",
+        "startNode": "code_sf"
+      }
+    }
+  ]
+}
