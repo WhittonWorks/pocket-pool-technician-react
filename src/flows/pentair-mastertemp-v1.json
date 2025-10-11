@@ -1,0 +1,243 @@
+{
+  "id": "pentair-mastertemp-v1",
+  "brand": "Pentair",
+  "equipmentType": "Heaters",
+  "model": "MasterTemp",
+  "title": "Pentair MasterTemp Series — Guided Troubleshooting",
+  "version": "1.0",
+  "description": "Covers Pentair MasterTemp gas heaters (125K–400K BTU) with shared diagnostic logic. Includes separate branches for the 125 model vs standard 200–400 models.",
+  "start": "select_variant",
+  "nodes": {
+    "select_variant": {
+      "id": "select_variant",
+      "text": "Select which MasterTemp model you are diagnosing:",
+      "input": "choice",
+      "choices": {
+        "MasterTemp 125": "variant_125_start",
+        "MasterTemp 200–400": "variant_200_400_start"
+      },
+      "isEntryPoint": true
+    },
+
+    "variant_125_start": {
+      "id": "variant_125_start",
+      "text": "MasterTemp 125 selected — 120V only, no AGS or Stack Flue Sensor.\n\nSelect the issue or fault code displayed:",
+      "input": "choice",
+      "choices": {
+        "No Power": "check_power_125",
+        "PS (Pressure Switch)": "check_pressure_switch",
+        "HLS (High Limit Switch)": "check_high_limit",
+        "E01 / E02 (Water Temp Sensor)": "check_temp_sensor",
+        "IF (Ignition Failure)": "check_ignition",
+        "Other / No Display": "end_other"
+      }
+    },
+
+    "variant_200_400_start": {
+      "id": "variant_200_400_start",
+      "text": "MasterTemp 200–400 selected — includes all standard sensors (HLS, AFS, AGS, SFS).\n\nSelect the issue or fault code displayed:",
+      "input": "choice",
+      "choices": {
+        "No Power": "check_power",
+        "PS (Pressure Switch)": "check_pressure_switch",
+        "HLS (High Limit Switch)": "check_high_limit",
+        "AFS (Air Flow Switch)": "check_airflow_switch",
+        "AGS (Auto Gas Shutoff)": "check_ags",
+        "E01 / E02 (Water Temp Sensor)": "check_temp_sensor",
+        "E05 / E06 (Stack Flue Sensor)": "check_sfs",
+        "IF (Ignition Failure)": "check_ignition",
+        "BD (Bad Board)": "replace_board",
+        "Other / No Display": "end_other"
+      }
+    },
+
+    "check_power": {
+      "id": "check_power",
+      "text": "Verify 120/240 VAC power at input terminals:\n- Expect 110–126 VAC (120V) or 220–252 VAC (240V).\n\nPower present?",
+      "input": "yesno",
+      "pass": "check_transformer",
+      "fail": "end_power_issue"
+    },
+
+    "check_power_125": {
+      "id": "check_power_125",
+      "text": "Verify 120 VAC power at heater input terminals.\nExpect 110–126 VAC.\n\nPower present?",
+      "input": "yesno",
+      "pass": "check_transformer",
+      "fail": "end_power_issue"
+    },
+
+    "check_transformer": {
+      "id": "check_transformer",
+      "text": "Measure transformer secondary output.\nExpect 24–28 VAC across yellow leads.\n\nIs voltage within range?",
+      "input": "number",
+      "unit": "VAC",
+      "range": [24, 28],
+      "pass": "check_fuse",
+      "fail": "replace_transformer"
+    },
+
+    "check_fuse": {
+      "id": "check_fuse",
+      "text": "Inspect 3A fuse on control board. Is it intact?",
+      "input": "yesno",
+      "pass": "check_display",
+      "fail": "replace_fuse"
+    },
+
+    "check_display": {
+      "id": "check_display",
+      "text": "Does the control panel display power on?",
+      "input": "yesno",
+      "pass": "end_retest",
+      "fail": "replace_board"
+    },
+
+    "check_pressure_switch": {
+      "id": "check_pressure_switch",
+      "text": "PS = Water Pressure Switch fault.\n\nWith pump running, check continuity across pressure switch terminals — should be CLOSED (0 Ω).\n\nIs switch closed?",
+      "input": "yesno",
+      "pass": "end_success",
+      "fail": "replace_pressure_switch"
+    },
+
+    "check_high_limit": {
+      "id": "check_high_limit",
+      "text": "HLS = High Limit fault.\n\nTest both high limit sensors for continuity (should read closed under 135°F).",
+      "input": "yesno",
+      "pass": "end_success",
+      "fail": "replace_high_limit"
+    },
+
+    "check_airflow_switch": {
+      "id": "check_airflow_switch",
+      "text": "AFS = Air Flow Switch fault.\n\nDuring blower operation, check continuity across AFS terminals — should be CLOSED (0 Ω).",
+      "input": "yesno",
+      "pass": "end_success",
+      "fail": "replace_airflow_switch"
+    },
+
+    "check_ags": {
+      "id": "check_ags",
+      "text": "AGS = Auto Gas Shutoff fault.\n\nAGS switch opens if combustion chamber overheats. Allow to cool and reset.\nIf condition persists, check gas valve and airflow.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "check_temp_sensor": {
+      "id": "check_temp_sensor",
+      "text": "E01 / E02 = Water temperature sensor error.\n\nCheck resistance of thermistor:\n- 77°F ≈ 10kΩ\n- 104°F ≈ 6kΩ\n\nSensor in range?",
+      "input": "yesno",
+      "pass": "end_success",
+      "fail": "replace_temp_sensor"
+    },
+
+    "check_sfs": {
+      "id": "check_sfs",
+      "text": "E05 / E06 = Stack Flue Sensor (SFS) fault.\n\nCheck sensor resistance:\n- 77°F ≈ 10kΩ\nIf reading out of range, replace SFS.",
+      "input": "yesno",
+      "pass": "end_success",
+      "fail": "replace_sfs"
+    },
+
+    "check_ignition": {
+      "id": "check_ignition",
+      "text": "IF = Ignition failure.\n\nCheck:\n- Igniter receives 120 VAC during ignition attempt.\n- Gas supply and pressure OK.\n- Flame sense ≥ 1.5 µA DC.\n\nAll conditions correct?",
+      "input": "yesno",
+      "pass": "end_success",
+      "fail": "replace_ignition_control"
+    },
+
+    "replace_pressure_switch": {
+      "id": "replace_pressure_switch",
+      "text": "Replace pressure switch and confirm normal operation under full flow.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_high_limit": {
+      "id": "replace_high_limit",
+      "text": "Replace faulty high-limit sensor(s).",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_airflow_switch": {
+      "id": "replace_airflow_switch",
+      "text": "Replace air flow switch and ensure tubing and ports are clear.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_temp_sensor": {
+      "id": "replace_temp_sensor",
+      "text": "Replace defective temperature sensor (thermistor).",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_sfs": {
+      "id": "replace_sfs",
+      "text": "Replace Stack Flue Sensor (SFS). Ensure flue exhaust path is unobstructed.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_transformer": {
+      "id": "replace_transformer",
+      "text": "Replace 24V transformer and verify 24–28 VAC output.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_fuse": {
+      "id": "replace_fuse",
+      "text": "Replace 3A fuse on control board and recheck display.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_board": {
+      "id": "replace_board",
+      "text": "Replace main control board. Verify proper operation after installation.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_ignition_control": {
+      "id": "replace_ignition_control",
+      "text": "Replace ignition control module and confirm normal ignition sequence.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "end_success": {
+      "id": "end_success",
+      "text": "✅ Heater operating normally after corrective action.",
+      "input": "info",
+      "terminal": true,
+      "success": true
+    },
+
+    "end_retest": {
+      "id": "end_retest",
+      "text": "Re-test heater operation after restoring power or replacing board.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "end_power_issue": {
+      "id": "end_power_issue",
+      "text": "⚠️ No power detected. Verify breaker, wiring, and line voltage before continuing.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "end_other": {
+      "id": "end_other",
+      "text": "Document observed issue for further review or manufacturer support.",
+      "input": "info",
+      "terminal": true
+    }
+  }
+}
