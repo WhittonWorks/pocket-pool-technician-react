@@ -1,0 +1,105 @@
+{
+  "id": "hayward-hseries-digital-hfdn-pm-v1",
+  "brand": "Hayward",
+  "equipmentType": "Heaters",
+  "model": "Universal H-Series Digital (HFDN)",
+  "title": "Hayward Universal H-Series Digital (HFDN) — Preventative Maintenance Flow",
+  "version": "1.0",
+  "description": "Preventative Maintenance inspection checklist for Hayward Universal H-Series Digital (HFDN) gas heaters. Records readings, verifies electrical safety, and confirms proper operation without guiding repairs.",
+  "start": "begin_pm",
+  "nodes": {
+    "begin_pm": {
+      "id": "begin_pm",
+      "text": "Begin Preventative Maintenance inspection for Hayward Universal H-Series Digital (HFDN).\n\nEnsure pump is running and heater is in service mode.",
+      "input": "info",
+      "pass": "record_voltage"
+    },
+
+    "record_voltage": {
+      "id": "record_voltage",
+      "text": "Measure incoming voltage at terminal block.\nExpected range: 110–130 VAC.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [110, 130],
+      "pass": "record_transformer"
+    },
+
+    "record_transformer": {
+      "id": "record_transformer",
+      "text": "Measure secondary transformer output between yellow and red wires.\nExpected: 24–28 VAC.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [24, 28],
+      "pass": "record_flame_signal"
+    },
+
+    "record_flame_signal": {
+      "id": "record_flame_signal",
+      "text": "Measure flame rectification signal during steady burn.\nExpected: ≥ 1.5 µA DC.",
+      "input": "number",
+      "unit": "µA",
+      "range": [1.5, 10],
+      "pass": "record_sensor_resistance"
+    },
+
+    "record_sensor_resistance": {
+      "id": "record_sensor_resistance",
+      "text": "Record resistance of temperature sensors (inlet/outlet thermistors).\nAt 77°F expect ≈ 10 kΩ.\nAt 104°F expect ≈ 6 kΩ.",
+      "input": "number",
+      "unit": "kΩ",
+      "range": [6, 10],
+      "pass": "record_airflow_check"
+    },
+
+    "record_airflow_check": {
+      "id": "record_airflow_check",
+      "text": "Visually confirm blower starts smoothly and shuts off properly.\nListen for bearing noise or vibration.",
+      "input": "yesno",
+      "pass": "record_flow_switch"
+    },
+
+    "record_flow_switch": {
+      "id": "record_flow_switch",
+      "text": "Check continuity of blower vacuum switch during operation.\nExpect CLOSED when blower runs, OPEN when off.",
+      "input": "yesno",
+      "pass": "record_pressure_switch"
+    },
+
+    "record_pressure_switch": {
+      "id": "record_pressure_switch",
+      "text": "Check water pressure switch operation.\nExpect continuity (CLOSED) while pump is on and system is primed.",
+      "input": "yesno",
+      "pass": "record_high_limit"
+    },
+
+    "record_high_limit": {
+      "id": "record_high_limit",
+      "text": "Test high-limit switch continuity.\nShould read CLOSED when water temp <135°F.",
+      "input": "yesno",
+      "pass": "record_safety_ground"
+    },
+
+    "record_safety_ground": {
+      "id": "record_safety_ground",
+      "text": "Verify heater chassis is bonded and grounded to electrical system.",
+      "input": "yesno",
+      "pass": "record_observations"
+    },
+
+    "record_observations": {
+      "id": "record_observations",
+      "text": "Enter any additional notes, wear observations, or recommendations.",
+      "input": "text",
+      "default": "No visible issues or corrosion found.",
+      "pass": "end_report"
+    },
+
+    "end_report": {
+      "id": "end_report",
+      "text": "✅ Preventative Maintenance inspection complete.\nAll readings recorded for report generation.",
+      "input": "info",
+      "terminal": true,
+      "success": true
+    }
+  }
+}
