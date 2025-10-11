@@ -1,0 +1,14 @@
+{
+  "id": "pentair-ultratemp-errors-v1",
+  "brand": "Pentair",
+  "equipmentType": "Heaters",
+  "model": "UltraTemp",
+  "title": "Pentair UltraTemp — Error Codes",
+  "errors": [
+    { "code": "LP", "title": "Low Pressure Fault", "meaning": "Refrigerant pressure too low during run cycle.", "fix": "Check water flow, ambient temperature, and refrigerant charge.", "flowTarget": { "brand": "Pentair", "equipmentType": "Heaters", "model": "UltraTemp", "startNode": "check_low_pressure" } },
+    { "code": "HP", "title": "High Pressure Fault", "meaning": "Refrigerant discharge pressure too high.", "fix": "Clean condenser coil, check fan operation, verify refrigerant charge.", "flowTarget": { "brand": "Pentair", "equipmentType": "Heaters", "model": "UltraTemp", "startNode": "check_high_pressure" } },
+    { "code": "FL", "title": "Flow Switch Open", "meaning": "Water flow insufficient or switch open.", "fix": "Ensure pump is on and filter clean; replace flow switch if open with flow.", "flowTarget": { "brand": "Pentair", "equipmentType": "Heaters", "model": "UltraTemp", "startNode": "check_flow_switch" } },
+    { "code": "FS", "title": "Freeze Sensor Fault", "meaning": "Freeze sensor resistance out of range.", "fix": "Measure at 77 °F ≈ 10 kΩ; replace if open or shorted.", "flowTarget": { "brand": "Pentair", "equipmentType": "Heaters", "model": "UltraTemp", "startNode": "check_freeze_sensor" } },
+    { "code": "TS", "title": "Temperature Sensor Fault", "meaning": "Water temperature sensor open or shorted.", "fix": "Verify ~10 kΩ @ 77 °F; replace if out of range.", "flowTarget": { "brand": "Pentair", "equipmentType": "Heaters", "model": "UltraTemp", "startNode": "check_temp_sensor" } }
+  ]
+}
