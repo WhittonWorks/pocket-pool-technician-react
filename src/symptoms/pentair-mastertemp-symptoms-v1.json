@@ -1,0 +1,149 @@
+{
+  "id": "pentair-mastertemp-symptoms-v1",
+  "brand": "Pentair",
+  "equipmentType": "Heaters",
+  "model": "MasterTemp",
+  "title": "Pentair MasterTemp — Symptom Lookup",
+  "symptoms": [
+    {
+      "symptom": "Heater will not power on",
+      "causes": [
+        "No incoming 120/240V supply",
+        "Open 3A fuse or failed transformer",
+        "Defective control board"
+      ],
+      "actions": [
+        "Verify power at terminal block (120V or 240V)",
+        "Check 24V transformer output (24–28 VAC)",
+        "Replace fuse or control board if no display"
+      ],
+      "flowTarget": {
+        "brand": "Pentair",
+        "equipmentType": "Heaters",
+        "model": "MasterTemp",
+        "startNode": "check_power"
+      }
+    },
+    {
+      "symptom": "PS (Pressure Switch) error or 'Service Heater' light",
+      "causes": [
+        "Low or no water flow",
+        "Open or faulty pressure switch"
+      ],
+      "actions": [
+        "Ensure pump is running and filter is clean",
+        "Check continuity across pressure switch with pump on"
+      ],
+      "flowTarget": {
+        "brand": "Pentair",
+        "equipmentType": "Heaters",
+        "model": "MasterTemp",
+        "startNode": "check_pressure_switch"
+      }
+    },
+    {
+      "symptom": "AFS (Air Flow Switch) or blower error",
+      "causes": [
+        "Blocked blower port or tubing",
+        "Stuck air flow switch"
+      ],
+      "actions": [
+        "Inspect blower tubing for water or debris",
+        "Verify continuity of air flow switch when blower runs"
+      ],
+      "flowTarget": {
+        "brand": "Pentair",
+        "equipmentType": "Heaters",
+        "model": "MasterTemp",
+        "startNode": "check_airflow_switch"
+      }
+    },
+    {
+      "symptom": "E01 / E02 (Water Temperature Sensor error)",
+      "causes": [
+        "Open or shorted thermistor",
+        "Sensor out of calibration"
+      ],
+      "actions": [
+        "Check thermistor resistance (~10kΩ at 77°F)",
+        "Replace temperature sensor if out of range"
+      ],
+      "flowTarget": {
+        "brand": "Pentair",
+        "equipmentType": "Heaters",
+        "model": "MasterTemp",
+        "startNode": "check_temp_sensor"
+      }
+    },
+    {
+      "symptom": "E05 / E06 (Stack Flue Sensor error)",
+      "causes": [
+        "Flue temperature too high",
+        "Defective Stack Flue Sensor (SFS)"
+      ],
+      "actions": [
+        "Check for blocked exhaust or dirty exchanger",
+        "Measure sensor resistance (~10kΩ at 77°F)"
+      ],
+      "flowTarget": {
+        "brand": "Pentair",
+        "equipmentType": "Heaters",
+        "model": "MasterTemp",
+        "startNode": "check_sfs"
+      }
+    },
+    {
+      "symptom": "HLS (High Limit Switch) or 'Service Heater' light",
+      "causes": [
+        "Restricted water flow or dirty filter",
+        "Open or faulty high-limit switch"
+      ],
+      "actions": [
+        "Clean filter and ensure strong flow",
+        "Check high-limit continuity (closed under 135°F)"
+      ],
+      "flowTarget": {
+        "brand": "Pentair",
+        "equipmentType": "Heaters",
+        "model": "MasterTemp",
+        "startNode": "check_high_limit"
+      }
+    },
+    {
+      "symptom": "IF (Ignition Failure)",
+      "causes": [
+        "Igniter not glowing or faulty",
+        "No gas pressure or blocked orifice",
+        "Weak or missing flame signal"
+      ],
+      "actions": [
+        "Verify 120V at igniter during ignition attempt",
+        "Clean flame sensor and verify ≥ 1.5 µA signal",
+        "Check gas supply and ignition control board"
+      ],
+      "flowTarget": {
+        "brand": "Pentair",
+        "equipmentType": "Heaters",
+        "model": "MasterTemp",
+        "startNode": "check_ignition"
+      }
+    },
+    {
+      "symptom": "Heater lights but shuts down",
+      "causes": [
+        "Weak flame signal",
+        "Intermittent ground or poor connection"
+      ],
+      "actions": [
+        "Clean flame sensor with emery cloth",
+        "Verify proper grounding to control board"
+      ],
+      "flowTarget": {
+        "brand": "Pentair",
+        "equipmentType": "Heaters",
+        "model": "MasterTemp",
+        "startNode": "check_ignition"
+      }
+    }
+  ]
+}
