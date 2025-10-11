@@ -1,0 +1,218 @@
+{
+  "id": "jandy-jxi-pm-v1",
+  "brand": "Jandy",
+  "equipmentType": "Heaters",
+  "model": "JXi",
+  "title": "Jandy JXi Heater — Preventative Maintenance Flow",
+  "version": "1.0",
+  "description": "Comprehensive maintenance checklist and test sequence for Jandy JXi gas heaters. Records data values and verifies components for long-term reliability tracking.",
+  "start": "visual_inspection",
+  "nodes": {
+    "visual_inspection": {
+      "id": "visual_inspection",
+      "text": "Perform a visual inspection of the JXi heater.\n\nCheck for:\n- Soot or corrosion near flue or heat exchanger\n- Debris in burner or blower area\n- Secure wiring and terminals\n- Gas and water connections tight, no leaks",
+      "input": "yesno",
+      "pass": "electrical_power",
+      "fail": "clean_and_reinspect"
+    },
+
+    "clean_and_reinspect": {
+      "id": "clean_and_reinspect",
+      "text": "Clean the affected area (remove debris, corrosion, or soot) and recheck condition.\nDid cleaning resolve the issue?",
+      "input": "yesno",
+      "pass": "electrical_power",
+      "fail": "end_repair_required"
+    },
+
+    "electrical_power": {
+      "id": "electrical_power",
+      "text": "Measure incoming line voltage at Distribution Board (Black C → Red B). Expect:\n- 120V configuration: 110–126 VAC\n- 240V configuration: 220–252 VAC",
+      "input": "number",
+      "unit": "VAC",
+      "range": [110, 252],
+      "pass": "transformer_output",
+      "fail": "check_power_supply"
+    },
+
+    "check_power_supply": {
+      "id": "check_power_supply",
+      "text": "Incoming voltage out of range.\n\n- Inspect breaker and wiring connections.\n- Confirm proper 120V or 240V feed.\n- Correct before continuing.",
+      "input": "info",
+      "pass": "transformer_output"
+    },
+
+    "transformer_output": {
+      "id": "transformer_output",
+      "text": "Measure transformer secondary output (Red 2 → Yellow 1). Expect 22–26 VAC.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [22, 26],
+      "pass": "fuse_check",
+      "fail": "replace_transformer"
+    },
+
+    "fuse_check": {
+      "id": "fuse_check",
+      "text": "Check PIB 3A fuse continuity. Is fuse intact?",
+      "input": "yesno",
+      "pass": "pressure_switch_check",
+      "fail": "replace_fuse"
+    },
+
+    "pressure_switch_check": {
+      "id": "pressure_switch_check",
+      "text": "With pump running, measure voltage across Water Pressure Switch (Purple 4 → Yellow 1). Expect 22–26 VAC.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [22, 26],
+      "pass": "fusible_link_chain",
+      "fail": "replace_pressure_switch"
+    },
+
+    "fusible_link_chain": {
+      "id": "fusible_link_chain",
+      "text": "Measure voltage through Fusible Link chain (Orange 6, Blue 7, Black 8). Expect 22–26 VAC across each link.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [22, 26],
+      "pass": "blower_check",
+      "fail": "replace_fusible_link"
+    },
+
+    "blower_check": {
+      "id": "blower_check",
+      "text": "Verify blower motor operation.\n- Does blower start and run smoothly?\n- Record blower current draw (if measured).",
+      "input": "number",
+      "unit": "A",
+      "range": [0.5, 3.0],
+      "pass": "igniter_check",
+      "fail": "replace_blower"
+    },
+
+    "igniter_check": {
+      "id": "igniter_check",
+      "text": "Measure voltage to igniter during startup (K & I terminals). Expect 105–130 VAC.\nRecord igniter resistance (cold): 40–75 Ω typical.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [105, 130],
+      "pass": "gas_valve_check",
+      "fail": "replace_ignition_control"
+    },
+
+    "gas_valve_check": {
+      "id": "gas_valve_check",
+      "text": "Measure 24 VAC at Brown (gas valve) → Yellow during ignition.\nConfirm valve energizes and gas pressure stable.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [22, 26],
+      "pass": "flame_sensor_check",
+      "fail": "replace_gas_valve"
+    },
+
+    "flame_sensor_check": {
+      "id": "flame_sensor_check",
+      "text": "Measure flame rectification signal. Expect ≥ 1.5 µA DC.\nClean flame sensor if below range and retest.",
+      "input": "number",
+      "unit": "µA",
+      "range": [1.5, 10],
+      "pass": "temperature_safety_check",
+      "fail": "clean_flame_sensor"
+    },
+
+    "temperature_safety_check": {
+      "id": "temperature_safety_check",
+      "text": "Check High Limit Switch and Thermistor Sensors:\n- Should read closed under 135°F (High Limit)\n- Verify Thermistor resistance ≈ 10kΩ at 77°F",
+      "input": "yesno",
+      "pass": "combustion_check",
+      "fail": "replace_high_limit"
+    },
+
+    "combustion_check": {
+      "id": "combustion_check",
+      "text": "Observe flame and exhaust:\n- Blue flame with minimal yellow tipping\n- Steady blower speed, no surging\n- Record flue gas temp (if available)",
+      "input": "number",
+      "unit": "°F",
+      "range": [250, 450],
+      "pass": "end_success",
+      "fail": "end_repair_required"
+    },
+
+    "replace_transformer": {
+      "id": "replace_transformer",
+      "text": "Replace transformer. Verify output between 22–26 VAC after replacement.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_fuse": {
+      "id": "replace_fuse",
+      "text": "Replace 3A PIB fuse and recheck continuity.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_pressure_switch": {
+      "id": "replace_pressure_switch",
+      "text": "Replace defective water pressure switch. Retest after replacement.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_fusible_link": {
+      "id": "replace_fusible_link",
+      "text": "Replace failed fusible link and confirm all links have 22–26 VAC continuity.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_blower": {
+      "id": "replace_blower",
+      "text": "Replace blower motor or capacitor. Ensure proper wiring and rotation direction.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_ignition_control": {
+      "id": "replace_ignition_control",
+      "text": "Replace ignition control board and retest ignition voltage sequence.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_gas_valve": {
+      "id": "replace_gas_valve",
+      "text": "Replace gas valve and perform leak test before restarting heater.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "clean_flame_sensor": {
+      "id": "clean_flame_sensor",
+      "text": "Clean flame sensor with fine emery cloth. Recheck signal ≥ 1.5 µA DC.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_high_limit": {
+      "id": "replace_high_limit",
+      "text": "Replace faulty high-limit or thermistor sensors and confirm proper cutoff temperatures.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "end_success": {
+      "id": "end_success",
+      "text": "✅ Preventative maintenance complete.\nAll test points verified within range.\nHeater operating normally.",
+      "input": "info",
+      "terminal": true,
+      "success": true
+    },
+
+    "end_repair_required": {
+      "id": "end_repair_required",
+      "text": "⚠️ One or more components failed PM inspection.\nDocument readings and schedule service repair.",
+      "input": "info",
+      "terminal": true
+    }
+  }
+}
