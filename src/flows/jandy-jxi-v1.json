@@ -209,7 +209,7 @@
     },
     "rev_h_step2_check_input": {
       "id": "rev_h_step2_check_input",
-      "text": "Measured transformer output below 22 VAC.\n\nVerify incoming voltage (110–126 / 220–252 VAC). If input correct and output low → replace transformer.",
+      "text": "Measured transformer output below 22 VAC.\n\nVerify incoming voltage (110–126 / 220–252 VAC). If input correct and output low → replace transformer. (P/N R0456301)",
       "input": "info",
       "pass": "rev_h_step3"
     },
