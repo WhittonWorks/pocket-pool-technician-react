@@ -200,7 +200,7 @@
 
     "rev_h_step2": {
       "id": "rev_h_step2",
-      "text": "Measure transformer output (Red 2 → Yellow 1). Expect 22–26 VAC.",
+      "text": "Measure transformer output (Between Red 2 and Yellow Ground 1). Expect 22–26 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
@@ -224,7 +224,7 @@
 
     "rev_h_step4": {
       "id": "rev_h_step4",
-      "text": "Check Water Pressure Switch: 24 VAC Purple (4) → Yellow (1). Expect 22–26 VAC.",
+      "text": "Water Pressure Switch: Check for 24 VAC between Purple (4) and Yellow (Ground). Check for 24 VAC between Gray (5) and Yellow (Ground) Expect 22–26 VAC. " ,
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
@@ -234,12 +234,19 @@
 
     "rev_h_step5": {
       "id": "rev_h_step5",
-      "text": "Check Fusible Link chain: Orange (6), Blue (7), Black (8). All 22–26 VAC?",
+      "text": "High Limits: Check for 24 VAC from each leg of high limits to ground. What was the voltage between each leg and ground?",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
       "pass": "rev_h_blower",
-      "fail": "rev_h_step4"
+      "fail": "rev_h_highlimit_failed"
+    },
+
+    "rev_h_highlimit_failed": {
+     "id": "rev_h_highlimit_failed",
+     "text": "Below expected Voltage — one or more high limit switches are open. Replace both high limits (P/N R0592300), then continue diagnostics.",
+      "input": "info",
+      "next": "rev_h_blower"
     },
 
     "rev_h_blower": {
