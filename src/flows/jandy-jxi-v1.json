@@ -252,8 +252,7 @@
     "rev_h_highlimit_failed": {
      "id": "rev_h_highlimit_failed",
      "text": "Below expected Voltage — one or more high limit switches are open. Replace both high limits (P/N R0592300), then continue diagnostics.",
-      "input": "info",
-      "next": "rev_h_blower"
+    "pass": "rev_h_blower"
     },
 
     "rev_h_blower": {
