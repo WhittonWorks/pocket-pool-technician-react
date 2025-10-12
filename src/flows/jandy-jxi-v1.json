@@ -8,7 +8,7 @@
   "nodes": {
     "enter_serial": {
       "id": "enter_serial",
-      "text": "Enter the full serial number from the JXi heater.\n\n- Rev G or earlier: starts with B (2017 & earlier)\n- Rev H or newer: starts with LB (2018+)",
+      "text": "Enter the full serial number from the JXi heater.\n\n- Rev G or earlier: starts with B and is 9 characters long (2017 & earlier)\n- Rev H or newer: starts with LB and is 18 characters long (2018+)",
       "input": "text",
       "logic": [
         { "if": "value.startsWith('B') && !value.startsWith('LB')", "goto": "rev_g_start" },
@@ -145,7 +145,7 @@
 
     "rev_g_gas": {
       "id": "rev_g_gas",
-      "text": "Check for 24 VAC at Brown (gas valve) → Yellow. Present?",
+      "text": "Check for approx. 24 VAC at Brown (gas valve) → Yellow (Ground). Is voltage Present?",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
@@ -284,7 +284,7 @@
 
     "rev_h_gas": {
       "id": "rev_h_gas",
-      "text": "Check for 24 VAC at Brown (gas valve) → Yellow. Present?",
+      "text": "Check for approx. 24 VAC at Brown (gas valve) → Yellow (Ground). Is voltage Present?",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
