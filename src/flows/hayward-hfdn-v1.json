@@ -4,55 +4,62 @@
   "equipmentType": "Heaters",
   "model": "Universal H-Series Digital (HFDN)",
   "title": "Hayward Universal H-Series Digital (HFDN) — Guided Troubleshooting",
-  "start": "choose_fault",
+  "start": "enter_serial",
   "nodes": {
-    "choose_fault": {
-      "id": "choose_fault",
-      "text": "Select the fault or condition to troubleshoot:",
+    "enter_serial": {
+      "id": "enter_serial",
+      "text": "Enter the heater serial number (for your final PDF/report).",
+      "input": "text",
+      "default": "field_voltage_select"
+    },
+
+    "field_voltage_select": {
+      "id": "field_voltage_select",
+      "text": "What is the heater wired for at the field wiring panel?",
       "input": "choice",
       "choices": {
-        "Heater will not power up": "powerup_1",
-        "Open FC1 / FC2 Fuse": "fc12_1",
-        "Open FC3 / F1 Fuse": "fc3f1_1",
-        "Open FC4 Fuse": "fc4_1",
-        "BD Code": "bd_1",
-        "EE / CE Codes": "eece_menu",
-        "IO / SB Codes": "iosb_1",
-        "SF / HS / PF Codes": "sfpfs_1",
-        "HF Code": "hf_1",
-        "LO Code": "lo_1",
-        "IF Code": "if_1",
-        "AC / AO Codes": "ac_ao_1"
+        "120 V": "measure_line_120",
+        "240 V": "measure_line_240"
       }
     },
 
-   
-    "powerup_1": {
-      "id": "powerup_1",
-      "text": "Step 1: Measure incoming line voltage at the heater (expect 110–125 VAC for 120V systems OR 220–245 VAC for 240V systems).",
+    "measure_line_120": {
+      "id": "measure_line_120",
+      "text": "Measure incoming line voltage at the heater (120 V config). Expect 110–126 VAC.",
       "input": "number",
       "unit": "VAC",
-      "range": [110, 245],
+      "range": [110, 126],
       "pass": "powerup_2",
       "fail": "check_power_source"
     },
+
+    "measure_line_240": {
+      "id": "measure_line_240",
+      "text": "Measure incoming line voltage at the heater (240 V config). Expect 220–252 VAC.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [220, 252],
+      "pass": "powerup_2",
+      "fail": "check_power_source"
+    },
+
     "powerup_2": {
       "id": "powerup_2",
-      "text": "Step 2: Does the Selector Plug match the incoming voltage?",
+      "text": "Does the Selector Plug match the incoming voltage?",
       "input": "yesno",
       "pass": "powerup_3",
       "fail": "install_correct_selector_plug"
     },
     "powerup_3": {
       "id": "powerup_3",
-      "text": "Step 3: Are all Fuse Board connections secure and correctly seated?",
+      "text": "Are all Fuse Board connections secure and correctly seated?",
       "input": "yesno",
       "pass": "powerup_4",
       "fail": "correct_wiring"
     },
     "powerup_4": {
       "id": "powerup_4",
-      "text": "Step 4: Measure transformer secondary at P4 pins 1 & 2. Expect 22–28 VAC.",
+      "text": "Measure transformer secondary at P4 pins 1 & 2. Expect 22–28 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 28],
@@ -61,7 +68,7 @@
     },
     "powerup_5": {
       "id": "powerup_5",
-      "text": "Step 5: Measure primary feed at P4 pins 4 & 6. Expect 110–125 VAC.",
+      "text": "Measure primary feed at P4 pins 4 & 6. Expect 110–125 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [110, 125],
@@ -70,7 +77,7 @@
     },
     "powerup_6": {
       "id": "powerup_6",
-      "text": "Step 6: Verify 22–28 VAC between R & C terminals on the Fuse Board.",
+      "text": "Verify 22–28 VAC between R & C terminals on the Fuse Board.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 28],
@@ -79,7 +86,7 @@
     },
     "powerup_7": {
       "id": "powerup_7",
-      "text": "Step 7: Verify 22–28 VAC between R & C on the ICB.",
+      "text": "Verify 22–28 VAC between R & C on the ICB.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 28],
@@ -88,14 +95,14 @@
     },
     "powerup_8": {
       "id": "powerup_8",
-      "text": "Step 8: Are all ICB plugs fully seated and keyed correctly?",
+      "text": "Are all ICB plugs fully seated and keyed correctly?",
       "input": "yesno",
       "pass": "powerup_9",
       "fail": "correct_icb_wiring"
     },
     "powerup_9": {
       "id": "powerup_9",
-      "text": "Step 9: Measure 22–28 VAC between COM & AC on the ICB.",
+      "text": "Measure 22–28 VAC between COM & AC on the ICB.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 28],
@@ -104,20 +111,20 @@
     },
     "powerup_10": {
       "id": "powerup_10",
-      "text": "Step 10: Check F1 fuse (3 A) on ICB for continuity. Good?",
+      "text": "Check F1 fuse (3 A) on ICB for continuity. Good?",
       "input": "yesno",
       "pass": "powerup_11",
       "fail": "replace_icb_fuse"
     },
     "powerup_11": {
       "id": "powerup_11",
-      "text": "Step 11: Is the display dry and do keypad buttons read correctly?",
+      "text": "Is the display dry and do keypad buttons read correctly?",
       "input": "yesno",
       "pass": "flow_complete",
       "fail": "replace_keypad"
     },
 
-
+    "fc12_1": {
       "id": "fc12_1",
       "text": "Is the correct voltage selector plug installed?",
       "input": "yesno",
@@ -141,7 +148,6 @@
       "fail": "replace_transformer"
     },
 
-  
     "fc3f1_1": {
       "id": "fc3f1_1",
       "text": "Inspect low-voltage wiring for damage or pinches. OK?",
@@ -165,7 +171,6 @@
       "pass": "flow_complete",
       "fail": "replace_icb"
     },
-
 
     "fc4_1": {
       "id": "fc4_1",
@@ -193,7 +198,6 @@
       "fail": "replace_blower"
     },
 
- 
     "bd_1": {
       "id": "bd_1",
       "text": "Remove FC4 fuse and check continuity. Good?",
@@ -219,7 +223,6 @@
       "pass": "flow_complete",
       "fail": "replace_wire_harness"
     },
-
 
     "eece_menu": {
       "id": "eece_menu",
@@ -260,7 +263,6 @@
       "fail": "replace_igniter"
     },
 
-
     "sfpfs_1": {
       "id": "sfpfs_1",
       "text": "Check temperature sensor (thermistor) plug at ICB. Fully seated?",
@@ -277,7 +279,6 @@
       "pass": "flow_complete",
       "fail": "replace_sensor"
     },
-
 
     "hf_1": {
       "id": "hf_1",
@@ -302,7 +303,6 @@
       "pass": "replace_icb",
       "fail": "replace_gas_valve"
     },
-
 
     "lo_1": {
       "id": "lo_1",
@@ -340,7 +340,6 @@
       "fail": "replace_limit_switch"
     },
 
-
     "if_1": {
       "id": "if_1",
       "text": "Are all external and internal gas shutoff valves fully OPEN?",
@@ -357,7 +356,7 @@
     },
     "if_3": {
       "id": "if_3",
-      "text": "Measure manifold gas pressure during trial for ignition (refer to spec). Propane 6.8–7.0 inWC; Natural Gas 1.8–2.0 inWC.",
+      "text": "Measure manifold gas pressure during trial for ignition. Propane 6.8–7.0 inWC; Natural Gas 1.8–2.0 inWC.",
       "input": "number",
       "unit": "inWC",
       "range": [1.8, 7.0],
@@ -382,7 +381,6 @@
         "Incorrect (3\") on post-2009 unit": "replace_flame_sensor"
       }
     },
-
 
     "ac_ao_1": {
       "id": "ac_ao_1",
@@ -416,7 +414,6 @@
       "pass": "flow_complete",
       "fail": "replace_icb"
     },
-
 
     "flow_complete": {
       "id": "flow_complete",
@@ -571,3 +568,4 @@
       "terminal": true
     }
   }
+}
