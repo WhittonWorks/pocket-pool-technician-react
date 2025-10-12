@@ -1,0 +1,134 @@
+{
+  "id": "pentair-ultratemp-v1",
+  "brand": "Pentair",
+  "equipmentType": "Heaters",
+  "model": "UltraTemp",
+  "title": "Pentair UltraTemp Heat Pump — Guided Troubleshooting",
+  "version": "1.0",
+  "description": "Guided diagnostic flow for Pentair UltraTemp heat pumps (models 70k–140k BTU). Covers power, pressure, flow, temperature, and refrigerant faults.",
+  "start": "choose_symptom",
+  "nodes": {
+    "choose_symptom": {
+      "id": "choose_symptom",
+      "text": "Select the symptom or displayed fault:",
+      "input": "choice",
+      "choices": {
+        "No Power / Blank Display": "check_power",
+        "LP (Low Pressure Fault)": "check_low_pressure",
+        "HP (High Pressure Fault)": "check_high_pressure",
+        "FL (Water Flow Fault)": "check_flow_switch",
+        "FS (Freeze Sensor Fault)": "check_freeze_sensor",
+        "TS (Temperature Sensor Fault)": "check_temp_sensor",
+        "Compressor not starting": "check_contactor",
+        "Other / Unknown": "end_other"
+      },
+      "isEntryPoint": true
+    },
+
+    "check_power": {
+      "id": "check_power",
+      "text": "Verify 240 VAC line voltage at L1–L2 input. Expect 220–252 VAC.\n\nIs voltage present?",
+      "input": "yesno",
+      "pass": "check_transformer",
+      "fail": "end_power_issue"
+    },
+
+    "check_transformer": {
+      "id": "check_transformer",
+      "text": "Measure secondary transformer output (24 VAC nominal). Expect 24–28 VAC.\n\nWithin range?",
+      "input": "number",
+      "unit": "VAC",
+      "range": [24, 28],
+      "pass": "check_display",
+      "fail": "replace_transformer"
+    },
+
+    "check_display": {
+      "id": "check_display",
+      "text": "Does the LCD display light and respond to button presses?",
+      "input": "yesno",
+      "pass": "end_retest",
+      "fail": "replace_control_board"
+    },
+
+    "check_low_pressure": {
+      "id": "check_low_pressure",
+      "text": "LP = Low refrigerant pressure during run cycle.\n\nCheck:\n- Water flow through heat exchanger\n- Outdoor temperature (must be > 50 °F for stable operation)\n- Refrigerant charge / leaks",
+      "input": "choice",
+      "choices": {
+        "Found low flow or cold ambient": "end_success",
+        "Refrigerant leak suspected": "call_refrigerant_service"
+      }
+    },
+
+    "check_high_pressure": {
+      "id": "check_high_pressure",
+      "text": "HP = High refrigerant pressure.\n\nCheck:\n- Dirty condenser coil\n- Fan operation\n- Restricted airflow or overcharge",
+      "input": "choice",
+      "choices": {
+        "Dirty coil / fan issue found": "end_success",
+        "No visible restriction": "call_refrigerant_service"
+      }
+    },
+
+    "check_flow_switch": {
+      "id": "check_flow_switch",
+      "text": "FL = Water flow fault.\n\nEnsure pump running and bypass valves open.\nCheck flow switch continuity (closed with flow).",
+      "input": "yesno",
+      "pass": "end_success",
+      "fail": "replace_flow_switch"
+    },
+
+    "check_freeze_sensor": {
+      "id": "check_freeze_sensor",
+      "text": "FS = Freeze sensor fault.\n\nVerify sensor resistance ≈ 10 kΩ @ 77 °F. Out of range = replace sensor.",
+      "input": "yesno",
+      "pass": "end_success",
+      "fail": "replace_freeze_sensor"
+    },
+
+    "check_temp_sensor": {
+      "id": "check_temp_sensor",
+      "text": "TS = Water temperature sensor error.\n\nCheck resistance (10 kΩ @ 77 °F). Replace if open/shorted.",
+      "input": "yesno",
+      "pass": "end_success",
+      "fail": "replace_temp_sensor"
+    },
+
+    "check_contactor": {
+      "id": "check_contactor",
+      "text": "Compressor not starting.\n\nCheck:\n- 24 VAC coil voltage at contactor\n- 240 VAC line at output terminals\n- Contactor continuity when energized",
+      "input": "yesno",
+      "pass": "check_capacitor",
+      "fail": "replace_contactor"
+    },
+
+    "check_capacitor": {
+      "id": "check_capacitor",
+      "text": "Measure compressor run capacitor capacitance.\nShould be within ±10% of rated µF.\nWithin spec?",
+      "input": "yesno",
+      "pass": "end_success",
+      "fail": "replace_capacitor"
+    },
+
+    "call_refrigerant_service": {
+      "id": "call_refrigerant_service",
+      "text": "Contact licensed HVAC technician for refrigerant recovery, leak detection, and recharge per EPA 608.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_flow_switch": { "id": "replace_flow_switch", "text": "Replace water flow switch and verify normal operation.", "input": "info", "terminal": true },
+    "replace_freeze_sensor": { "id": "replace_freeze_sensor", "text": "Replace freeze sensor and confirm normal reading at 77 °F ≈ 10 kΩ.", "input": "info", "terminal": true },
+    "replace_temp_sensor": { "id": "replace_temp_sensor", "text": "Replace water temperature sensor (thermistor).", "input": "info", "terminal": true },
+    "replace_transformer": { "id": "replace_transformer", "text": "Replace 24 V transformer and verify 24–28 VAC output.", "input": "info", "terminal": true },
+    "replace_capacitor": { "id": "replace_capacitor", "text": "Replace compressor run capacitor and retest startup.", "input": "info", "terminal": true },
+    "replace_contactor": { "id": "replace_contactor", "text": "Replace compressor contactor and confirm 240 VAC through when energized.", "input": "info", "terminal": true },
+    "replace_control_board": { "id": "replace_control_board", "text": "Replace control board and retest display.", "input": "info", "terminal": true },
+
+    "end_success": { "id": "end_success", "text": "✅ Normal operation restored.", "input": "info", "terminal": true, "success": true },
+    "end_retest": { "id": "end_retest", "text": "Re-test unit after restoring power.", "input": "info", "terminal": true },
+    "end_power_issue": { "id": "end_power_issue", "text": "⚠️ No line voltage detected — verify breaker, wiring, and disconnect.", "input": "info", "terminal": true },
+    "end_other": { "id": "end_other", "text": "Document symptoms and contact Pentair technical support if issue persists.", "input": "info", "terminal": true }
+  }
+}

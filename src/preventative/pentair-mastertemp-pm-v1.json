@@ -1,0 +1,87 @@
+{
+  "id": "pentair-mastertemp-pm-v1",
+  "brand": "Pentair",
+  "equipmentType": "Heaters",
+  "model": "MasterTemp",
+  "title": "Pentair MasterTemp — Preventative Maintenance Checklist",
+  "version": "1.0",
+  "description": "Seasonal maintenance flow for Pentair MasterTemp gas heaters. Includes visual, electrical, combustion, and sensor checks.",
+  "start": "intro",
+  "nodes": {
+    "intro": {
+      "id": "intro",
+      "text": "Perform all safety checks with gas and power OFF unless voltage or flame tests are required.",
+      "input": "info",
+      "pass": "check_air_intake"
+    },
+    "check_air_intake": {
+      "id": "check_air_intake",
+      "text": "Inspect air intake and exhaust for blockages, insects, or debris. Ensure at least 12\" clearance around vents.",
+      "input": "yesno",
+      "pass": "check_power",
+      "fail": "clean_airpath"
+    },
+    "check_power": {
+      "id": "check_power",
+      "text": "Verify incoming line voltage (120 or 240 VAC depending on wiring). Within expected range?",
+      "input": "number",
+      "unit": "VAC",
+      "range": [110, 252],
+      "pass": "check_transformer",
+      "fail": "report_power_issue"
+    },
+    "check_transformer": {
+      "id": "check_transformer",
+      "text": "Measure transformer output at secondary leads. Expect 24–28 VAC.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [24, 28],
+      "pass": "check_flue_sensor",
+      "fail": "replace_transformer"
+    },
+    "check_flue_sensor": {
+      "id": "check_flue_sensor",
+      "text": "Check Stack Flue Sensor resistance: ~10kΩ @ 77°F. Within ±10%?",
+      "input": "yesno",
+      "pass": "check_limit_switches",
+      "fail": "replace_flue_sensor"
+    },
+    "check_limit_switches": {
+      "id": "check_limit_switches",
+      "text": "Check continuity across High Limit (HLS) and Pressure Switch (PS) with system primed. Both should read CLOSED.",
+      "input": "yesno",
+      "pass": "check_igniter",
+      "fail": "replace_limit_switch"
+    },
+    "check_igniter": {
+      "id": "check_igniter",
+      "text": "With power disconnected, inspect igniter for cracks and continuity (40–75 Ω cold). Within spec?",
+      "input": "yesno",
+      "pass": "check_flame_sensor",
+      "fail": "replace_igniter"
+    },
+    "check_flame_sensor": {
+      "id": "check_flame_sensor",
+      "text": "Inspect flame sensor. Clean with emery cloth and ensure tight connection.",
+      "input": "yesno",
+      "pass": "check_burners",
+      "fail": "replace_flame_sensor"
+    },
+    "check_burners": {
+      "id": "check_burners",
+      "text": "Visually inspect burner tray for corrosion or spider webs. Clean with compressed air if needed.",
+      "input": "yesno",
+      "pass": "finalize",
+      "fail": "clean_burners"
+    },
+    "clean_airpath": { "id": "clean_airpath", "text": "Clean intake and exhaust openings. Recheck airflow before continuing.", "input": "info", "pass": "check_power" },
+    "replace_transformer": { "id": "replace_transformer", "text": "Replace transformer and confirm 24–28 VAC output.", "input": "info", "terminal": true },
+    "replace_flue_sensor": { "id": "replace_flue_sensor", "text": "Replace stack flue sensor and confirm normal resistance at room temp.", "input": "info", "terminal": true },
+    "replace_limit_switch": { "id": "replace_limit_switch", "text": "Replace high-limit or pressure switch as required.", "input": "info", "terminal": true },
+    "replace_igniter": { "id": "replace_igniter", "text": "Replace hot surface igniter and verify startup voltage (105–130 VAC).", "input": "info", "terminal": true },
+    "replace_flame_sensor": { "id": "replace_flame_sensor", "text": "Replace flame sensor and verify >1.5 µA DC flame rectification current.", "input": "info", "terminal": true },
+    "clean_burners": { "id": "clean_burners", "text": "Clean burner tray and orifices with air. Inspect flame pattern after restart.", "input": "info", "terminal": true },
+    "report_power_issue": { "id": "report_power_issue", "text": "⚠️ Line voltage abnormal. Document reading and verify wiring or breaker.", "input": "info", "terminal": true },
+    "finalize": { "id": "finalize", "text": "✅ Preventative maintenance complete. Record readings and restart system.", "input": "info", "terminal": true, "success": true }
+  }
+}

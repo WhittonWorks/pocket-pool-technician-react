@@ -1,0 +1,39 @@
+{
+  "id": "pentair-ultratemp-symptoms-v1",
+  "brand": "Pentair",
+  "equipmentType": "Heaters",
+  "model": "UltraTemp",
+  "title": "Pentair UltraTemp — Symptom Lookup",
+  "symptoms": [
+    {
+      "symptom": "No Power / Display Blank",
+      "causes": ["Tripped breaker or open disconnect", "Failed 24 V transformer", "Defective control board"],
+      "actions": ["Verify 240 VAC input and 24 VAC transformer output", "Replace transformer or control board if necessary"],
+      "flowTarget": { "brand": "Pentair", "equipmentType": "Heaters", "model": "UltraTemp", "startNode": "check_power" }
+    },
+    {
+      "symptom": "LP (Low Pressure) error",
+      "causes": ["Low refrigerant charge", "Low ambient air temperature", "Poor water flow"],
+      "actions": ["Check water flow and filter", "Verify ambient > 50 °F", "Inspect for refrigerant leaks"],
+      "flowTarget": { "brand": "Pentair", "equipmentType": "Heaters", "model": "UltraTemp", "startNode": "check_low_pressure" }
+    },
+    {
+      "symptom": "HP (High Pressure) error",
+      "causes": ["Dirty condenser coil", "Blocked airflow", "Overcharge of refrigerant"],
+      "actions": ["Clean condenser coil", "Check fan operation", "Verify refrigerant charge"],
+      "flowTarget": { "brand": "Pentair", "equipmentType": "Heaters", "model": "UltraTemp", "startNode": "check_high_pressure" }
+    },
+    {
+      "symptom": "FL (Flow) or 'Check Flow' message",
+      "causes": ["Pump off or insufficient flow", "Faulty flow switch"],
+      "actions": ["Ensure pump running", "Replace flow switch if no continuity"],
+      "flowTarget": { "brand": "Pentair", "equipmentType": "Heaters", "model": "UltraTemp", "startNode": "check_flow_switch" }
+    },
+    {
+      "symptom": "Compressor will not start",
+      "causes": ["Defective contactor", "Failed run capacitor", "Control not sending 24 V to coil"],
+      "actions": ["Measure coil voltage", "Replace contactor or capacitor if defective"],
+      "flowTarget": { "brand": "Pentair", "equipmentType": "Heaters", "model": "UltraTemp", "startNode": "check_contactor" }
+    }
+  ]
+}

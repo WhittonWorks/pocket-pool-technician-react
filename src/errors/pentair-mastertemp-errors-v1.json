@@ -1,0 +1,105 @@
+{
+  "id": "pentair-mastertemp-errors-v1",
+  "brand": "Pentair",
+  "equipmentType": "Heaters",
+  "model": "MasterTemp",
+  "title": "Pentair MasterTemp — Error Codes",
+  "errors": [
+    {
+      "code": "PS",
+      "title": "Water Pressure Switch Open",
+      "meaning": "Detected open water pressure switch during operation.",
+      "fix": "Verify pump flow and pressure switch continuity (closed when pump is on).",
+      "flowTarget": {
+        "brand": "Pentair",
+        "equipmentType": "Heaters",
+        "model": "MasterTemp",
+        "startNode": "check_pressure_switch"
+      }
+    },
+    {
+      "code": "AFS",
+      "title": "Air Flow Switch Fault",
+      "meaning": "Air flow switch detected open when blower is running.",
+      "fix": "Check blower operation and tubing for blockage. Replace AFS if no continuity during blower run.",
+      "flowTarget": {
+        "brand": "Pentair",
+        "equipmentType": "Heaters",
+        "model": "MasterTemp",
+        "startNode": "check_airflow_switch"
+      }
+    },
+    {
+      "code": "HLS",
+      "title": "High Limit Switch Fault",
+      "meaning": "Water temperature exceeded safety threshold.",
+      "fix": "Check for restricted water flow or faulty high-limit sensor. Replace if open below 135°F.",
+      "flowTarget": {
+        "brand": "Pentair",
+        "equipmentType": "Heaters",
+        "model": "MasterTemp",
+        "startNode": "check_high_limit"
+      }
+    },
+    {
+      "code": "AGS",
+      "title": "Auto Gas Shutoff Fault",
+      "meaning": "Detected excessive combustion temperature or gas valve safety lockout.",
+      "fix": "Allow unit to cool. Inspect airflow and gas valve function. Replace AGS if fault persists."
+    },
+    {
+      "code": "E01",
+      "title": "Water Temperature Sensor (Thermistor) Error",
+      "meaning": "Water temperature sensor open or shorted.",
+      "fix": "Check resistance (10kΩ at 77°F). Replace if out of range.",
+      "flowTarget": {
+        "brand": "Pentair",
+        "equipmentType": "Heaters",
+        "model": "MasterTemp",
+        "startNode": "check_temp_sensor"
+      }
+    },
+    {
+      "code": "E02",
+      "title": "Water Temperature Sensor (Thermistor) Error",
+      "meaning": "Duplicate E01 — sensor failure.",
+      "fix": "Same as E01: verify resistance and replace if open or shorted."
+    },
+    {
+      "code": "E05",
+      "title": "Stack Flue Sensor Fault",
+      "meaning": "Stack flue temperature exceeded limit or sensor failed.",
+      "fix": "Check exhaust path for blockage and measure SFS resistance (~10kΩ at 77°F). Replace sensor if faulty.",
+      "flowTarget": {
+        "brand": "Pentair",
+        "equipmentType": "Heaters",
+        "model": "MasterTemp",
+        "startNode": "check_sfs"
+      }
+    },
+    {
+      "code": "E06",
+      "title": "Stack Flue Sensor Fault",
+      "meaning": "Duplicate E05 — overheat or sensor failure.",
+      "fix": "Same as E05."
+    },
+    {
+      "code": "IF",
+      "title": "Ignition Failure",
+      "meaning": "No flame detected after ignition attempt.",
+      "fix": "Verify 120V to igniter, clean flame sensor, check gas supply and ignition control.",
+      "flowTarget": {
+        "brand": "Pentair",
+        "equipmentType": "Heaters",
+        "model": "MasterTemp",
+        "startNode": "check_ignition"
+      }
+    },
+    {
+      "code": "BD",
+      "title": "Bad Board",
+      "meaning": "Control board detected internal fault.",
+      "fix": "Cycle power to reset. Replace main control board if fault persists."
+    }
+  ]
+}

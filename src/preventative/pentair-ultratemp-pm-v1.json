@@ -1,0 +1,92 @@
+{
+  "id": "pentair-ultratemp-pm-v1",
+  "brand": "Pentair",
+  "equipmentType": "Heaters",
+  "model": "UltraTemp",
+  "title": "Pentair UltraTemp — Preventative Maintenance Checklist",
+  "version": "1.0",
+  "description": "Seasonal preventative maintenance for Pentair UltraTemp heat pumps. Includes electrical, refrigerant, and water flow inspection points.",
+  "start": "intro",
+  "nodes": {
+    "intro": {
+      "id": "intro",
+      "text": "Perform all checks with power off unless measurement is required. Record all readings for seasonal tracking.",
+      "input": "info",
+      "pass": "check_airflow"
+    },
+    "check_airflow": {
+      "id": "check_airflow",
+      "text": "Inspect condenser coil and fan for debris or blockage. Clean coil and ensure unobstructed airflow (≥ 18\" clearance).",
+      "input": "yesno",
+      "pass": "check_power",
+      "fail": "clean_coil"
+    },
+    "check_power": {
+      "id": "check_power",
+      "text": "Measure line voltage at L1–L2 input (expect 220–252 VAC). Within range?",
+      "input": "number",
+      "unit": "VAC",
+      "range": [220, 252],
+      "pass": "check_transformer",
+      "fail": "report_electrical_issue"
+    },
+    "check_transformer": {
+      "id": "check_transformer",
+      "text": "Check 24 VAC transformer secondary output. Expect 24–28 VAC under load.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [24, 28],
+      "pass": "check_flow_switch",
+      "fail": "replace_transformer"
+    },
+    "check_flow_switch": {
+      "id": "check_flow_switch",
+      "text": "Run pump and test continuity across flow switch. Should read CLOSED (0 Ω).",
+      "input": "yesno",
+      "pass": "check_sensors",
+      "fail": "replace_flow_switch"
+    },
+    "check_sensors": {
+      "id": "check_sensors",
+      "text": "Measure resistance of water and freeze sensors at ~77°F. Expect ≈ 10 kΩ ±10%. Within spec?",
+      "input": "yesno",
+      "pass": "check_contactors",
+      "fail": "replace_sensor"
+    },
+    "check_contactors": {
+      "id": "check_contactors",
+      "text": "Inspect contactor points for pitting or corrosion. Replace if excessive wear observed.",
+      "input": "yesno",
+      "pass": "check_capacitor",
+      "fail": "replace_contactor"
+    },
+    "check_capacitor": {
+      "id": "check_capacitor",
+      "text": "Measure compressor capacitor capacitance (µF). Should be within ±10% of rated value.",
+      "input": "yesno",
+      "pass": "check_refrigerant",
+      "fail": "replace_capacitor"
+    },
+    "check_refrigerant": {
+      "id": "check_refrigerant",
+      "text": "Observe refrigerant pressures during operation. Low side typically 50–70 psi, high side 225–275 psi (at 80–90°F ambient). Within range?",
+      "input": "yesno",
+      "pass": "finalize",
+      "fail": "call_refrigerant_service"
+    },
+    "clean_coil": {
+      "id": "clean_coil",
+      "text": "Clean condenser coil using coil cleaner and low-pressure water. Re-test airflow after cleaning.",
+      "input": "info",
+      "pass": "check_power"
+    },
+    "replace_transformer": { "id": "replace_transformer", "text": "Replace 24 VAC transformer and recheck voltage.", "input": "info", "terminal": true },
+    "replace_flow_switch": { "id": "replace_flow_switch", "text": "Replace flow switch and verify continuity under flow.", "input": "info", "terminal": true },
+    "replace_sensor": { "id": "replace_sensor", "text": "Replace defective thermistor (water/freeze). Verify readings at room temp.", "input": "info", "terminal": true },
+    "replace_contactor": { "id": "replace_contactor", "text": "Replace compressor contactor and confirm 240 VAC transfer.", "input": "info", "terminal": true },
+    "replace_capacitor": { "id": "replace_capacitor", "text": "Replace run capacitor and re-measure value.", "input": "info", "terminal": true },
+    "report_electrical_issue": { "id": "report_electrical_issue", "text": "Voltage out of spec. Document readings and contact electrician or Pentair support.", "input": "info", "terminal": true },
+    "call_refrigerant_service": { "id": "call_refrigerant_service", "text": "Refrigerant pressures out of range — contact licensed HVAC technician for service.", "input": "info", "terminal": true },
+    "finalize": { "id": "finalize", "text": "✅ UltraTemp PM complete. Record readings and confirm system operation.", "input": "info", "terminal": true, "success": true }
+  }
+}
