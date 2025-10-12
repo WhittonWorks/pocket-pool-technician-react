@@ -219,7 +219,13 @@
       "text": "Check PIB fuse continuity. Good?",
       "input": "yesno",
       "pass": "rev_h_step4",
-      "fail": "rev_h_step2"
+      "fail": "rev_h_replace_fuse"
+    },
+
+    "rev_h_replace_fuse": {
+    "id": "rev_h_replace_fuse",
+    "text": "fuse failed, repalce with P/N R0384900",
+    "pass": "rev_h_step4"
     },
 
     "rev_h_step4": {
