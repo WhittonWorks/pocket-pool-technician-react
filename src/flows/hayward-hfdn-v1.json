@@ -4,184 +4,570 @@
   "equipmentType": "Heaters",
   "model": "Universal H-Series Digital (HFDN)",
   "title": "Hayward Universal H-Series Digital (HFDN) — Guided Troubleshooting",
-  "version": "1.0",
-  "description": "Guided diagnostic flow for Hayward Universal H-Series Digital gas heaters (HFDN/FDN models with LCD display). Uses onboard error codes and voltage checks to isolate faults.",
-  "start": "enter_code",
+  "start": "choose_fault",
   "nodes": {
-    "enter_code": {
-      "id": "enter_code",
-      "text": "Select the error code currently displayed on the heater:",
+    "choose_fault": {
+      "id": "choose_fault",
+      "text": "Select the fault or condition to troubleshoot:",
       "input": "choice",
       "choices": {
-        "AO — Blower Vacuum Switch Open": "code_ao",
-        "AC — Blower Vacuum Switch Closed": "code_ac",
-        "IF — Ignition Failure": "code_if",
-        "HS — High Limit or Overheat": "code_hs",
-        "LO — Water Pressure or Limit Fault": "code_lo",
-        "PF — Polarity / Voltage Fault": "code_pf",
-        "CE — Communication Error": "code_ce",
-        "EE — Bad Board": "code_ee",
-        "HF — Flame Present w/o Gas": "code_hf",
-        "SF — Sensor Failure": "code_sf",
-        "Other / No Code": "end_other"
-      },
-      "isEntryPoint": true
+        "Heater will not power up": "powerup_1",
+        "Open FC1 / FC2 Fuse": "fc12_1",
+        "Open FC3 / F1 Fuse": "fc3f1_1",
+        "Open FC4 Fuse": "fc4_1",
+        "BD Code": "bd_1",
+        "EE / CE Codes": "eece_menu",
+        "IO / SB Codes": "iosb_1",
+        "SF / HS / PF Codes": "sfpfs_1",
+        "HF Code": "hf_1",
+        "LO Code": "lo_1",
+        "IF Code": "if_1",
+        "AC / AO Codes": "ac_ao_1"
+      }
     },
 
-    "code_ao": {
-      "id": "code_ao",
-      "text": "AO = Blower vacuum switch open when it should be closed.\n\n1️⃣ Does the blower start?\n2️⃣ Check vacuum hose to switch — ensure connected and clear.\n3️⃣ During blower run, test continuity across vacuum switch (expect CLOSED / 0 Ω).",
-      "input": "yesno",
-      "pass": "end_success",
-      "fail": "replace_vacuum_switch"
-    },
-
-    "code_ac": {
-      "id": "code_ac",
-      "text": "AC = Blower vacuum switch closed when it should be open.\n\n1️⃣ Disconnect one lead from vacuum switch.\n2️⃣ Check continuity — should read OPEN when blower is off.\nIf stuck closed → replace blower vacuum switch.",
-      "input": "yesno",
-      "pass": "end_success",
-      "fail": "replace_vacuum_switch"
-    },
-
-    "code_if": {
-      "id": "code_if",
-      "text": "IF = Ignition failure.\n\nCheck:\n- Igniter receives 120 VAC during ignition attempt.\n- Verify gas supply and manifold pressure.\n- Flame sensor clean and aligned.\n- Flame rectification current ≥ 1.5 µA DC.",
-      "input": "number",
-      "unit": "µA",
-      "range": [1.5, 10],
-      "pass": "end_success",
-      "fail": "replace_ignition_control"
-    },
-
-    "code_hs": {
-      "id": "code_hs",
-      "text": "HS = High limit or overheat detected.\n\nPossible causes:\n- Restricted flow (dirty filter or closed valve).\n- Faulty high-limit sensor (should read CLOSED under 135 °F).",
-      "input": "yesno",
-      "pass": "end_success",
-      "fail": "replace_high_limit"
-    },
-
-    "code_lo": {
-      "id": "code_lo",
-      "text": "LO = Water pressure or limit fault.\n\nCheck:\n- Pump on and system fully primed.\n- Pressure switch continuity — should be CLOSED when pump running.\n- Filter and bypass clear of obstruction.",
-      "input": "yesno",
-      "pass": "end_success",
-      "fail": "replace_pressure_switch"
-    },
-
-    "code_pf": {
-      "id": "code_pf",
-      "text": "PF = Polarity or low voltage fault.\n\n1️⃣ Confirm line and neutral orientation.\n2️⃣ Verify ground continuity to chassis.\n3️⃣ Measure supply voltage (expect 110–130 VAC).",
+   
+    "powerup_1": {
+      "id": "powerup_1",
+      "text": "Step 1: Measure incoming line voltage at the heater (expect 110–125 VAC for 120V systems OR 220–245 VAC for 240V systems).",
       "input": "number",
       "unit": "VAC",
-      "range": [110, 130],
-      "pass": "end_success",
-      "fail": "replace_board"
+      "range": [110, 245],
+      "pass": "powerup_2",
+      "fail": "check_power_source"
     },
-
-    "code_ce": {
-      "id": "code_ce",
-      "text": "CE = Communication error between main board and display.\n\nInspect ribbon cable for corrosion, pin damage, or loose fit.\nIf intact but code remains → replace display interface.",
+    "powerup_2": {
+      "id": "powerup_2",
+      "text": "Step 2: Does the Selector Plug match the incoming voltage?",
       "input": "yesno",
-      "pass": "end_success",
-      "fail": "replace_display"
+      "pass": "powerup_3",
+      "fail": "install_correct_selector_plug"
+    },
+    "powerup_3": {
+      "id": "powerup_3",
+      "text": "Step 3: Are all Fuse Board connections secure and correctly seated?",
+      "input": "yesno",
+      "pass": "powerup_4",
+      "fail": "correct_wiring"
+    },
+    "powerup_4": {
+      "id": "powerup_4",
+      "text": "Step 4: Measure transformer secondary at P4 pins 1 & 2. Expect 22–28 VAC.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [22, 28],
+      "pass": "powerup_5",
+      "fail": "fc12_1"
+    },
+    "powerup_5": {
+      "id": "powerup_5",
+      "text": "Step 5: Measure primary feed at P4 pins 4 & 6. Expect 110–125 VAC.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [110, 125],
+      "pass": "powerup_6",
+      "fail": "replace_transformer"
+    },
+    "powerup_6": {
+      "id": "powerup_6",
+      "text": "Step 6: Verify 22–28 VAC between R & C terminals on the Fuse Board.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [22, 28],
+      "pass": "powerup_7",
+      "fail": "replace_fuse_board"
+    },
+    "powerup_7": {
+      "id": "powerup_7",
+      "text": "Step 7: Verify 22–28 VAC between R & C on the ICB.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [22, 28],
+      "pass": "powerup_8",
+      "fail": "replace_wire_harness"
+    },
+    "powerup_8": {
+      "id": "powerup_8",
+      "text": "Step 8: Are all ICB plugs fully seated and keyed correctly?",
+      "input": "yesno",
+      "pass": "powerup_9",
+      "fail": "correct_icb_wiring"
+    },
+    "powerup_9": {
+      "id": "powerup_9",
+      "text": "Step 9: Measure 22–28 VAC between COM & AC on the ICB.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [22, 28],
+      "pass": "powerup_10",
+      "fail": "replace_icb"
+    },
+    "powerup_10": {
+      "id": "powerup_10",
+      "text": "Step 10: Check F1 fuse (3 A) on ICB for continuity. Good?",
+      "input": "yesno",
+      "pass": "powerup_11",
+      "fail": "replace_icb_fuse"
+    },
+    "powerup_11": {
+      "id": "powerup_11",
+      "text": "Step 11: Is the display dry and do keypad buttons read correctly?",
+      "input": "yesno",
+      "pass": "flow_complete",
+      "fail": "replace_keypad"
     },
 
-    "code_ee": {
-      "id": "code_ee",
-      "text": "EE = Control board fault.\n\nCycle power. If fault returns immediately, replace main control board.",
+
+      "id": "fc12_1",
+      "text": "Is the correct voltage selector plug installed?",
+      "input": "yesno",
+      "pass": "fc12_2",
+      "fail": "install_correct_selector_plug"
+    },
+    "fc12_2": {
+      "id": "fc12_2",
+      "text": "Is the transformer wiring free of damage, pinches, or abrasion?",
+      "input": "yesno",
+      "pass": "fc12_3",
+      "fail": "repair_wiring"
+    },
+    "fc12_3": {
+      "id": "fc12_3",
+      "text": "Measure transformer primary resistance. Expect 1.9–2.9 Ω.",
+      "input": "number",
+      "unit": "Ω",
+      "range": [1.9, 2.9],
+      "pass": "flow_complete",
+      "fail": "replace_transformer"
+    },
+
+  
+    "fc3f1_1": {
+      "id": "fc3f1_1",
+      "text": "Inspect low-voltage wiring for damage or pinches. OK?",
+      "input": "yesno",
+      "pass": "fc3f1_2",
+      "fail": "repair_wiring"
+    },
+    "fc3f1_2": {
+      "id": "fc3f1_2",
+      "text": "Measure resistance across the gas valve coil. Expect > 0.5 Ω.",
+      "input": "number",
+      "unit": "Ω",
+      "range": [0.5, 999],
+      "pass": "fc3f1_3",
+      "fail": "replace_gas_valve"
+    },
+    "fc3f1_3": {
+      "id": "fc3f1_3",
+      "text": "Inspect ICB wiring and insulation for shorts. OK?",
+      "input": "yesno",
+      "pass": "flow_complete",
+      "fail": "replace_icb"
+    },
+
+
+    "fc4_1": {
+      "id": "fc4_1",
+      "text": "Inspect igniter and blower wiring insulation for chafing/shorts. OK?",
+      "input": "yesno",
+      "pass": "fc4_2",
+      "fail": "repair_wiring"
+    },
+    "fc4_2": {
+      "id": "fc4_2",
+      "text": "Measure igniter resistance. Expect 8–25 Ω (20–140°F).",
+      "input": "number",
+      "unit": "Ω",
+      "range": [8, 25],
+      "pass": "fc4_3",
+      "fail": "replace_igniter"
+    },
+    "fc4_3": {
+      "id": "fc4_3",
+      "text": "Measure blower motor resistance. Pre-2010: 8–9 Ω. Post-2010: 4–5 Ω.",
+      "input": "number",
+      "unit": "Ω",
+      "range": [4, 9],
+      "pass": "flow_complete",
+      "fail": "replace_blower"
+    },
+
+ 
+    "bd_1": {
+      "id": "bd_1",
+      "text": "Remove FC4 fuse and check continuity. Good?",
+      "input": "yesno",
+      "pass": "bd_2",
+      "fail": "fc4_1"
+    },
+    "bd_2": {
+      "id": "bd_2",
+      "text": "Measure 110–125 VAC between P6-3 and P6-5 on Fuse Board.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [110, 125],
+      "pass": "bd_3",
+      "fail": "replace_transformer"
+    },
+    "bd_3": {
+      "id": "bd_3",
+      "text": "Measure 110–125 VAC at E10 (pins 1 & 3) of the ICB harness.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [110, 125],
+      "pass": "flow_complete",
+      "fail": "replace_wire_harness"
+    },
+
+
+    "eece_menu": {
+      "id": "eece_menu",
+      "text": "Which code is displayed?",
+      "input": "choice",
+      "choices": {
+        "EE (EEPROM Error)": "eece_ee",
+        "CE (Communication Error)": "eece_ce"
+      }
+    },
+    "eece_ee": {
+      "id": "eece_ee",
+      "text": "EE Code indicates a defective ICB (EEPROM error). Replace the ICB.",
+      "input": "info",
+      "terminal": true
+    },
+    "eece_ce": {
+      "id": "eece_ce",
+      "text": "CE Code indicates a comms error between display and ICB. 1) Power-cycle line voltage. 2) Inspect display ribbon cable and connector fit. If the code persists, replace the Display Interface Assembly / Keypad; if still present, replace the ICB.",
       "input": "info",
       "terminal": true
     },
 
-    "code_hf": {
-      "id": "code_hf",
-      "text": "HF = Flame present when gas valve not energized.\n\n1️⃣ Check flame sense lead for short to ground.\n2️⃣ Verify gas valve operation.\nIf valve closed but flame detected → replace gas valve.",
+    "iosb_1": {
+      "id": "iosb_1",
+      "text": "IO: Inspect igniter wiring/plug — secure and undamaged?",
       "input": "yesno",
-      "pass": "end_success",
-      "fail": "replace_gas_valve"
+      "pass": "iosb_2",
+      "fail": "repair_wiring"
+    },
+    "iosb_2": {
+      "id": "iosb_2",
+      "text": "Measure igniter resistance. Expect 8–25 Ω.",
+      "input": "number",
+      "unit": "Ω",
+      "range": [8, 25],
+      "pass": "flow_complete",
+      "fail": "replace_igniter"
     },
 
-    "code_sf": {
-      "id": "code_sf",
-      "text": "SF = Sensor (thermistor) fault.\n\nCheck inlet/outlet sensor resistance:\n- 77°F ≈ 10 kΩ\n- 104°F ≈ 6 kΩ\n\nIf open or out of range → replace sensor.",
+
+    "sfpfs_1": {
+      "id": "sfpfs_1",
+      "text": "Check temperature sensor (thermistor) plug at ICB. Fully seated?",
+      "input": "yesno",
+      "pass": "sfpfs_2",
+      "fail": "secure_sensor"
+    },
+    "sfpfs_2": {
+      "id": "sfpfs_2",
+      "text": "Measure temperature sensor resistance (black to each red). Expect ≈ 10k Ω @ 77°F and both reds should match.",
       "input": "number",
-      "unit": "kΩ",
-      "range": [6, 10],
-      "pass": "end_success",
+      "unit": "Ω",
+      "range": [9000, 11000],
+      "pass": "flow_complete",
       "fail": "replace_sensor"
     },
 
-    "replace_vacuum_switch": {
-      "id": "replace_vacuum_switch",
-      "text": "Replace blower vacuum (pressure) switch. Ensure hose and ports are clear post-installation.",
-      "input": "info",
-      "terminal": true
+
+    "hf_1": {
+      "id": "hf_1",
+      "text": "Reset the heater (cycle line power OFF/ON). Did HF clear?",
+      "input": "yesno",
+      "pass": "flow_complete",
+      "fail": "hf_2"
+    },
+    "hf_2": {
+      "id": "hf_2",
+      "text": "With gas valve OFF, is flame still sensed (false flame)?",
+      "input": "yesno",
+      "pass": "hf_3",
+      "fail": "replace_icb"
+    },
+    "hf_3": {
+      "id": "hf_3",
+      "text": "During the fault, measure control output to gas valve. Expect ~24 VAC when flame is actually present. If 24 VAC is present but valve closed and manifold pressure correct: valve is defective. If 24 VAC not present and manifold pressure is correct: replace ICB.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [22, 26],
+      "pass": "replace_icb",
+      "fail": "replace_gas_valve"
     },
 
-    "replace_ignition_control": {
-      "id": "replace_ignition_control",
-      "text": "Replace ignition control module. Verify correct connections before reattempting ignition.",
-      "input": "info",
-      "terminal": true
+
+    "lo_1": {
+      "id": "lo_1",
+      "text": "Verify pump operation and adequate water flow. Flow above minimum?",
+      "input": "yesno",
+      "pass": "lo_2",
+      "fail": "turn_on_pump"
+    },
+    "lo_2": {
+      "id": "lo_2",
+      "text": "Inspect Water Pressure Switch wiring and spade connections. OK?",
+      "input": "yesno",
+      "pass": "lo_3",
+      "fail": "repair_wiring"
+    },
+    "lo_3": {
+      "id": "lo_3",
+      "text": "With pump running, does the Water Pressure Switch show continuity (closed)?",
+      "input": "yesno",
+      "pass": "lo_4",
+      "fail": "replace_pressure_switch"
+    },
+    "lo_4": {
+      "id": "lo_4",
+      "text": "Inspect Temperature Limit Switch wiring and terminals. OK?",
+      "input": "yesno",
+      "pass": "lo_5",
+      "fail": "repair_wiring"
+    },
+    "lo_5": {
+      "id": "lo_5",
+      "text": "Do the Temperature Limit Switches have continuity (closed)?",
+      "input": "yesno",
+      "pass": "flow_complete",
+      "fail": "replace_limit_switch"
     },
 
-    "replace_pressure_switch": {
-      "id": "replace_pressure_switch",
-      "text": "Replace defective pressure switch and confirm proper flow.",
-      "input": "info",
-      "terminal": true
+
+    "if_1": {
+      "id": "if_1",
+      "text": "Are all external and internal gas shutoff valves fully OPEN?",
+      "input": "yesno",
+      "pass": "if_2",
+      "fail": "open_gas_valves"
+    },
+    "if_2": {
+      "id": "if_2",
+      "text": "Inspect flame sensor and gas valve wiring/terminals. OK?",
+      "input": "yesno",
+      "pass": "if_3",
+      "fail": "repair_wiring"
+    },
+    "if_3": {
+      "id": "if_3",
+      "text": "Measure manifold gas pressure during trial for ignition (refer to spec). Propane 6.8–7.0 inWC; Natural Gas 1.8–2.0 inWC.",
+      "input": "number",
+      "unit": "inWC",
+      "range": [1.8, 7.0],
+      "pass": "if_4",
+      "fail": "adjust_gas_pressure"
+    },
+    "if_4": {
+      "id": "if_4",
+      "text": "During the 4-second trial for ignition, measure 22–28 VAC at the Gas Valve.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [22, 28],
+      "pass": "if_5",
+      "fail": "replace_icb"
+    },
+    "if_5": {
+      "id": "if_5",
+      "text": "Which flame sensor is installed?",
+      "input": "choice",
+      "choices": {
+        "Correct (5\")": "flow_complete",
+        "Incorrect (3\") on post-2009 unit": "replace_flame_sensor"
+      }
     },
 
-    "replace_high_limit": {
-      "id": "replace_high_limit",
-      "text": "Replace high-limit sensor(s). Confirm cutoff near 135 °F and verify continuity when cool.",
-      "input": "info",
-      "terminal": true
+
+    "ac_ao_1": {
+      "id": "ac_ao_1",
+      "text": "Inspect blower vacuum tubing, hose barbs, wiring and connections. OK?",
+      "input": "yesno",
+      "pass": "ac_ao_2",
+      "fail": "repair_tubing"
+    },
+    "ac_ao_2": {
+      "id": "ac_ao_2",
+      "text": "Is the voltage selector plug installed for the correct supply voltage?",
+      "input": "yesno",
+      "pass": "ac_ao_3",
+      "fail": "install_correct_selector_plug"
+    },
+    "ac_ao_3": {
+      "id": "ac_ao_3",
+      "text": "Measure blower resistance. Pre-2010: 8–9 Ω. Post-2010: 4–5 Ω.",
+      "input": "number",
+      "unit": "Ω",
+      "range": [4, 9],
+      "pass": "ac_ao_4",
+      "fail": "replace_blower"
+    },
+    "ac_ao_4": {
+      "id": "ac_ao_4",
+      "text": "During pre-purge/call for heat, measure 110–125 VAC at blower relay output.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [110, 125],
+      "pass": "flow_complete",
+      "fail": "replace_icb"
     },
 
-    "replace_board": {
-      "id": "replace_board",
-      "text": "Replace main control board. Reconnect all harnesses securely and verify startup.",
-      "input": "info",
-      "terminal": true
-    },
 
-    "replace_display": {
-      "id": "replace_display",
-      "text": "Replace display interface board. Ensure ribbon cable seats properly and no corrosion present.",
-      "input": "info",
-      "terminal": true
-    },
-
-    "replace_gas_valve": {
-      "id": "replace_gas_valve",
-      "text": "Replace gas valve. Perform leak test before startup.",
-      "input": "info",
-      "terminal": true
-    },
-
-    "replace_sensor": {
-      "id": "replace_sensor",
-      "text": "Replace temperature sensor (thermistor) and confirm correct reading at ambient temperature.",
-      "input": "info",
-      "terminal": true
-    },
-
-    "end_success": {
-      "id": "end_success",
-      "text": "✅ Fault cleared — heater operating normally after corrective action.",
+    "flow_complete": {
+      "id": "flow_complete",
+      "text": "✅ Troubleshooting complete. If the issue persists, contact Hayward Tech Support.",
       "input": "info",
       "terminal": true,
       "success": true
     },
 
-    "end_other": {
-      "id": "end_other",
-      "text": "If no error code displayed or issue persists, document readings and contact Hayward Technical Support.",
+    "check_power_source": {
+      "id": "check_power_source",
+      "text": "Correct incoming power/breaker/wiring to the heater, then retest.",
+      "input": "info",
+      "terminal": true
+    },
+    "install_correct_selector_plug": {
+      "id": "install_correct_selector_plug",
+      "text": "Install the correct voltage selector plug for the supply (120/240 VAC), then retest.",
+      "input": "info",
+      "terminal": true
+    },
+    "correct_wiring": {
+      "id": "correct_wiring",
+      "text": "Correct any loose/incorrect Fuse Board wiring and reseat connectors, then retest.",
+      "input": "info",
+      "terminal": true
+    },
+    "replace_transformer": {
+      "id": "replace_transformer",
+      "text": "Transformer out of spec. Replace transformer.",
+      "input": "info",
+      "terminal": true
+    },
+    "replace_fuse_board": {
+      "id": "replace_fuse_board",
+      "text": "Fuse Board not supplying 24 VAC. Replace Fuse Board.",
+      "input": "info",
+      "terminal": true
+    },
+    "replace_wire_harness": {
+      "id": "replace_wire_harness",
+      "text": "Harness between boards open/shorted. Replace Wire Harness.",
+      "input": "info",
+      "terminal": true
+    },
+    "correct_icb_wiring": {
+      "id": "correct_icb_wiring",
+      "text": "Reseat/realign ICB plugs and correct any keying issues; inspect for bent pins.",
+      "input": "info",
+      "terminal": true
+    },
+    "replace_icb": {
+      "id": "replace_icb",
+      "text": "ICB defective/out of spec. Replace ICB.",
+      "input": "info",
+      "terminal": true
+    },
+    "replace_icb_fuse": {
+      "id": "replace_icb_fuse",
+      "text": "Replace the F1 3-amp fuse on the ICB, then retest.",
+      "input": "info",
+      "terminal": true
+    },
+    "replace_keypad": {
+      "id": "replace_keypad",
+      "text": "Replace Display/Keypad assembly.",
+      "input": "info",
+      "terminal": true
+    },
+    "repair_wiring": {
+      "id": "repair_wiring",
+      "text": "Repair/replace damaged wiring and ensure proper routing and strain relief.",
+      "input": "info",
+      "terminal": true
+    },
+    "replace_gas_valve": {
+      "id": "replace_gas_valve",
+      "text": "Gas valve coil out of spec/valve defective. Replace gas valve.",
+      "input": "info",
+      "terminal": true
+    },
+    "replace_igniter": {
+      "id": "replace_igniter",
+      "text": "Igniter out of spec or open. Replace igniter.",
+      "input": "info",
+      "terminal": true
+    },
+    "replace_blower": {
+      "id": "replace_blower",
+      "text": "Blower motor out of spec. Replace blower.",
+      "input": "info",
+      "terminal": true
+    },
+    "secure_sensor": {
+      "id": "secure_sensor",
+      "text": "Reseat/secure temperature sensor connector at ICB, then retest.",
+      "input": "info",
+      "terminal": true
+    },
+    "replace_sensor": {
+      "id": "replace_sensor",
+      "text": "Temperature sensor out of spec. Replace sensor.",
+      "input": "info",
+      "terminal": true
+    },
+    "turn_on_pump": {
+      "id": "turn_on_pump",
+      "text": "Start circulation pump / restore proper water flow before proceeding.",
+      "input": "info",
+      "terminal": true
+    },
+    "replace_pressure_switch": {
+      "id": "replace_pressure_switch",
+      "text": "Water Pressure Switch open during flow. Replace switch.",
+      "input": "info",
+      "terminal": true
+    },
+    "replace_limit_switch": {
+      "id": "replace_limit_switch",
+      "text": "Temperature Limit Switch open. Replace limit switch(es).",
+      "input": "info",
+      "terminal": true
+    },
+    "open_gas_valves": {
+      "id": "open_gas_valves",
+      "text": "Open all gas shutoff valves and verify supply to the heater.",
+      "input": "info",
+      "terminal": true
+    },
+    "adjust_gas_pressure": {
+      "id": "adjust_gas_pressure",
+      "text": "Adjust inlet/manifold gas pressure to manufacturer spec, then retest.",
+      "input": "info",
+      "terminal": true
+    },
+    "repair_tubing": {
+      "id": "repair_tubing",
+      "text": "Repair/replace blower vacuum tubing and ensure hose barbs are sealed.",
+      "input": "info",
+      "terminal": true
+    },
+    "replace_display_board": {
+      "id": "replace_display_board",
+      "text": "Replace the Display Interface/Keypad board if ribbon and connections are OK.",
+      "input": "info",
+      "terminal": true
+    },
+    "replace_flame_sensor": {
+      "id": "replace_flame_sensor",
+      "text": "Install the correct flame sensor (5\" on models after 4/14/2009).",
       "input": "info",
       "terminal": true
     }
   }
-}
