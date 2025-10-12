@@ -79,7 +79,7 @@
 
     "rev_g_step4": {
       "id": "rev_g_step4",
-      "text": "Check Water Pressure Switch: 24 VAC Purple (4) → Yellow (1). Expect 22–26 VAC.",
+      "text": "Check Water Pressure Switch: 24 VAC Purple (4) and Ground. Expect 22–26 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
@@ -89,7 +89,7 @@
 
     "rev_g_step5": {
       "id": "rev_g_step5",
-      "text": "Check Fusible Link chain: Orange (6), Blue (7), Black (8). All 22–26 VAC?",
+      "text": "Check Fusible Link chain: Check from Orange (6) to Ground  22–26 VAC?",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
