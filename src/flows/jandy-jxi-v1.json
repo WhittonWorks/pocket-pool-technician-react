@@ -236,7 +236,7 @@
      "id": "rev_h_pressure_switch_failed",
      "text": "Voltage is 0 or below spec — Verify filter pump is on, filter is clean, and filter pressure is above 2 psi. If Filter pressure is above 2 psi and the pressure switch is still open, replace pressure switch (P/N R0457001) ",
      "input": "info",
-     "pass": "rev_h_blower"
+     "pass": "rev_h_step5"
    },
 
     "rev_h_step5": {
