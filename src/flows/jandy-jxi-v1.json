@@ -64,8 +64,8 @@
     },
     "rev_g_step2_check_input": {
       "id": "rev_g_step2_check_input",
-      "text": "Measured transformer output below 22 VAC.\n\nVerify incoming voltage (110–126 or 220–252 VAC). If input correct and output low → replace transformer.",
-      "input": "info",
+      "text": "Measured transformer output below 22 VAC.\n\nVerify incoming voltage (110–126 or 220–252 VAC). If input correct and output low → replace transformer. P/N R0456301",
+     "input": "info",
       "pass": "rev_g_step3"
     },
 
@@ -73,18 +73,14 @@
       "id": "rev_g_step3",
       "text": "Check PIB fuse continuity. Good?",
       "input": "yesno",
-      "pass": "rev_g_step4",
-      "fail": "rev_g_step2"
-    },
-
-    "rev_g_step4": {
-      "id": "rev_g_step4",
-      "text": "Water Pressure Switch: Check for 24 VAC between Purple (4) and Yellow (Ground). Check for 24 VAC between Gray (5) and Yellow (Ground) Expect 22–26 VAC. ",
-      "input": "number",
-      "unit": "VAC",
-      "range": [22, 26],
       "pass": "rev_g_step5",
-      "fail": "rev_g_step3"
+      "fail": "rev_g_replace_fuse"
+    },
+    
+    "rev_g_replace_fuse":{
+      "id": "rev_g_replace_fuse",
+      "text": "replace fuse P/N R0384900",
+      "pass": "rev_g_step5"
     },
 
     "rev_g_step5": {
@@ -140,7 +136,7 @@
       "id": "rev_g_blower_no_power",
       "text": "blower issue, talk to Fluidra/jandy and find out blower specs and best diagnostic process ",
       "input": "info",
-      "pass":"rev_g_blower_no_power",
+      "pass":"rev_g_gas",
       "terminal": true
     },
     "replace_ignitor": {
