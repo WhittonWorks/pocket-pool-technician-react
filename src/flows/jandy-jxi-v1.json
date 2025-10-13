@@ -34,7 +34,7 @@
 
     "rev_g_120": {
       "id": "rev_g_120",
-      "text": "Measure power at Distribution Board (Black C → Red B). Expect 110–126 VAC.",
+      "text": "Measure power at Distribution Board Black and Red. Expect 110–126 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [110, 126],
@@ -44,7 +44,7 @@
     },
     "rev_g_240": {
       "id": "rev_g_240",
-      "text": "Measure power at Distribution Board (Black C → Red B). Expect 220–252 VAC.",
+      "text": "Measure power at Distribution Board Black and Red. Expect 220–252 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [220, 252],
@@ -55,7 +55,7 @@
 
     "rev_g_step2": {
       "id": "rev_g_step2",
-      "text": "Measure transformer output (Red 2 → Yellow 1). Expect 22–26 VAC.",
+      "text": "Measure transformer output Red and Yellow (Ground). Expect 22–26 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
@@ -79,7 +79,7 @@
 
     "rev_g_step4": {
       "id": "rev_g_step4",
-      "text": "Check Water Pressure Switch: 24 VAC Purple (4) and Ground. Expect 22–26 VAC.",
+      "text": "Water Pressure Switch: Check for 24 VAC between Purple (4) and Yellow (Ground). Check for 24 VAC between Gray (5) and Yellow (Ground) Expect 22–26 VAC. ",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
@@ -89,7 +89,7 @@
 
     "rev_g_step5": {
       "id": "rev_g_step5",
-      "text": "Check Fusible Link chain: Check from Orange (6) to Ground  22–26 VAC?",
+      "text": "Water Pressure Switch: Check for 24 VAC between Purple (4) and Yellow (Ground). Check for 24 VAC between Gray (5) and Yellow (Ground) Expect 22–26 VAC. ",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
@@ -102,7 +102,7 @@
       "text": "Does the blower motor run?",
       "input": "yesno",
       "pass": "rev_g_igniter",
-      "fail": "rev_g_step5",
+      "fail": "rev_g_blower_no_power",
       "isEntryPoint": true
     },
 
@@ -134,6 +134,13 @@
       "id": "rev_g_igniter_no_power",
       "text": "No 120 VAC to ignitor. Verify ignition control receives 24 VAC and ground. If 24 VAC present but no output, replace ignition control.",
       "input": "info",
+      "terminal": true
+    },
+    "rev_g_blower_no_power": {
+      "id": "rev_g_blower_no_power",
+      "text": "blower issue, talk to Fluidra/jandy and find out blower specs and best diagnostic process ",
+      "input": "info",
+      "pass":"rev_g_blower_no_power",
       "terminal": true
     },
     "replace_ignitor": {
@@ -179,7 +186,7 @@
 
     "rev_h_120": {
       "id": "rev_h_120",
-      "text": "Measure power at Distribution Board (Black C → Red B). Expect 110–126 VAC.",
+      "text": "Measure power at Distribution Board between Black and Red . Expect 110–126 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [110, 126],
@@ -189,7 +196,7 @@
     },
     "rev_h_240": {
       "id": "rev_h_240",
-      "text": "Measure at Distribution Board from Black C to  Red B`  . Expect 220–252 VAC.",
+      "text": "Measure at Distribution Board from Black and Red B  . Expect 220–252 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [220, 252],
@@ -200,7 +207,7 @@
 
     "rev_h_step2": {
       "id": "rev_h_step2",
-      "text": "Measure transformer output (Between Red 2 and Yellow Ground 1). Expect 22–26 VAC.",
+      "text": "Measure transformer output Between Red and Yellow Ground. Expect 22–26 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
