@@ -16,7 +16,6 @@
       ],
       "default": "invalid_serial"
     },
-
     "invalid_serial": {
       "id": "invalid_serial",
       "text": "❌ Invalid serial number. Try again.\nExpected formats:\n- Rev G or earlier = B#####\n- Rev H or newer = LB#####",
@@ -24,7 +23,6 @@
       "pass": "enter_serial"
     },
 
-   
     "rev_g_start": {
       "id": "rev_g_start",
       "text": "Which input voltage is the JXi Rev G configured for?",
@@ -39,7 +37,7 @@
       "unit": "VAC",
       "range": [110, 126],
       "pass": "rev_g_step2",
-      "fail": "fix_power",
+      "fail": "critical_stop_line_power",
       "isEntryPoint": true
     },
     "rev_g_240": {
@@ -49,7 +47,7 @@
       "unit": "VAC",
       "range": [220, 252],
       "pass": "rev_g_step2",
-      "fail": "fix_power",
+      "fail": "critical_stop_line_power",
       "isEntryPoint": true
     },
 
@@ -60,13 +58,7 @@
       "unit": "VAC",
       "range": [22, 26],
       "pass": "rev_g_step3",
-      "fail": "rev_g_step2_check_input"
-    },
-    "rev_g_step2_check_input": {
-      "id": "rev_g_step2_check_input",
-      "text": "Measured transformer output below 22 VAC.\n\nVerify incoming voltage (110–126 or 220–252 VAC). If input correct and output low → replace transformer.",
-      "input": "info",
-      "pass": "rev_g_step3"
+      "fail": "critical_stop_transformer"
     },
 
     "rev_g_step3": {
@@ -74,7 +66,7 @@
       "text": "Check PIB fuse continuity. Good?",
       "input": "yesno",
       "pass": "rev_g_step4",
-      "fail": "rev_g_step2"
+      "fail": "critical_stop_pib_fuse"
     },
 
     "rev_g_step4": {
@@ -89,7 +81,7 @@
 
     "rev_g_step5": {
       "id": "rev_g_step5",
-      "text": "Check Fusible Link chain: Check from Orange (6) to Ground  22–26 VAC?",
+      "text": "Check Fusible Link chain: Check from Orange (6) to Ground. Expect 22–26 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
@@ -102,7 +94,7 @@
       "text": "Does the blower motor run?",
       "input": "yesno",
       "pass": "rev_g_igniter",
-      "fail": "rev_g_step5",
+      "fail": "critical_stop_pib_board",
       "isEntryPoint": true
     },
 
@@ -111,9 +103,9 @@
       "text": "After blower starts, does the Hot Surface Igniter glow?",
       "input": "yesno",
       "pass": "rev_g_gas",
-      "fail": "rev_g_igniter_check_input",
-      "isEntryPoint": true
+      "fail": "rev_g_igniter_check_input"
     },
+
     "rev_g_igniter_check_input": {
       "id": "rev_g_igniter_check_input",
       "text": "Measure voltage at Ignition Control K & I terminals during ignition. Expect 105–130 VAC.\n\nIf no voltage → verify 24 VAC to board.\nIf voltage present → check ignitor continuity.",
@@ -121,36 +113,33 @@
       "unit": "VAC",
       "range": [105, 130],
       "pass": "rev_g_igniter_check_continuity",
-      "fail": "rev_g_igniter_no_power"
+      "fail": "critical_stop_icb"
     },
+
     "rev_g_igniter_check_continuity": {
       "id": "rev_g_igniter_check_continuity",
-      "text": "With power off and ignitor cool, check continuity between ignitor leads.\n\n✅ Continuity present → ignitor intact.\n❌ Open circuit → replace ignitor.\n(Optional) Cold resistance ≈ 40–75 Ω; > 90 Ω = weak element.",
+      "text": "With power off and ignitor cool, check continuity between ignitor leads.\n\n✅ Continuity present → ignitor intact.\n❌ Open circuit → replace ignitor.",
       "input": "yesno",
       "pass": "rev_g_gas",
       "fail": "replace_ignitor"
     },
-    "rev_g_igniter_no_power": {
-      "id": "rev_g_igniter_no_power",
-      "text": "No 120 VAC to ignitor. Verify ignition control receives 24 VAC and ground. If 24 VAC present but no output, replace ignition control.",
-      "input": "info",
-      "terminal": true
-    },
+
     "replace_ignitor": {
       "id": "replace_ignitor",
-      "text": "Replace Hot Surface Ignitor. Verify connections and ceramic integrity before restart.",
+      "text": "Replace Hot Surface Ignitor (P/N R0452300). Verify connections and ceramic integrity before restart.",
       "input": "info",
-      "terminal": true
+      "terminal": true,
+      "exportReport": true
     },
 
     "rev_g_gas": {
       "id": "rev_g_gas",
-      "text": "Check for approx. 24 VAC at Brown (gas valve) → Yellow (Ground). Is voltage Present?",
+      "text": "Check for approx. 24 VAC at Brown (gas valve) → Yellow (Ground). Expect 22–26 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
       "pass": "rev_g_flame",
-      "fail": "rev_g_igniter"
+      "fail": "critical_stop_icb"
     },
 
     "rev_g_flame": {
@@ -166,10 +155,10 @@
       "text": "✅ Rev G heater operating normally.",
       "input": "info",
       "terminal": true,
-      "success": true
+      "success": true,
+      "exportReport": true
     },
 
-    
     "rev_h_start": {
       "id": "rev_h_start",
       "text": "Which input voltage is the JXi Rev H configured for?",
@@ -184,34 +173,27 @@
       "unit": "VAC",
       "range": [110, 126],
       "pass": "rev_h_step2",
-      "fail": "fix_power",
-      "isEntryPoint": true
+      "fail": "critical_stop_line_power"
     },
+
     "rev_h_240": {
       "id": "rev_h_240",
-      "text": "Measure at Distribution Board from Black C to  Red B`  . Expect 220–252 VAC.",
+      "text": "Measure at Distribution Board from Black to Red. Expect 220–252 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [220, 252],
       "pass": "rev_h_step2",
-      "fail": "fix_power",
-      "isEntryPoint": true
+      "fail": "critical_stop_line_power"
     },
 
     "rev_h_step2": {
       "id": "rev_h_step2",
-      "text": "Measure transformer output (Between Red 2 and Yellow Ground 1). Expect 22–26 VAC.",
+      "text": "Measure transformer output (Red 2 → Yellow Ground 1). Expect 22–26 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
       "pass": "rev_h_step3",
-      "fail": "rev_h_step2_check_input"
-    },
-    "rev_h_step2_check_input": {
-      "id": "rev_h_step2_check_input",
-      "text": "Measured transformer output below 22 VAC.\n\nVerify incoming voltage (110–126 / 220–252 VAC). If input correct and output low → replace transformer. (P/N R0456301)",
-      "input": "info",
-      "pass": "rev_h_step3"
+      "fail": "critical_stop_transformer"
     },
 
     "rev_h_step3": {
@@ -219,18 +201,12 @@
       "text": "Check PIB fuse continuity. Good?",
       "input": "yesno",
       "pass": "rev_h_step4",
-      "fail": "rev_h_replace_fuse"
-    },
-
-    "rev_h_replace_fuse": {
-    "id": "rev_h_replace_fuse",
-    "text": "fuse failed, repalce with P/N R0384900",
-    "pass": "rev_h_step4"
+      "fail": "critical_stop_pib_fuse"
     },
 
     "rev_h_step4": {
       "id": "rev_h_step4",
-      "text": "Water Pressure Switch: Check for 24 VAC between Purple (4) and Yellow (Ground). Check for 24 VAC between Gray (5) and Yellow (Ground) Expect 22–26 VAC. " ,
+      "text": "Water Pressure Switch: Check 24 VAC between Purple (4) and Ground, then Gray (5) and Ground. Expect 22–26 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
@@ -238,16 +214,16 @@
       "fail": "rev_h_pressure_switch_failed"
     },
 
-     "rev_h_pressure_switch_failed": {
-     "id": "rev_h_pressure_switch_failed",
-     "text": "Voltage is 0 or below spec — Verify filter pump is on, filter is clean, and filter pressure is above 2 psi. If Filter pressure is above 2 psi and the pressure switch is still open, replace pressure switch (P/N R0457001) ",
-     "input": "info",
-     "pass": "rev_h_step5"
-   },
+    "rev_h_pressure_switch_failed": {
+      "id": "rev_h_pressure_switch_failed",
+      "text": "Voltage 0 or below spec — verify pump on and filter clean. If pressure > 2 psi and switch still open, replace Pressure Switch (P/N R0457001).",
+      "input": "info",
+      "pass": "rev_h_step5"
+    },
 
     "rev_h_step5": {
       "id": "rev_h_step5",
-      "text": "High Limits: Check for 24 VAC from each leg of high limits to ground. What was the voltage between each leg and ground?",
+      "text": "High Limits: Check for 24 VAC from each leg of high limits to ground (Expect 22–26 VAC).",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
@@ -256,10 +232,10 @@
     },
 
     "rev_h_highlimit_failed": {
-     "id": "rev_h_highlimit_failed",
-     "text": "Below expected Voltage — one or more high limit switches are open. Replace both high limits (P/N R0592300), then continue diagnostics.",
-     "input": "info",
-     "pass": "rev_h_blower"
+      "id": "rev_h_highlimit_failed",
+      "text": "Below expected voltage — one or more high-limit switches are open. Replace both High Limits (P/N R0592300), then continue.",
+      "input": "info",
+      "pass": "rev_h_blower"
     },
 
     "rev_h_blower": {
@@ -267,8 +243,7 @@
       "text": "Does the blower motor run?",
       "input": "yesno",
       "pass": "rev_h_igniter",
-      "fail": "rev_h_step5",
-      "isEntryPoint": true
+      "fail": "critical_stop_pib_board"
     },
 
     "rev_h_igniter": {
@@ -276,40 +251,35 @@
       "text": "After blower starts, does the Hot Surface Igniter glow?",
       "input": "yesno",
       "pass": "rev_h_gas",
-      "fail": "rev_h_igniter_check_input",
-      "isEntryPoint": true
+      "fail": "rev_h_igniter_check_input"
     },
+
     "rev_h_igniter_check_input": {
       "id": "rev_h_igniter_check_input",
-      "text": "Measure voltage at Ignition Control K & I terminals during ignition. Expect 105–130 VAC.\n\nIf no voltage → verify 24 VAC supply.\nIf voltage present → check ignitor continuity.",
+      "text": "Measure voltage at Ignition Control K & I terminals during ignition (Expect 105–130 VAC). If no voltage → verify 24 VAC supply. If voltage present → check ignitor continuity.",
       "input": "number",
       "unit": "VAC",
       "range": [105, 130],
       "pass": "rev_h_igniter_check_continuity",
-      "fail": "rev_h_igniter_no_power"
+      "fail": "critical_stop_icb"
     },
+
     "rev_h_igniter_check_continuity": {
       "id": "rev_h_igniter_check_continuity",
-      "text": "With power off and ignitor cool, check continuity between ignitor leads.\n\n✅ Continuity present → ignitor intact.\n❌ Open circuit → replace ignitor.",
+      "text": "With power off and ignitor cool, check continuity between ignitor leads. ✅ Continuity present → ignitor intact. ❌ Open circuit → replace ignitor (P/N R0452300).",
       "input": "yesno",
       "pass": "rev_h_gas",
       "fail": "replace_ignitor"
     },
-    "rev_h_igniter_no_power": {
-      "id": "rev_h_igniter_no_power",
-      "text": "No 120 VAC to ignitor. Verify ignition control receives 24 VAC and ground. If 24 VAC present but no output, replace ignition control.",
-      "input": "info",
-      "terminal": true
-    },
 
     "rev_h_gas": {
       "id": "rev_h_gas",
-      "text": "Check for approx. 24 VAC at Brown (gas valve) → Yellow (Ground). Is voltage Present?",
+      "text": "Check for approx. 24 VAC at Brown (gas valve) → Yellow (Ground). Expect 22–26 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
       "pass": "rev_h_flame",
-      "fail": "rev_h_igniter"
+      "fail": "critical_stop_icb"
     },
 
     "rev_h_flame": {
@@ -325,7 +295,51 @@
       "text": "✅ Rev H heater operating normally.",
       "input": "info",
       "terminal": true,
-      "success": true
+      "success": true,
+      "exportReport": true
+    },
+
+    "critical_stop_line_power": {
+      "id": "critical_stop_line_power",
+      "text": "❌ Line Power Failure — No incoming 120/240 VAC to heater.\nVerify breaker, wiring, and disconnect. Cannot continue until power restored.",
+      "input": "info",
+      "terminal": true,
+      "exportReport": true
+    },
+    "critical_stop_transformer": {
+      "id": "critical_stop_transformer",
+      "text": "❌ Transformer failure (P/N R0456301). Measured 0 VAC output — expected 22–26 VAC. Replace before continuing diagnostics.",
+      "input": "info",
+      "terminal": true,
+      "exportReport": true
+    },
+    "critical_stop_pib_fuse": {
+      "id": "critical_stop_pib_fuse",
+      "text": "❌ PIB Fuse Open (P/N R0384900). Heater control power interrupted. Replace fuse and restart diagnostics.",
+      "input": "info",
+      "terminal": true,
+      "exportReport": true
+    },
+    "critical_stop_pib_board": {
+      "id": "critical_stop_pib_board",
+      "text": "❌ PIB Board Failure — no low-voltage response after 24 VAC confirmed. Replace PIB Board before continuing.",
+      "input": "info",
+      "terminal": true,
+      "exportReport": true
+    },
+    "critical_stop_icb": {
+      "id": "critical_stop_icb",
+      "text": "❌ Ignition Control (ICB) failure — no output voltage to gas valve or ignitor. Replace ICB module (P/N R0452500).",
+      "input": "info",
+      "terminal": true,
+      "exportReport": true
+    },
+    "critical_stop_comms": {
+      "id": "critical_stop_comms",
+      "text": "❌ Communication Error (EE/CE Code) — EEPROM or display ICB link failure. Replace display board or ICB as needed.",
+      "input": "info",
+      "terminal": true,
+      "exportReport": true
     },
 
     "fix_power": {
