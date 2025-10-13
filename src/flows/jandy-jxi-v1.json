@@ -24,7 +24,6 @@
       "pass": "enter_serial"
     },
 
-   
     "rev_g_start": {
       "id": "rev_g_start",
       "text": "Which input voltage is the JXi Rev G configured for?",
@@ -39,8 +38,7 @@
       "unit": "VAC",
       "range": [110, 126],
       "pass": "rev_g_step2",
-      "fail": "fix_power",
-      "isEntryPoint": true
+      "fail": "fix_power"
     },
     "rev_g_240": {
       "id": "rev_g_240",
@@ -49,8 +47,7 @@
       "unit": "VAC",
       "range": [220, 252],
       "pass": "rev_g_step2",
-      "fail": "fix_power",
-      "isEntryPoint": true
+      "fail": "fix_power"
     },
 
     "rev_g_step2": {
@@ -60,13 +57,14 @@
       "unit": "VAC",
       "range": [22, 26],
       "pass": "rev_g_step3",
-      "fail": "rev_g_step2_check_input"
+      "fail": "rev_g_transformer_failed"
     },
-    "rev_g_step2_check_input": {
-      "id": "rev_g_step2_check_input",
-      "text": "Measured transformer output below 22 VAC.\n\nVerify incoming voltage (110–126 or 220–252 VAC). If input correct and output low → replace transformer. P/N R0456301",
-     "input": "info",
-      "pass": "rev_g_step3"
+
+    "rev_g_transformer_failed": {
+      "id": "rev_g_transformer_failed",
+      "text": "Measured transformer output below 22 VAC.\n\nInput voltage correct — replace transformer (P/N R0456301).",
+      "input": "info",
+      "terminal": true
     },
 
     "rev_g_step3": {
@@ -77,20 +75,28 @@
       "fail": "rev_g_replace_fuse"
     },
     
-    "rev_g_replace_fuse":{
+    "rev_g_replace_fuse": {
       "id": "rev_g_replace_fuse",
-      "text": "replace fuse P/N R0384900",
+      "text": "PIB fuse open. Replace fuse (P/N R0384900) and verify continuity before continuing.",
+      "input": "info",
       "pass": "rev_g_step5"
     },
 
     "rev_g_step5": {
       "id": "rev_g_step5",
-      "text": "Water Pressure Switch: Check for 24 VAC between Purple (4) and Yellow (Ground). Check for 24 VAC between Gray (5) and Yellow (Ground) Expect 22–26 VAC. ",
+      "text": "Water Pressure Switch: Measure 24 VAC between Purple (4) and Ground, then Gray (5) and Ground. Expect 22–26 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
       "pass": "rev_g_blower",
-      "fail": "rev_g_step4"
+      "fail": "rev_g_pressure_switch_failed"
+    },
+
+    "rev_g_pressure_switch_failed": {
+      "id": "rev_g_pressure_switch_failed",
+      "text": "Voltage below spec — confirm filter pump on and filter clean. If pressure > 2 psi and still open, replace Pressure Switch (P/N R0457001).",
+      "input": "info",
+      "pass": "rev_g_blower"
     },
 
     "rev_g_blower": {
@@ -98,8 +104,14 @@
       "text": "Does the blower motor run?",
       "input": "yesno",
       "pass": "rev_g_igniter",
-      "fail": "rev_g_blower_no_power",
-      "isEntryPoint": true
+      "fail": "rev_g_blower_no_power"
+    },
+
+    "rev_g_blower_no_power": {
+      "id": "rev_g_blower_no_power",
+      "text": "Blower not running. Contact Fluidra/Jandy for blower test specs and diagnostics (P/N R0452200).",
+      "input": "info",
+      "terminal": true
     },
 
     "rev_g_igniter": {
@@ -107,9 +119,9 @@
       "text": "After blower starts, does the Hot Surface Igniter glow?",
       "input": "yesno",
       "pass": "rev_g_gas",
-      "fail": "rev_g_igniter_check_input",
-      "isEntryPoint": true
+      "fail": "rev_g_igniter_check_input"
     },
+
     "rev_g_igniter_check_input": {
       "id": "rev_g_igniter_check_input",
       "text": "Measure voltage at Ignition Control K & I terminals during ignition. Expect 105–130 VAC.\n\nIf no voltage → verify 24 VAC to board.\nIf voltage present → check ignitor continuity.",
@@ -119,41 +131,44 @@
       "pass": "rev_g_igniter_check_continuity",
       "fail": "rev_g_igniter_no_power"
     },
+
     "rev_g_igniter_check_continuity": {
       "id": "rev_g_igniter_check_continuity",
-      "text": "With power off and ignitor cool, check continuity between ignitor leads.\n\n✅ Continuity present → ignitor intact.\n❌ Open circuit → replace ignitor.\n(Optional) Cold resistance ≈ 40–75 Ω; > 90 Ω = weak element.",
+      "text": "With power off and ignitor cool, check continuity between ignitor leads.\n\n✅ Continuity present → ignitor intact.\n❌ Open circuit → replace ignitor (P/N R0452300).",
       "input": "yesno",
       "pass": "rev_g_gas",
       "fail": "replace_ignitor"
     },
+
     "rev_g_igniter_no_power": {
       "id": "rev_g_igniter_no_power",
-      "text": "No 120 VAC to ignitor. Verify ignition control receives 24 VAC and ground. If 24 VAC present but no output, replace ignition control.",
+      "text": "No 120 VAC to ignitor — replace ignition control board.",
       "input": "info",
       "terminal": true
     },
-    "rev_g_blower_no_power": {
-      "id": "rev_g_blower_no_power",
-      "text": "blower issue, talk to Fluidra/jandy and find out blower specs and best diagnostic process ",
-      "input": "info",
-      "pass":"rev_g_gas",
-      "terminal": true
-    },
+
     "replace_ignitor": {
       "id": "replace_ignitor",
-      "text": "Replace Hot Surface Ignitor. Verify connections and ceramic integrity before restart.",
+      "text": "Replace Hot Surface Ignitor (P/N R0452300). Verify connections and ceramic integrity before restart.",
       "input": "info",
       "terminal": true
     },
 
     "rev_g_gas": {
       "id": "rev_g_gas",
-      "text": "Check for approx. 24 VAC at Brown (gas valve) → Yellow (Ground). Is voltage Present?",
+      "text": "Check for approx. 24 VAC at Brown (gas valve) → Yellow (Ground). Expect 22–26 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
       "pass": "rev_g_flame",
-      "fail": "rev_g_igniter"
+      "fail": "rev_g_gas_valve_failed"
+    },
+
+    "rev_g_gas_valve_failed": {
+      "id": "rev_g_gas_valve_failed",
+      "text": "Voltage missing or coil open — replace gas valve (P/N R0452400).",
+      "input": "info",
+      "pass": "rev_g_flame"
     },
 
     "rev_g_flame": {
@@ -161,7 +176,27 @@
       "text": "Do burners ignite and stay lit > 7 s?",
       "input": "yesno",
       "pass": "rev_g_success",
-      "fail": "rev_g_gas"
+      "fail": "rev_g_flame_test"
+    },
+
+    "rev_g_flame_test": {
+      "id": "rev_g_flame_test",
+      "text": "Measure flame-rectification current between sensor and ground. Expect ≥ 1.5 µA DC. If low, clean or replace flame sensor (P/N R0452502).",
+      "input": "number",
+      "unit": "µA DC",
+      "range": [1.5, 10],
+      "pass": "rev_g_success",
+      "fail": "rev_g_gas_pressure_test"
+    },
+
+    "rev_g_gas_pressure_test": {
+      "id": "rev_g_gas_pressure_test",
+      "text": "Check manifold pressure during ignition. Expect NG 1.8–2.0 inWC / LP 6.8–7.0 inWC. Adjust or replace gas valve (P/N R0452400) if out of spec.",
+      "input": "number",
+      "unit": "inWC",
+      "range": [1.8, 7.0],
+      "pass": "rev_g_success",
+      "fail": "rev_g_gas_valve_failed"
     },
 
     "rev_g_success": {
@@ -172,7 +207,6 @@
       "success": true
     },
 
-    
     "rev_h_start": {
       "id": "rev_h_start",
       "text": "Which input voltage is the JXi Rev H configured for?",
@@ -182,39 +216,38 @@
 
     "rev_h_120": {
       "id": "rev_h_120",
-      "text": "Measure power at Distribution Board between Black and Red . Expect 110–126 VAC.",
+      "text": "Measure power at Distribution Board between Black and Red. Expect 110–126 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [110, 126],
       "pass": "rev_h_step2",
-      "fail": "fix_power",
-      "isEntryPoint": true
+      "fail": "fix_power"
     },
     "rev_h_240": {
       "id": "rev_h_240",
-      "text": "Measure at Distribution Board from Black and Red B  . Expect 220–252 VAC.",
+      "text": "Measure at Distribution Board between Black and Red. Expect 220–252 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [220, 252],
       "pass": "rev_h_step2",
-      "fail": "fix_power",
-      "isEntryPoint": true
+      "fail": "fix_power"
     },
 
     "rev_h_step2": {
       "id": "rev_h_step2",
-      "text": "Measure transformer output Between Red and Yellow Ground. Expect 22–26 VAC.",
+      "text": "Measure transformer output between Red and Yellow Ground. Expect 22–26 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
       "pass": "rev_h_step3",
-      "fail": "rev_h_step2_check_input"
+      "fail": "rev_h_transformer_failed"
     },
-    "rev_h_step2_check_input": {
-      "id": "rev_h_step2_check_input",
-      "text": "Measured transformer output below 22 VAC.\n\nVerify incoming voltage (110–126 / 220–252 VAC). If input correct and output low → replace transformer. (P/N R0456301)",
+
+    "rev_h_transformer_failed": {
+      "id": "rev_h_transformer_failed",
+      "text": "Transformer output low — replace transformer (P/N R0456301).",
       "input": "info",
-      "pass": "rev_h_step3"
+      "terminal": true
     },
 
     "rev_h_step3": {
@@ -226,14 +259,15 @@
     },
 
     "rev_h_replace_fuse": {
-    "id": "rev_h_replace_fuse",
-    "text": "fuse failed, repalce with P/N R0384900",
-    "pass": "rev_h_step4"
+      "id": "rev_h_replace_fuse",
+      "text": "PIB fuse open. Replace fuse (P/N R0384900) and verify continuity.",
+      "input": "info",
+      "pass": "rev_h_step4"
     },
 
     "rev_h_step4": {
       "id": "rev_h_step4",
-      "text": "Water Pressure Switch: Check for 24 VAC between Purple (4) and Yellow (Ground). Check for 24 VAC between Gray (5) and Yellow (Ground) Expect 22–26 VAC. " ,
+      "text": "Water Pressure Switch: Measure 24 VAC between Purple (4) and Yellow (Ground), then Gray (5) and Yellow (Ground). Expect 22–26 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
@@ -241,16 +275,16 @@
       "fail": "rev_h_pressure_switch_failed"
     },
 
-     "rev_h_pressure_switch_failed": {
-     "id": "rev_h_pressure_switch_failed",
-     "text": "Voltage is 0 or below spec — Verify filter pump is on, filter is clean, and filter pressure is above 2 psi. If Filter pressure is above 2 psi and the pressure switch is still open, replace pressure switch (P/N R0457001) ",
-     "input": "info",
-     "pass": "rev_h_step5"
-   },
+    "rev_h_pressure_switch_failed": {
+      "id": "rev_h_pressure_switch_failed",
+      "text": "Voltage 0 or below spec — verify pump on, filter clean, and pressure > 2 psi. Replace Pressure Switch (P/N R0457001) if still open.",
+      "input": "info",
+      "pass": "rev_h_step5"
+    },
 
     "rev_h_step5": {
       "id": "rev_h_step5",
-      "text": "High Limits: Check for 24 VAC from each leg of high limits to ground. What was the voltage between each leg and ground?",
+      "text": "High Limits: Check 24 VAC from each leg to ground. Expect 22–26 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
@@ -259,10 +293,10 @@
     },
 
     "rev_h_highlimit_failed": {
-     "id": "rev_h_highlimit_failed",
-     "text": "Below expected Voltage — one or more high limit switches are open. Replace both high limits (P/N R0592300), then continue diagnostics.",
-     "input": "info",
-     "pass": "rev_h_blower"
+      "id": "rev_h_highlimit_failed",
+      "text": "Below expected voltage — replace both High Limits (P/N R0592300) and retest.",
+      "input": "info",
+      "pass": "rev_h_blower"
     },
 
     "rev_h_blower": {
@@ -270,8 +304,14 @@
       "text": "Does the blower motor run?",
       "input": "yesno",
       "pass": "rev_h_igniter",
-      "fail": "rev_h_step5",
-      "isEntryPoint": true
+      "fail": "rev_h_blower_no_power"
+    },
+
+    "rev_h_blower_no_power": {
+      "id": "rev_h_blower_no_power",
+      "text": "Blower not running — contact Fluidra/Jandy for blower test specifications (P/N R0452200).",
+      "input": "info",
+      "terminal": true
     },
 
     "rev_h_igniter": {
@@ -279,40 +319,49 @@
       "text": "After blower starts, does the Hot Surface Igniter glow?",
       "input": "yesno",
       "pass": "rev_h_gas",
-      "fail": "rev_h_igniter_check_input",
-      "isEntryPoint": true
+      "fail": "rev_h_igniter_check_input"
     },
+
     "rev_h_igniter_check_input": {
       "id": "rev_h_igniter_check_input",
-      "text": "Measure voltage at Ignition Control K & I terminals during ignition. Expect 105–130 VAC.\n\nIf no voltage → verify 24 VAC supply.\nIf voltage present → check ignitor continuity.",
+      "text": "Measure voltage at Ignition Control K & I terminals during ignition. Expect 105–130 VAC.\nIf no voltage → verify 24 VAC. If voltage present → check ignitor continuity.",
       "input": "number",
       "unit": "VAC",
       "range": [105, 130],
       "pass": "rev_h_igniter_check_continuity",
       "fail": "rev_h_igniter_no_power"
     },
+
     "rev_h_igniter_check_continuity": {
       "id": "rev_h_igniter_check_continuity",
-      "text": "With power off and ignitor cool, check continuity between ignitor leads.\n\n✅ Continuity present → ignitor intact.\n❌ Open circuit → replace ignitor.",
+      "text": "With power off, check ignitor continuity.  Present → OK.✅  Open → replace ignitor❌ (P/N R0452300).",
       "input": "yesno",
       "pass": "rev_h_gas",
       "fail": "replace_ignitor"
     },
+
     "rev_h_igniter_no_power": {
       "id": "rev_h_igniter_no_power",
-      "text": "No 120 VAC to ignitor. Verify ignition control receives 24 VAC and ground. If 24 VAC present but no output, replace ignition control.",
+      "text": "No 120 VAC to ignitor — replace ignition control board.",
       "input": "info",
       "terminal": true
     },
 
     "rev_h_gas": {
       "id": "rev_h_gas",
-      "text": "Check for approx. 24 VAC at Brown (gas valve) → Yellow (Ground). Is voltage Present?",
+      "text": "Check for approx. 24 VAC at Brown (gas valve) → Yellow (Ground). Expect 22–26 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
       "pass": "rev_h_flame",
-      "fail": "rev_h_igniter"
+      "fail": "rev_h_gas_valve_failed"
+    },
+
+    "rev_h_gas_valve_failed": {
+      "id": "rev_h_gas_valve_failed",
+      "text": "No voltage or valve not opening — replace gas valve (P/N R0591400).",
+      "input": "info",
+      "pass": "rev_h_flame"
     },
 
     "rev_h_flame": {
@@ -320,7 +369,27 @@
       "text": "Do burners ignite and stay lit > 7 s?",
       "input": "yesno",
       "pass": "rev_h_success",
-      "fail": "rev_h_gas"
+      "fail": "rev_h_flame_test"
+    },
+
+    "rev_h_flame_test": {
+      "id": "rev_h_flame_test",
+      "text": "Measure flame-rectification current (expect ≥ 1.5 µA DC). If low, clean or replace sensor (P/N R0452502).",
+      "input": "number",
+      "unit": "µA DC",
+      "range": [1.5, 10],
+      "pass": "rev_h_success",
+      "fail": "rev_h_gas_pressure_test"
+    },
+
+    "rev_h_gas_pressure_test": {
+      "id": "rev_h_gas_pressure_test",
+      "text": "Check manifold pressure during ignition. Expect NG 1.8–2.0 inWC / LP 6.8–7.0 inWC. Adjust or replace gas valve (P/N R0452400).",
+      "input": "number",
+      "unit": "inWC",
+      "range": [1.8, 7.0],
+      "pass": "rev_h_success",
+      "fail": "rev_h_gas_valve_failed"
     },
 
     "rev_h_success": {
