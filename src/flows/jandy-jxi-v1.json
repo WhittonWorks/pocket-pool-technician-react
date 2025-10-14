@@ -40,6 +40,7 @@
       "pass": "rev_g_step2",
       "fail": "fix_power"
     },
+
     "rev_g_240": {
       "id": "rev_g_240",
       "text": "Measure power at Distribution Board Black and Red. Expect 220–252 VAC.",
@@ -77,7 +78,7 @@
 
     "rev_g_replace_fuse": {
       "id": "rev_g_replace_fuse",
-      "text": "PIB fuse open. Replace fuse (P/N R0384900) and verify continuity before continuing.",
+      "text": "PIB fuse open. Replace (P/N R0384900) and verify continuity before continuing.",
       "input": "info",
       "terminal": true
     },
@@ -104,12 +105,44 @@
       "text": "Does the blower motor run?",
       "input": "yesno",
       "pass": "rev_g_igniter",
-      "fail": "rev_g_blower_no_power"
+      "fail": "rev_g_blower_test_icb_output"
     },
 
-    "rev_g_blower_no_power": {
-      "id": "rev_g_blower_no_power",
-      "text": "Blower not running. Replace blower assembly (P/N R0591100).",
+    "rev_g_blower_test_icb_output": {
+      "id": "rev_g_blower_test_icb_output",
+      "text": "With a call for heat active, check for continuity across Fenwal terminals F1 and F2.\n✅ Continuity present → ICB output good → proceed to blower capacitor test.\n❌ No continuity → ICB/Fenwal defective.",
+      "input": "yesno",
+      "pass": "rev_g_test_blower_capacitor",
+      "fail": "rev_g_icb_failed"
+    },
+
+    "rev_g_test_blower_capacitor": {
+      "id": "rev_g_test_blower_capacitor",
+      "text": "Measure blower run capacitor (P/N R0614500). Expect 8 µF ± 5%.\n✅ Within range → blower failed.\n❌ Below spec → replace capacitor.",
+      "input": "number",
+      "unit": "µF",
+      "range": [7.6, 8.4],
+      "pass": "rev_g_blower_failed",
+      "fail": "rev_g_capacitor_failed"
+    },
+
+    "rev_g_capacitor_failed": {
+      "id": "rev_g_capacitor_failed",
+      "text": "Capacitor out of spec. Replace blower capacitor (P/N R0614500).",
+      "input": "info",
+      "terminal": true
+    },
+
+    "rev_g_blower_failed": {
+      "id": "rev_g_blower_failed",
+      "text": "Capacitor in range but blower still not running — replace blower assembly (P/N R0591100).",
+      "input": "info",
+      "terminal": true
+    },
+
+    "rev_g_icb_failed": {
+      "id": "rev_g_icb_failed",
+      "text": "No continuity across Fenwal F1–F2 during call for heat — replace Ignition Control Board (ICB/Fenwal) (P/N R0451800 validate).",
       "input": "info",
       "terminal": true
     },
@@ -142,7 +175,7 @@
 
     "rev_g_igniter_no_power": {
       "id": "rev_g_igniter_no_power",
-      "text": "No 120 VAC to ignitor — replace ignition control board (P/N R0456900).",
+      "text": "No 120 VAC to ignitor — replace Ignition Control Board (P/N R0456900).",
       "input": "info",
       "terminal": true
     },
@@ -168,8 +201,7 @@
       "input": "info",
       "terminal": true
     },
-
-    "rev_g_flame": {
+        "rev_g_flame": {
       "id": "rev_g_flame",
       "text": "Do burners ignite and stay lit > 7 s?",
       "input": "yesno",
@@ -179,7 +211,7 @@
 
     "rev_g_flame_test": {
       "id": "rev_g_flame_test",
-      "text": "Measure flame-rectification current. Expect ≥ 1.5 µA DC.\nIf low → clean/replace sensor (P/N R0452502).",
+      "text": "Measure flame-rectification current. Expect ≥ 1.5 µA DC.\nIf low → clean / replace sensor (P/N R0452502).",
       "input": "number",
       "unit": "µA DC",
       "range": [1.5, 10],
@@ -189,7 +221,7 @@
 
     "rev_g_gas_inlet_pressure_test": {
       "id": "rev_g_gas_inlet_pressure_test",
-      "text": "Check static inlet gas pressure with heater idle.\nExpected values:\n- Natural Gas (NG): 5.0–10.5 inWC\n- Propane (LP): 11.0–13.0 inWC\nEnter measured value:",
+      "text": "Check static inlet gas pressure with heater idle.\nExpected values:\n- Natural Gas (NG): 5.0–10.5 inWC\n- Propane (LP): 11.0–13.0 inWC",
       "input": "number",
       "unit": "inWC",
       "range": [5.0, 13.0],
@@ -199,14 +231,14 @@
 
     "rev_g_low_gas_supply": {
       "id": "rev_g_low_gas_supply",
-      "text": "Inlet gas pressure below manufacturer specification.\nPossible causes: undersized gas line, closed valve, or faulty regulator.\nCorrect gas supply issue before proceeding.",
+      "text": "Inlet gas pressure below specification — check supply line, valves, or regulator.",
       "input": "info",
       "terminal": true
     },
 
     "rev_g_gas_outlet_pressure_test": {
       "id": "rev_g_gas_outlet_pressure_test",
-      "text": "Check dynamic manifold pressure during ignition.\nExpected values:\n- Natural Gas (NG): 1.8–2.0 inWC\n- Propane (LP): 6.8–7.0 inWC\nIf within range → OK. If outside range → adjust or replace Gas Valve (P/N R0452400).",
+      "text": "Check dynamic manifold pressure during ignition.\nExpected:\n- NG 1.8–2.0 inWC     - LP 6.8–7.0 inWC\nAdjust / replace gas valve (P/N R0452400) if out of spec.",
       "input": "number",
       "unit": "inWC",
       "range": [1.8, 7.0],
@@ -238,6 +270,7 @@
       "pass": "rev_h_step2",
       "fail": "fix_power"
     },
+
     "rev_h_240": {
       "id": "rev_h_240",
       "text": "Measure at Distribution Board (Black → Red). Expect 220–252 VAC.",
@@ -319,12 +352,44 @@
       "text": "Does the blower motor run?",
       "input": "yesno",
       "pass": "rev_h_igniter",
-      "fail": "rev_h_blower_no_power"
+      "fail": "rev_h_blower_test_icb_output"
     },
 
-    "rev_h_blower_no_power": {
-      "id": "rev_h_blower_no_power",
-      "text": "Blower not running. Replace blower assembly (P/N R0452200).",
+    "rev_h_blower_test_icb_output": {
+      "id": "rev_h_blower_test_icb_output",
+      "text": "With a call for heat active, check for continuity across Fenwal terminals F1 and F2.\n✅ Continuity present → ICB output good → proceed to blower capacitor test.\n❌ No continuity → ICB/Fenwal defective.",
+      "input": "yesno",
+      "pass": "rev_h_test_blower_capacitor",
+      "fail": "rev_h_icb_failed"
+    },
+
+    "rev_h_test_blower_capacitor": {
+      "id": "rev_h_test_blower_capacitor",
+      "text": "Measure blower run capacitor (P/N R0614500). Expect 8 µF ± 5%.\n✅ Within range → blower failed.\n❌ Below spec → replace capacitor.",
+      "input": "number",
+      "unit": "µF",
+      "range": [7.6, 8.4],
+      "pass": "rev_h_blower_failed",
+      "fail": "rev_h_capacitor_failed"
+    },
+
+    "rev_h_capacitor_failed": {
+      "id": "rev_h_capacitor_failed",
+      "text": "Capacitor out of spec. Replace blower capacitor (P/N R0614500).",
+      "input": "info",
+      "terminal": true
+    },
+
+    "rev_h_blower_failed": {
+      "id": "rev_h_blower_failed",
+      "text": "Capacitor in range but blower still not running — replace blower assembly (P/N R0452200).",
+      "input": "info",
+      "terminal": true
+    },
+
+    "rev_h_icb_failed": {
+      "id": "rev_h_icb_failed",
+      "text": "No continuity across Fenwal F1–F2 during call for heat — replace Ignition Control Board (ICB/Fenwal) (P/N R0451800 validate).",
       "input": "info",
       "terminal": true
     },
@@ -339,7 +404,7 @@
 
     "rev_h_igniter_check_input": {
       "id": "rev_h_igniter_check_input",
-      "text": "Measure voltage at Ignition Control K&I terminals during ignition. Expect 105–130 VAC.",
+      "text": "Measure voltage at Ignition Control K & I terminals during ignition. Expect 105–130 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [105, 130],
@@ -357,7 +422,7 @@
 
     "rev_h_igniter_no_power": {
       "id": "rev_h_igniter_no_power",
-      "text": "No 120 VAC to ignitor — replace ignition control board (P/N R0451800 validate).",
+      "text": "No 120 VAC to ignitor — replace Ignition Control Board (P/N R0451800 validate).",
       "input": "info",
       "terminal": true
     },
@@ -372,7 +437,7 @@
 
     "rev_h_gas_valve_mechanical_fail": {
       "id": "rev_h_gas_valve_mechanical_fail",
-      "text": "Valve received correct voltage and resistance but did not open. Replace Gas Valve (P/N R0452400) — likely internal failure.",
+      "text": "Valve received correct voltage and resistance but did not open — replace Gas Valve (P/N R0452400).",
       "input": "info",
       "terminal": true
     },
@@ -387,7 +452,7 @@
 
     "rev_h_flame_test": {
       "id": "rev_h_flame_test",
-      "text": "Measure flame rectification current. Expect ≥ 1.5 µA DC.\nIf low, clean or replace flame sensor (P/N R0452502).",
+      "text": "Measure flame rectification current. Expect ≥ 1.5 µA DC.\nIf low, clean or replace sensor (P/N R0452502).",
       "input": "number",
       "unit": "µA DC",
       "range": [1.5, 10],
@@ -397,23 +462,24 @@
 
     "rev_h_gas_inlet_pressure_test": {
       "id": "rev_h_gas_inlet_pressure_test",
-      "text": "Check static inlet gas pressure with heater idle.\nExpected values:\n- Natural Gas (NG): 5.0–10.5 inWC\n- Propane (LP): 11.0–13.0 inWC\nEnter measured value:",
+      "text": "Check static inlet gas pressure with heater idle.\nExpected:\n- NG 5.0–10.5 inWC\n- LP 11.0–13.0 inWC",
       "input": "number",
       "unit": "inWC",
-            "pass": "rev_h_gas_outlet_pressure_test",
+      "range": [5.0, 13.0],
+      "pass": "rev_h_gas_outlet_pressure_test",
       "fail": "rev_h_low_gas_supply"
     },
 
     "rev_h_low_gas_supply": {
       "id": "rev_h_low_gas_supply",
-      "text": "Inlet gas pressure below manufacturer specification.\nPossible causes: undersized gas line, closed or partially closed valve, or faulty regulator.\nCorrect gas supply issue before proceeding.",
+      "text": "Inlet gas pressure below spec — check supply line, valves, or regulator before continuing.",
       "input": "info",
       "terminal": true
     },
 
     "rev_h_gas_outlet_pressure_test": {
       "id": "rev_h_gas_outlet_pressure_test",
-      "text": "Check dynamic manifold pressure during ignition.\nExpected values:\n- Natural Gas (NG): 1.8–2.0 inWC\n- Propane (LP): 6.8–7.0 inWC\nIf within range → OK.\nIf outside range → adjust or replace Gas Valve (P/N R0452400).",
+      "text": "Check dynamic manifold pressure during ignition.\nExpected:\n- NG 1.8–2.0 inWC     - LP 6.8–7.0 inWC\nAdjust / replace Gas Valve (P/N R0452400) if out of spec.",
       "input": "number",
       "unit": "inWC",
       "range": [1.8, 7.0],
