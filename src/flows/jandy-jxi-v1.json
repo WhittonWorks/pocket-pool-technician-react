@@ -200,12 +200,43 @@
     },
 
     "rev_g_gas": {
-      "id": "rev_g_gas",
-      "text": "Measure 24 VAC at Brown (gas valve) → Yellow (Ground). Expect 22–26 VAC.\nDoes the valve open?",
-      "input": "yesno",
-      "pass": "rev_g_flame",
-      "fail": "rev_g_gas_valve_mechanical_fail"
-    },
+  "id": "rev_g_gas",
+  "text": "Measure 24 VAC at Brown (gas valve) → Yellow (Ground). Expect 22–26 VAC.\nDoes the valve open?",
+  "input": "yesno",
+  "pass": "rev_g_branch_gas_type",
+  "fail": "rev_g_gas_valve_mechanical_fail"
+},
+
+"rev_g_branch_gas_type": {
+  "id": "rev_g_branch_gas_type",
+  "text": "Auto-routing by gas type (based on model number)…",
+  "input": "info",
+  "logic": [
+    { "if": "answers.modelInfo.gasType === 'Natural Gas'", "goto": "rev_g_ng_pressure" },
+    { "if": "answers.modelInfo.gasType === 'Propane'", "goto": "rev_g_lp_pressure" }
+  ],
+  "default": "rev_g_ng_pressure"
+},
+
+"rev_g_ng_pressure": {
+  "id": "rev_g_ng_pressure",
+  "text": "Check static inlet gas pressure with heater idle — expect 5.0–10.5 inWC.\nThen check dynamic manifold pressure during ignition — expect 1.8–2.0 inWC.",
+  "input": "number",
+  "unit": "inWC",
+  "range": [1.8, 10.5],
+  "pass": "rev_g_flame_test",
+  "fail": "rev_g_low_gas_supply"
+},
+
+"rev_g_lp_pressure": {
+  "id": "rev_g_lp_pressure",
+  "text": "Check static inlet gas pressure with heater idle — expect 11.0–13.0 inWC.\nThen check dynamic manifold pressure during ignition — expect 6.8–7.0 inWC.",
+  "input": "number",
+  "unit": "inWC",
+  "range": [6.8, 13.0],
+  "pass": "rev_g_flame_test",
+  "fail": "rev_g_low_gas_supply"
+}
 
     "rev_g_gas_valve_mechanical_fail": {
       "id": "rev_g_gas_valve_mechanical_fail",
@@ -440,12 +471,43 @@
     },
 
     "rev_h_gas": {
-      "id": "rev_h_gas",
-      "text": "Measure 24 VAC at Brown (gas valve) → Yellow (Ground). Expect 22–26 VAC.\nDoes valve open?",
-      "input": "yesno",
-      "pass": "rev_h_flame",
-      "fail": "rev_h_gas_valve_mechanical_fail"
-    },
+  "id": "rev_h_gas",
+  "text": "Measure 24 VAC at Brown (gas valve) → Yellow (Ground). Expect 22–26 VAC.\nDoes the valve open?",
+  "input": "yesno",
+  "pass": "rev_h_branch_gas_type",
+  "fail": "rev_h_gas_valve_mechanical_fail"
+},
+
+"rev_h_branch_gas_type": {
+  "id": "rev_h_branch_gas_type",
+  "text": "Auto-routing by gas type (based on model number)…",
+  "input": "info",
+  "logic": [
+    { "if": "answers.modelInfo.gasType === 'Natural Gas'", "goto": "rev_h_ng_pressure" },
+    { "if": "answers.modelInfo.gasType === 'Propane'", "goto": "rev_h_lp_pressure" }
+  ],
+  "default": "rev_h_ng_pressure"
+},
+
+"rev_h_ng_pressure": {
+  "id": "rev_h_ng_pressure",
+  "text": "Check static inlet gas pressure with heater idle — expect 5.0–10.5 inWC.\nThen check dynamic manifold pressure during ignition — expect 1.8–2.0 inWC.",
+  "input": "number",
+  "unit": "inWC",
+  "range": [1.8, 10.5],
+  "pass": "rev_h_flame_test",
+  "fail": "rev_h_low_gas_supply"
+},
+
+"rev_h_lp_pressure": {
+  "id": "rev_h_lp_pressure",
+  "text": "Check static inlet gas pressure with heater idle — expect 11.0–13.0 inWC.\nThen check dynamic manifold pressure during ignition — expect 6.8–7.0 inWC.",
+  "input": "number",
+  "unit": "inWC",
+  "range": [6.8, 13.0],
+  "pass": "rev_h_flame_test",
+  "fail": "rev_h_low_gas_supply"
+}
 
     "rev_h_gas_valve_mechanical_fail": {
       "id": "rev_h_gas_valve_mechanical_fail",
