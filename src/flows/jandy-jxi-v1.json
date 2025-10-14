@@ -236,7 +236,7 @@
   "range": [6.8, 13.0],
   "pass": "rev_g_flame_test",
   "fail": "rev_g_low_gas_supply"
-}
+},
 
     "rev_g_gas_valve_mechanical_fail": {
       "id": "rev_g_gas_valve_mechanical_fail",
@@ -507,7 +507,7 @@
   "range": [6.8, 13.0],
   "pass": "rev_h_flame_test",
   "fail": "rev_h_low_gas_supply"
-}
+},
 
     "rev_h_gas_valve_mechanical_fail": {
       "id": "rev_h_gas_valve_mechanical_fail",
