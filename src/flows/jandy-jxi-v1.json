@@ -4,8 +4,21 @@
   "equipmentType": "Heaters",
   "model": "JXi",
   "title": "Jandy JXi Heater (Rev G & Rev H) — Guided Troubleshooting",
-  "start": "enter_serial",
+  "start": "enter_model",
   "nodes": {
+    "enter_model": {
+      "id": "enter_model",
+      "text": "Enter the model number from the JXi heater label.\n\nExample: JXI400NK (400k BTU, Natural Gas, CuNi, VersaFlo)",
+      "input": "text",
+      "default": "invalid_model",
+      "pass": "enter_serial"
+    },
+    "invalid_model": {
+      "id": "invalid_model",
+      "text": "❌ Invalid model number. Try again.\nExpected formats:\nJXI followed by BTU and letters (e.g., JXI400NK, JXI260N, JXI400P).",
+      "input": "info",
+      "pass": "enter_model"
+    },
     "enter_serial": {
       "id": "enter_serial",
       "text": "Enter the full serial number from the JXi heater.\n\n- Rev G or earlier: starts with B and is 9 characters long (2017 & earlier)\n- Rev H or newer: starts with LB and is 18 characters long (2018+)",
@@ -16,14 +29,13 @@
       ],
       "default": "invalid_serial"
     },
-
     "invalid_serial": {
       "id": "invalid_serial",
       "text": "❌ Invalid serial number. Try again.\nExpected formats:\n- Rev G or earlier = B#####\n- Rev H or newer = LB#####",
       "input": "info",
       "pass": "enter_serial"
     },
-
+    
     "rev_g_start": {
       "id": "rev_g_start",
       "text": "Which input voltage is the JXi Rev G configured for?",
