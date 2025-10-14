@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import FeedbackModal from "./components/FeedbackModal";
 import AppSettings from "./config/appSettings"; // 🧠 Centralized config import
-
+import { jandy as serialJandy } from "./tools/serial";
+import { jandy as modelJandy } from "./tools/model";
 function FlowRunner({ flow, onExit, onFinish }) {
   const [currentId, setCurrentId] = useState(flow.start);
   const [answers, setAnswers] = useState({ model: flow.model });
@@ -84,7 +85,6 @@ function FlowRunner({ flow, onExit, onFinish }) {
         console.error("⚠️ Error during onFinish:", err);
       }
 
-      // 🧠 Automatically show feedback modal when flow ends
       if (AppSettings.FEEDBACK_MODAL_ENABLED) {
         console.log("🧠 Triggering feedback modal automatically...");
         setShowFeedback(true);
@@ -94,25 +94,75 @@ function FlowRunner({ flow, onExit, onFinish }) {
     } else if (current.pass) goTo(current.pass);
   }
 
+  // 🧠 Text input handler — now decodes serials & models automatically
   function handleTextNext() {
     const val = textInput.trim();
     if (!val) return;
-    setAnswers((prev) => ({ ...prev, [currentId]: val }));
+    const upperVal = val.toUpperCase(); // normalize user input
 
+    setAnswers((prev) => ({ ...prev, [currentId]: upperVal }));
+
+    // --- SERIAL ENTRY NODE ---
+    if (currentId === "enter_serial") {
+      const info = serialJandy.decodeJandyJxiSerial(upperVal);
+
+      if (!info.valid) {
+        console.warn("❌ Invalid serial format:", upperVal);
+        if (current.default) return goTo(current.default, upperVal);
+        return;
+      }
+
+      console.log("🧠 Serial decoded:", info);
+
+      setAnswers((prev) => ({
+        ...prev,
+        serialInfo: info,
+      }));
+
+      // Route automatically by revision
+      if (info.revision === "Rev G or earlier")
+        return goTo("rev_g_start", upperVal);
+      if (info.revision === "Rev H or newer")
+        return goTo("rev_h_start", upperVal);
+    }
+
+    // --- MODEL ENTRY NODE ---
+    if (currentId === "enter_model") {
+      const info = modelJandy.decodeJandyJxiModel(upperVal);
+
+      if (!info.valid) {
+        console.warn("❌ Invalid model format:", upperVal);
+        if (current.default) return goTo(current.default, upperVal);
+        return;
+      }
+
+      console.log("🧠 Model decoded:", info);
+
+      setAnswers((prev) => ({
+        ...prev,
+        modelInfo: info,
+      }));
+
+      // Optional routing logic by gas type
+      if (info.gasType === "Natural Gas") return goTo("ng_flow_start", upperVal);
+      if (info.gasType === "Propane") return goTo("lp_flow_start", upperVal);
+    }
+
+    // --- FALLBACK LOGIC (non-serial/model nodes) ---
     if (Array.isArray(current.logic)) {
       for (const rule of current.logic) {
         try {
-          const safeVal = JSON.stringify(val);
+          const safeVal = JSON.stringify(upperVal);
           const condition = rule.if.replace(/value/g, safeVal);
           // eslint-disable-next-line no-eval
-          if (eval(condition)) return goTo(rule.goto, val);
+          if (eval(condition)) return goTo(rule.goto, upperVal);
         } catch (err) {
           console.error("⚠️ Logic eval error:", err, "for rule:", rule.if);
         }
       }
     }
 
-    if (current.default) goTo(current.default, val);
+    if (current.default) goTo(current.default, upperVal);
   }
 
   // 🧾 Feedback submission handler
@@ -125,6 +175,7 @@ function FlowRunner({ flow, onExit, onFinish }) {
     onExit?.();
   }
 
+  // ---------------- UI RENDER ----------------
   return (
     <div className="p-4 border rounded bg-white shadow text-gray-800">
       <h3 className="font-bold mb-3">{current.text}</h3>
@@ -224,7 +275,7 @@ function FlowRunner({ flow, onExit, onFinish }) {
             value={textInput}
             onChange={(e) => setTextInput(e.target.value)}
             className="border p-2 rounded w-full mb-2"
-            placeholder="Enter serial number"
+            placeholder="Enter serial or model number"
           />
           <button
             onClick={handleTextNext}

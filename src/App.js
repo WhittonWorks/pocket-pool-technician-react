@@ -7,161 +7,7 @@ import FeedbackLog from "./components/FeedbackLog";
 import errors from "./errors";
 import symptoms from "./symptoms";
 import { findFlow } from "./flows";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
-import branding from "./config/branding"; // 🧩 NEW IMPORT
-
-// 🧾 Generate professional, self-cleaning diagnostic report
-async function handleFinishReport(answers, flow = null) {
-  const doc = new jsPDF();
-
-  // --- Load Active Branding ---
-  const activeProfile =
-    branding.profiles?.[branding.activeProfile] || branding;
-
-  const cleanText = (text) =>
-    !text
-      ? "—"
-      : String(text)
-          .replace(/\s+/g, " ")
-          .replace(/['"`]+/g, "")
-          .replace(/\s*:\s*/g, ": ")
-          .trim();
-
-  const prettifyStep = (key) =>
-    key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-
-  // --- Filter & normalize data ---
-  const filtered = Object.entries(answers).filter(
-    ([key, val]) =>
-      val &&
-      !["outcome", "result", "enter_serial"].includes(key) &&
-      String(val).trim() !== ""
-  );
-
-  const unique = [];
-  const seen = new Set();
-  for (const [k, v] of filtered) {
-    if (!seen.has(k)) {
-      seen.add(k);
-      unique.push([k, v]);
-    }
-  }
-
-  // --- Build clean rows ---
-  const rows = unique.map(([key, val], i) => {
-    const node = flow?.nodes?.[key];
-    const step = node?.text ? cleanText(node.text) : prettifyStep(key);
-    const expected =
-      Array.isArray(node?.range) && node.range.length
-        ? `${node.range.join(" – ")} ${node.unit || ""}`
-        : "—";
-    const actual = cleanText(val);
-    let result = "—";
-    if (/pass|true|success/i.test(actual)) result = "PASS";
-    if (/fail|false|error/i.test(actual)) result = "FAIL";
-    return [i + 1, step, expected, actual, result];
-  });
-
-  // --- 🧾 Header using Branding.js (now with auto line breaks) ---
-  doc.setFontSize(18);
-  doc.text("Pool Diagnostic Report", 60, 20);
-
-  doc.setFontSize(12);
-  let y = 30; // dynamic y-position for spacing
-
-  doc.text(activeProfile.companyName || "Your Pool Company, LLC", 60, y);
-  y += 6;
-
-  // ✅ Split multiline address correctly
-  const addressLines = (activeProfile.address || "123 Main Street\nAnytown, USA 12345").split("\n");
-  addressLines.forEach((line) => {
-    doc.text(line.trim(), 60, y);
-    y += 6;
-  });
-
-  doc.text(`Phone: ${activeProfile.phone || "(555) 555-5555"}`, 60, y);
-  y += 6;
-  doc.text(`Email: ${activeProfile.email || "info@yourpoolcompany.com"}`, 60, y);
-  y += 6;
-  doc.text(`Website: ${activeProfile.website || "www.yourpoolcompany.com"}`, 60, y);
-
-  // --- Report metadata ---
-  const yStart = y + 16;
-  doc.setFontSize(11);
-  doc.text(`Date: ${new Date().toLocaleString()}`, 10, yStart);
-  if (answers.enter_serial)
-    doc.text(`Heater Serial Number: ${cleanText(answers.enter_serial)}`, 10, yStart + 8);
-  if (flow) {
-    doc.text(`Brand: ${flow.brand || "N/A"}`, 10, yStart + 16);
-    doc.text(`Model: ${flow.model || "N/A"}`, 10, yStart + 24);
-  }
-
-  // --- Outcome summary ---
-  const outcome = cleanText(answers.outcome || "Unknown");
-  const summary = cleanText(answers.result || "No summary provided.");
-  const isPass = /pass|success/i.test(outcome);
-
-  doc.setFontSize(13);
-  doc.setTextColor(isPass ? 0 : 200, isPass ? 150 : 0, 0);
-  doc.text(`Outcome: ${outcome}`, 10, yStart + 36);
-  doc.setTextColor(0, 0, 0);
-  doc.setFontSize(12);
-  doc.text(`Summary: ${summary}`, 10, yStart + 44);
-
-  // --- Results table ---
-  autoTable(doc, {
-    startY: yStart + 58,
-    head: [["#", "Step / Test", "Expected Range / Condition", "Actual Reading", "Result"]],
-    body: rows,
-    styles: {
-      fontSize: 9,
-      cellPadding: 3,
-      overflow: "linebreak",
-      valign: "middle",
-    },
-    headStyles: {
-      fillColor: [11, 115, 255],
-      textColor: 255,
-      halign: "center",
-    },
-    columnStyles: {
-      0: { halign: "center", cellWidth: 8 },
-      1: { cellWidth: 70 },
-      2: { cellWidth: 45 },
-      3: { cellWidth: 35 },
-      4: { halign: "center", cellWidth: 20 },
-    },
-    alternateRowStyles: { fillColor: [245, 245, 245] },
-    didParseCell: (data) => {
-      if (data.section === "body" && data.column.index === 4) {
-        const val = String(data.cell.text).toLowerCase();
-        if (val.includes("pass")) data.cell.styles.textColor = [0, 128, 0];
-        if (val.includes("fail")) data.cell.styles.textColor = [200, 0, 0];
-      }
-    },
-  });
-
-  // --- Footer (branded) ---
-  const pageHeight = doc.internal.pageSize.height;
-  doc.setDrawColor(180);
-  doc.line(10, pageHeight - 15, 200, pageHeight - 15);
-  doc.setFontSize(10);
-  doc.text(activeProfile.copyright || branding.copyright, 10, pageHeight - 8);
-
-  // --- Save ---
-  const timestamp = new Date()
-    .toISOString()
-    .replace("T", "_")
-    .replace(/:/g, "-")
-    .split(".")[0];
-  const fileName = `diagnostic-report_${outcome}_${timestamp}.pdf`;
-
-  doc.save(fileName);
-  alert("✅ PDF report generated successfully!");
-}
-
-// ... [rest of your file remains unchanged below this point]
+import createReportPDF from "./utils/pdf/createReportPDF"; // ✅ modular PDF generator import
 
 function App() {
   const [mode, setMode] = useState(null);
@@ -234,10 +80,11 @@ function App() {
     if (!mode) {
       return (
         <div>
+          {/* 🧾 Test PDF button (optional developer tool) */}
           <button
             style={{ ...btnStyle, background: "#007bff", marginBottom: 16 }}
             onClick={() =>
-              handleFinishReport(
+              createReportPDF(
                 {
                   enter_serial: "B1234567",
                   outcome: "Success",
@@ -283,7 +130,14 @@ function App() {
             </button>
             <h3 className="font-bold mb-2">Choose Brand</h3>
             {brands.map((b) => (
-              <button key={b} onClick={() => { setBrand(b); setStep("type"); }} style={btnStyle}>
+              <button
+                key={b}
+                onClick={() => {
+                  setBrand(b);
+                  setStep("type");
+                }}
+                style={btnStyle}
+              >
                 {b}
               </button>
             ))}
@@ -299,7 +153,14 @@ function App() {
             </button>
             <h3 className="font-bold mb-2">{brand} Equipment</h3>
             {equipmentTypes.map((t) => (
-              <button key={t} onClick={() => { setEquipmentType(t); setStep("model"); }} style={btnStyle}>
+              <button
+                key={t}
+                onClick={() => {
+                  setEquipmentType(t);
+                  setStep("model");
+                }}
+                style={btnStyle}
+              >
                 {t}
               </button>
             ))}
@@ -313,9 +174,18 @@ function App() {
             <button onClick={() => setStep("type")} style={backStyle}>
               ← Back
             </button>
-            <h3 className="font-bold mb-2">{brand} {equipmentType}</h3>
+            <h3 className="font-bold mb-2">
+              {brand} {equipmentType}
+            </h3>
             {models[brand][equipmentType].map((m) => (
-              <button key={m} onClick={() => { setModel(m); if (isMobile) setSidebarCollapsed(true); }} style={btnStyle}>
+              <button
+                key={m}
+                onClick={() => {
+                  setModel(m);
+                  if (isMobile) setSidebarCollapsed(true);
+                }}
+                style={btnStyle}
+              >
                 {m}
               </button>
             ))}
@@ -327,7 +197,9 @@ function App() {
     if (mode === "errors")
       return (
         <div>
-          <button onClick={() => setMode(null)} style={backStyle}>← Back</button>
+          <button onClick={() => setMode(null)} style={backStyle}>
+            ← Back
+          </button>
           <ErrorLookup errors={errors} onSelectError={launchFlowFromSymptom} />
         </div>
       );
@@ -335,15 +207,22 @@ function App() {
     if (mode === "symptoms")
       return (
         <div>
-          <button onClick={() => setMode(null)} style={backStyle}>← Back</button>
-          <SymptomLookup symptoms={symptoms} onSelectSymptom={launchFlowFromSymptom} />
+          <button onClick={() => setMode(null)} style={backStyle}>
+            ← Back
+          </button>
+          <SymptomLookup
+            symptoms={symptoms}
+            onSelectSymptom={launchFlowFromSymptom}
+          />
         </div>
       );
 
     if (mode === "feedback")
       return (
         <div>
-          <button onClick={() => setMode(null)} style={backStyle}>← Back</button>
+          <button onClick={() => setMode(null)} style={backStyle}>
+            ← Back
+          </button>
           <FeedbackLog />
         </div>
       );
@@ -362,10 +241,14 @@ function App() {
                 key={flow.id}
                 flow={flow}
                 onExit={resetToHome}
-                onFinish={(answers) => handleFinishReport(answers, flow)}
+                onFinish={(answers) => createReportPDF(answers, flow)} // ✅ uses modular PDF generator
               />
             ) : (
-              <p>✅ You chose <strong>{brand}</strong> → <strong>{equipmentType}</strong> → <strong>{model}</strong> — but no diagnostic flow exists yet.</p>
+              <p>
+                ✅ You chose <strong>{brand}</strong> →{" "}
+                <strong>{equipmentType}</strong> → <strong>{model}</strong> — but
+                no diagnostic flow exists yet.
+              </p>
             );
           })()}
         </>

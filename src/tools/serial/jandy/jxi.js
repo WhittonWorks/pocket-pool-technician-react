@@ -1,11 +1,15 @@
+// src/tools/serial/jandy/jxi.js
+// Jandy JXi serial decoder — returns manufacturing info only
+
 export function decodeJandyJxiSerial(serial) {
-  const clean = serial.trim().toUpperCase();
+  const clean = serial.trim().toUpperCase(); // normalize input
   const result = {
     valid: false,
+    serial: clean,
     revision: null,
-    manufactureDate: null,
-    gasType: null,
-    hasVersaFlo: false,
+    manufactureWeek: null,
+    manufactureYear: null,
+    unitNumber: null,
     notes: ""
   };
 
@@ -15,21 +19,13 @@ export function decodeJandyJxiSerial(serial) {
   if (/^B\d{2}[A-Z][A-Z]\d{4}$/.test(clean)) {
     result.revision = "Rev G or earlier";
 
-    // B13AE0267
-    const year = 2000 + parseInt(clean.substring(1, 3)); // 13 = 2013
-    const monthCode = clean.substring(4, 5);
-    const monthMap = {
-      A: "January", B: "February", C: "March", D: "April", E: "May",
-      F: "June", G: "July", H: "August", J: "September", K: "October",
-      L: "November", M: "December"
-    };
-    result.manufactureDate = {
-      year,
-      month: monthMap[monthCode] || "Unknown"
-    };
-
+    // Example: B13AE0267
+    const year = 2000 + parseInt(clean.substring(1, 3)); // 13 → 2013
+    const unitNumber = clean.substring(5); // last 4 = unit #
+    result.manufactureYear = year;
+    result.unitNumber = unitNumber;
+    result.notes = `Rev G or earlier • ${year} • Unit ${unitNumber}`;
     result.valid = true;
-    result.notes = `Rev G or earlier • ${monthMap[monthCode] || "Unknown"} ${year}`;
     return result;
   }
 
@@ -39,21 +35,19 @@ export function decodeJandyJxiSerial(serial) {
   if (clean.startsWith("LB")) {
     result.revision = "Rev H or newer";
 
-    // LBEC02050329180001
-    //  Week manufactured: positions 8–9 (05)
-    //  Year manufactured: positions 12–15 (2018)
+    // Example: LBEC02050329180001
+    // Week manufactured: positions 8–9 (05)
+    // Year manufactured: positions 12–15 (2018)
+    // Unit number: last 4 digits (0001)
     const week = parseInt(clean.substring(8, 10));  // 05
     const year = parseInt(clean.substring(12, 16)); // 2018
+    const unitNumber = clean.slice(-4);             // 0001
 
-    result.manufactureDate = { year, week };
-
-    // Optional flags
-    if (clean.includes("NG")) result.gasType = "Natural Gas";
-    else if (clean.includes("LP")) result.gasType = "Propane";
-    if (clean.includes("VF")) result.hasVersaFlo = true;
-
+    result.manufactureWeek = week;
+    result.manufactureYear = year;
+    result.unitNumber = unitNumber;
+    result.notes = `Rev H or newer • Week ${week}, ${year} • Unit ${unitNumber}`;
     result.valid = true;
-    result.notes = `Rev H or newer • Week ${week}, ${year}`;
     return result;
   }
 
