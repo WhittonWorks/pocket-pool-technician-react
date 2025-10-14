@@ -1,31 +1,37 @@
-// src/tools/model/jandy/jxi.js
-// Jandy JXi model decoder — determines gas type, BTU rating, VersaFlo status
-
 export function decodeJandyJxiModel(model) {
-  const clean = model.trim().toUpperCase(); // normalize input
+  const clean = model.trim().toUpperCase();
   const result = {
     valid: false,
     model: clean,
+    btu: null,
     gasType: null,
     hasVersaFlo: false,
-    btu: null,
+    exchanger: null,
+    asme: false,
     notes: ""
   };
 
-  // Example formats: JXI400N, JXI400P, JXI400NK, JXI400PK
+  if (!/^JXI/.test(clean)) return result;
+
   const btuMatch = clean.match(/JXI(\d{3})/);
-  if (btuMatch) result.btu = parseInt(btuMatch[1]) * 1000; // e.g., 400 → 400,000 BTU
+  if (btuMatch) result.btu = parseInt(btuMatch[1]) * 1000;
 
   if (clean.includes("N")) result.gasType = "Natural Gas";
-  else if (clean.includes("P")) result.gasType = "Propane";
+  if (clean.includes("P")) result.gasType = "Propane";
+  if (clean.endsWith("K") || clean.includes("NK")) result.hasVersaFlo = true;
 
-  if (clean.includes("K")) result.hasVersaFlo = true;
+  if (clean.includes("NK")) result.exchanger = "Cupronickel";
+  else result.exchanger = "Copper";
 
-  result.valid = !!btuMatch;
+  if (clean.endsWith("C") || clean.endsWith("S")) result.asme = true;
+
+  result.valid = true;
   result.notes = [
-    result.btu ? `${result.btu.toLocaleString()} BTU` : null,
+    `${result.btu || ""} BTU`,
     result.gasType,
-    result.hasVersaFlo ? "VersaFlo" : null
+    result.exchanger,
+    result.asme ? "ASME" : "",
+    result.hasVersaFlo ? "VersaFlo" : ""
   ]
     .filter(Boolean)
     .join(" • ");
