@@ -12,29 +12,28 @@ export function decodeJandyJxiModel(model) {
     notes: ""
   };
 
-  // Must start with JXI
   if (!/^JXI/.test(clean)) return result;
 
-  // --- Parse BTU ---
+  // Extract BTU rating
   const btuMatch = clean.match(/JXI(\d{3})/);
   if (btuMatch) result.btu = parseInt(btuMatch[1]) * 1000;
 
-  // --- Parse gas type (N = Natural, P = Propane) ---
+  // Gas type (N or P immediately after BTU)
   const gasMatch = clean.match(/JXI\d{3}([NP])/);
   if (gasMatch) {
     result.gasType = gasMatch[1] === "N" ? "Natural Gas" : "Propane";
   }
 
-  // --- VersaFlo detection (K at the end or NK after BTU) ---
-  if (/-?NK?$/.test(clean) || clean.includes("NK")) result.hasVersaFlo = true;
+  // VersaFlo detection
+  if (clean.endsWith("K") || clean.includes("NK")) result.hasVersaFlo = true;
 
-  // --- Exchanger ---
+  // Exchanger type
   result.exchanger = clean.includes("NK") ? "Cupronickel" : "Copper";
 
-  // --- ASME-rated (C or S at the end) ---
+  // ASME
   if (/[CS]$/.test(clean)) result.asme = true;
 
-  // --- Notes ---
+  // Notes
   result.notes = [
     result.btu ? `${result.btu.toLocaleString()} BTU` : "",
     result.gasType,
@@ -45,7 +44,7 @@ export function decodeJandyJxiModel(model) {
     .filter(Boolean)
     .join(" • ");
 
-  // ✅ Mark valid only if we parsed a BTU and gas type
+  // Only mark valid if both BTU and gas type exist
   result.valid = !!(result.btu && result.gasType);
 
   return result;
