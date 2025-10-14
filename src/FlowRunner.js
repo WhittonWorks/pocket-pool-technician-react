@@ -1,8 +1,28 @@
 import React, { useState } from "react";
 import FeedbackModal from "./components/FeedbackModal";
-import AppSettings from "./config/appSettings"; // 🧠 Centralized config import
+import AppSettings from "./config/appSettings";
 import { jandy as serialJandy } from "./tools/serial";
 import { jandy as modelJandy } from "./tools/model";
+
+// 🧠 Merge helper: unify serial + model data into one equipment object
+function mergeEquipmentInfo(serialInfo, modelInfo) {
+  return {
+    brand: "Jandy",
+    equipmentType: "Heater",
+    model: modelInfo?.model || null,
+    revision: serialInfo?.revision || null,
+    manufactureDate: serialInfo?.manufactureDate || null,
+    plant: serialInfo?.plant || null,
+    line: serialInfo?.line || null,
+    unitNumber: serialInfo?.unitNumber || null,
+    gasType: modelInfo?.gasType || null,
+    btu: modelInfo?.btu || null,
+    hasVersaFlo: modelInfo?.hasVersaFlo || false,
+    exchanger: modelInfo?.exchanger || null,
+    asme: modelInfo?.asme || false,
+  };
+}
+
 function FlowRunner({ flow, onExit, onFinish }) {
   const [currentId, setCurrentId] = useState(flow.start);
   const [answers, setAnswers] = useState({ model: flow.model });
@@ -94,7 +114,7 @@ function FlowRunner({ flow, onExit, onFinish }) {
     } else if (current.pass) goTo(current.pass);
   }
 
-  // 🧠 Text input handler — now decodes serials & models automatically
+  // 🧠 Text input handler — decodes serials & models automatically
   function handleTextNext() {
     const val = textInput.trim();
     if (!val) return;
@@ -114,9 +134,12 @@ function FlowRunner({ flow, onExit, onFinish }) {
 
       console.log("🧠 Serial decoded:", info);
 
+      const merged = mergeEquipmentInfo(info, answers.modelInfo);
+
       setAnswers((prev) => ({
         ...prev,
         serialInfo: info,
+        equipmentInfo: merged,
       }));
 
       // Route automatically by revision
@@ -138,14 +161,18 @@ function FlowRunner({ flow, onExit, onFinish }) {
 
       console.log("🧠 Model decoded:", info);
 
+      const merged = mergeEquipmentInfo(answers.serialInfo, info);
+
       setAnswers((prev) => ({
         ...prev,
         modelInfo: info,
+        equipmentInfo: merged,
       }));
 
       // Optional routing logic by gas type
       if (info.gasType === "Natural Gas") return goTo("ng_flow_start", upperVal);
       if (info.gasType === "Propane") return goTo("lp_flow_start", upperVal);
+      if (info.hasVersaFlo) return goTo("versaflo_branch", upperVal);
     }
 
     // --- FALLBACK LOGIC (non-serial/model nodes) ---
