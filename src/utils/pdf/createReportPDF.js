@@ -26,7 +26,7 @@ export default async function createReportPDF(answers, flow = null) {
   const filtered = Object.entries(answers).filter(
     ([key, val]) =>
       val &&
-      !["outcome", "result", "enter_serial"].includes(key) &&
+      !["outcome", "result", "enter_serial", "enter_model"].includes(key) &&
       String(val).trim() !== ""
   );
 
@@ -76,9 +76,30 @@ export default async function createReportPDF(answers, flow = null) {
   y += 6;
   doc.text(`Website: ${activeProfile.website || "www.yourpoolcompany.com"}`, 60, y);
 
-  // --- Serial / Model Info section ---
+  // --- Unified Equipment Info section ---
+  const eq = answers.equipmentInfo || {};
   const serialInfo = answers.serialInfo || {};
   const modelInfo = answers.modelInfo || {};
+
+  // Merge fallback fields (for older flows that didn’t use mergeEquipmentInfo)
+  const mergedEq = {
+    brand: eq.brand || flow?.brand || "Unknown",
+    model: eq.model || modelInfo.model || "—",
+    revision: eq.revision || serialInfo.revision || "—",
+    manufactureDate: eq.manufactureDate || {
+      week: serialInfo.manufactureWeek,
+      year: serialInfo.manufactureYear,
+    },
+    gasType: eq.gasType || modelInfo.gasType || "—",
+    btu: eq.btu || modelInfo.btu || null,
+    hasVersaFlo:
+      typeof eq.hasVersaFlo === "boolean"
+        ? eq.hasVersaFlo
+        : modelInfo.hasVersaFlo,
+    plant: eq.plant || serialInfo.plant || null,
+    line: eq.line || serialInfo.line || null,
+    unitNumber: eq.unitNumber || serialInfo.unitNumber || null,
+  };
 
   const yStart = y + 16;
   doc.setFontSize(11);
@@ -86,58 +107,45 @@ export default async function createReportPDF(answers, flow = null) {
 
   let lineY = yStart + 8;
 
-  if (serialInfo.serial || answers.enter_serial) {
+  doc.text(`Brand: ${cleanText(mergedEq.brand)}`, 10, lineY);
+  lineY += 6;
+  doc.text(`Model: ${cleanText(mergedEq.model)}`, 10, lineY);
+  lineY += 6;
+  doc.text(`Revision: ${cleanText(mergedEq.revision)}`, 10, lineY);
+  lineY += 6;
+
+  if (mergedEq.btu) {
+    doc.text(`BTU: ${mergedEq.btu.toLocaleString()} BTU`, 10, lineY);
+    lineY += 6;
+  }
+
+  doc.text(`Gas Type: ${cleanText(mergedEq.gasType)}`, 10, lineY);
+  lineY += 6;
+
+  if (typeof mergedEq.hasVersaFlo === "boolean") {
     doc.text(
-      `Serial: ${serialInfo.serial || cleanText(answers.enter_serial)}`,
+      `VersaFlo: ${mergedEq.hasVersaFlo ? "Included" : "Not Included"}`,
       10,
       lineY
     );
     lineY += 6;
   }
 
-  if (serialInfo.manufactureWeek && serialInfo.manufactureYear) {
-    doc.text(
-      `Manufactured: Week ${serialInfo.manufactureWeek}, ${serialInfo.manufactureYear}`,
-      10,
-      lineY
-    );
-    lineY += 6;
-  } else if (serialInfo.manufactureYear) {
-    doc.text(`Manufactured: ${serialInfo.manufactureYear}`, 10, lineY);
+  if (mergedEq.manufactureDate?.year) {
+    const wk = mergedEq.manufactureDate.week
+      ? `Week ${mergedEq.manufactureDate.week}, `
+      : "";
+    doc.text(`Manufactured: ${wk}${mergedEq.manufactureDate.year}`, 10, lineY);
     lineY += 6;
   }
 
-  if (serialInfo.unitNumber) {
-    doc.text(`Unit #: ${serialInfo.unitNumber}`, 10, lineY);
+  if (mergedEq.plant) {
+    doc.text(`Plant: ${mergedEq.plant}`, 10, lineY);
     lineY += 6;
   }
 
-  if (serialInfo.revision) {
-    doc.text(`Revision: ${serialInfo.revision}`, 10, lineY);
-    lineY += 6;
-  }
-
-  if (modelInfo.model) {
-    doc.text(`Model: ${modelInfo.model}`, 10, lineY);
-    lineY += 6;
-  }
-
-  if (modelInfo.btu) {
-    doc.text(`BTU: ${modelInfo.btu.toLocaleString()} BTU`, 10, lineY);
-    lineY += 6;
-  }
-
-  if (modelInfo.gasType) {
-    doc.text(`Gas Type: ${modelInfo.gasType}`, 10, lineY);
-    lineY += 6;
-  }
-
-  if (typeof modelInfo.hasVersaFlo === "boolean") {
-    doc.text(
-      `VersaFlo: ${modelInfo.hasVersaFlo ? "Included" : "Not Included"}`,
-      10,
-      lineY
-    );
+  if (mergedEq.unitNumber) {
+    doc.text(`Unit #: ${mergedEq.unitNumber}`, 10, lineY);
     lineY += 10;
   }
 
