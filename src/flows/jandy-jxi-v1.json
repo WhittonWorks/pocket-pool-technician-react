@@ -400,7 +400,7 @@
       "text": "Check static inlet gas pressure with heater idle.\nExpected values:\n- Natural Gas (NG): 5.0–10.5 inWC\n- Propane (LP): 11.0–13.0 inWC\nEnter measured value:",
       "input": "number",
       "unit": "inWC",
-      "pass": "rev_h_gas_outlet_pressure_test",
+            "pass": "rev_h_gas_outlet_pressure_test",
       "fail": "rev_h_low_gas_supply"
     },
 
