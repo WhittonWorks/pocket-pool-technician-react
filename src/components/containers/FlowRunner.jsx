@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-import FeedbackModal from "./components/FeedbackModal";
-import AppSettings from "./config/appSettings";
-import { jandy as serialJandy } from "./tools/serial";
-import { jandy as modelJandy } from "./tools/model";
+import React, { useState, useEffect } from "react";
+import FeedbackModal from "../ui/FeedbackModal";
+import AppSettings from "../../config/appSettings";
+import { jandy as serialJandy } from "../../tools/serial";
+import { jandy as modelJandy } from "../../tools/model";
+import { evaluateLogic } from "../../engine/flowEngine"; // ✅ centralized logic helper
 
 // 🧠 Merge helper: unify serial + model data into one equipment object
 function mergeEquipmentInfo(serialInfo, modelInfo) {
@@ -35,8 +36,23 @@ function FlowRunner({ flow, onExit, onFinish }) {
   const [textInput, setTextInput] = useState("");
 
   const current = flow.nodes[currentId];
+
+  // 🧭 AUTO-ROUTING EFFECT — runs immediately when a logic-only info node is loaded
+  useEffect(() => {
+    if (current?.input === "info" && Array.isArray(current.logic) && current.logic.length > 0) {
+      console.log("⚙️ Auto-routing node detected:", current.id);
+      const nextNode = evaluateLogic(current, answers);
+      if (nextNode) {
+        console.log("➡️ Auto-advancing to:", nextNode);
+        goTo(nextNode);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentId]);
+
   if (!current) return <p>⚠️ Invalid step.</p>;
 
+  // 🧹 Reset UI states between nodes
   function resetLocalUI() {
     setSelectedChoice(null);
     setNumberInput("");
@@ -44,6 +60,7 @@ function FlowRunner({ flow, onExit, onFinish }) {
     setMediaToShow(null);
   }
 
+  // 🔀 Navigation
   function goTo(nextId, value) {
     if (!flow.nodes[nextId]) return console.warn("❌ Invalid node:", nextId);
 
@@ -70,6 +87,7 @@ function FlowRunner({ flow, onExit, onFinish }) {
     setHistory((h) => h.slice(0, -1));
   }
 
+  // ✅ Basic handlers
   function handleYesNo(nextId, value) {
     goTo(nextId, value);
   }
@@ -85,13 +103,21 @@ function FlowRunner({ flow, onExit, onFinish }) {
     if (nextId) goTo(nextId, val);
   }
 
-  function handleChoiceNext() {
-    if (!selectedChoice) return;
-    const nextId = current.choices[selectedChoice];
-    if (nextId) goTo(nextId, selectedChoice);
+  // ✅ Unified logic evaluation
+  function processLogic() {
+    const nextNode = evaluateLogic(current, answers);
+    if (nextNode) {
+      console.log("🧭 Auto-routing to:", nextNode);
+      goTo(nextNode);
+      return true;
+    }
+    return false;
   }
 
+  // ⚙️ Info node progression
   function handleInfoNext() {
+    if (processLogic()) return;
+
     if (current.terminal) {
       const finalAnswers = {
         ...answers,
@@ -114,99 +140,67 @@ function FlowRunner({ flow, onExit, onFinish }) {
     } else if (current.pass) goTo(current.pass);
   }
 
-  // 🧠 Text input handler — decodes serials & models automatically
+  // 🧠 Text input handler — serial/model decoding
   function handleTextNext() {
     const val = textInput.trim();
     if (!val) return;
-    const upperVal = val.toUpperCase(); // normalize user input
-
+    const upperVal = val.toUpperCase();
     setAnswers((prev) => ({ ...prev, [currentId]: upperVal }));
 
-    // --- SERIAL ENTRY NODE ---
     if (currentId === "enter_serial") {
       const info = serialJandy.decodeJandyJxiSerial(upperVal);
-
       if (!info.valid) {
         console.warn("❌ Invalid serial format:", upperVal);
         if (current.default) return goTo(current.default, upperVal);
         return;
       }
-
       console.log("🧠 Serial decoded:", info);
-
       const merged = mergeEquipmentInfo(info, answers.modelInfo);
-
       setAnswers((prev) => ({
         ...prev,
         serialInfo: info,
         equipmentInfo: merged,
       }));
-
-      // Route automatically by revision
-      if (info.revision === "Rev G or earlier")
-        return goTo("rev_g_start", upperVal);
-      if (info.revision === "Rev H or newer")
-        return goTo("rev_h_start", upperVal);
+      if (info.revision === "Rev G or earlier") return goTo("rev_g_start", upperVal);
+      if (info.revision === "Rev H or newer") return goTo("rev_h_start", upperVal);
     }
 
-    // --- MODEL ENTRY NODE ---
     if (currentId === "enter_model") {
       const info = modelJandy.decodeJandyJxiModel(upperVal);
-
       if (!info.valid) {
         console.warn("❌ Invalid model format:", upperVal);
         if (current.default) return goTo(current.default, upperVal);
         return;
       }
-
       console.log("🧠 Model decoded:", info);
-
       const merged = mergeEquipmentInfo(answers.serialInfo, info);
-
       setAnswers((prev) => ({
         ...prev,
         modelInfo: info,
         equipmentInfo: merged,
       }));
-
-      // Optional routing logic by gas type
-      if (info.gasType === "Natural Gas") return goTo("ng_flow_start", upperVal);
-      if (info.gasType === "Propane") return goTo("lp_flow_start", upperVal);
-      if (info.hasVersaFlo) return goTo("versaflo_branch", upperVal);
+      console.log("➡️ Proceeding to serial entry...");
+      return goTo("enter_serial", upperVal);
     }
 
-    // --- FALLBACK LOGIC (non-serial/model nodes) ---
-    if (Array.isArray(current.logic)) {
-      for (const rule of current.logic) {
-        try {
-          const safeVal = JSON.stringify(upperVal);
-          const condition = rule.if.replace(/value/g, safeVal);
-          // eslint-disable-next-line no-eval
-          if (eval(condition)) return goTo(rule.goto, upperVal);
-        } catch (err) {
-          console.error("⚠️ Logic eval error:", err, "for rule:", rule.if);
-        }
-      }
-    }
-
+    if (processLogic()) return;
     if (current.default) goTo(current.default, upperVal);
   }
 
-  // 🧾 Feedback submission handler
+  // 💬 Feedback handling
   function handleFeedbackSubmit() {
     console.log("✅ Feedback submitted after diagnostic.");
-    alert(
-      "✅ Feedback received — thank you for helping us improve the Compact Pool Technician!"
-    );
+    alert("✅ Feedback received — thank you for helping us improve the Compact Pool Technician!");
     setShowFeedback(false);
     onExit?.();
   }
 
-  // ---------------- UI RENDER ----------------
+  // ---------------- UI ----------------
   return (
     <div className="p-4 border rounded bg-white shadow text-gray-800">
       <h3 className="font-bold mb-3">{current.text}</h3>
 
+      {/* MEDIA */}
       {current.media && (
         <div className="mb-3">
           {current.media.image && (
@@ -228,6 +222,7 @@ function FlowRunner({ flow, onExit, onFinish }) {
         </div>
       )}
 
+      {/* CHOICE */}
       {current.input === "choice" && (
         <div className="mb-2">
           {Object.entries(current.choices).map(([label]) => {
@@ -237,9 +232,7 @@ function FlowRunner({ flow, onExit, onFinish }) {
                 key={label}
                 onClick={() => setSelectedChoice(label)}
                 className={`block w-full text-left p-2 mb-2 border rounded ${
-                  active
-                    ? "bg-green-200 border-green-500"
-                    : "bg-gray-100 hover:bg-gray-200"
+                  active ? "bg-green-200 border-green-500" : "bg-gray-100 hover:bg-gray-200"
                 }`}
               >
                 {label}
@@ -247,12 +240,10 @@ function FlowRunner({ flow, onExit, onFinish }) {
             );
           })}
           <button
-            onClick={handleChoiceNext}
+            onClick={() => goTo(current.choices[selectedChoice], selectedChoice)}
             disabled={!selectedChoice}
             className={`w-full px-4 py-2 mt-2 rounded text-white ${
-              selectedChoice
-                ? "bg-green-600 hover:bg-green-700"
-                : "bg-green-300 cursor-not-allowed"
+              selectedChoice ? "bg-green-600 hover:bg-green-700" : "bg-green-300 cursor-not-allowed"
             }`}
           >
             ➡️ Next
@@ -260,6 +251,7 @@ function FlowRunner({ flow, onExit, onFinish }) {
         </div>
       )}
 
+      {/* NUMBER */}
       {current.input === "number" && (
         <div className="mb-2">
           <input
@@ -278,6 +270,7 @@ function FlowRunner({ flow, onExit, onFinish }) {
         </div>
       )}
 
+      {/* YES/NO */}
       {current.input === "yesno" && (
         <div className="mb-2">
           <button
@@ -295,6 +288,7 @@ function FlowRunner({ flow, onExit, onFinish }) {
         </div>
       )}
 
+      {/* TEXT */}
       {current.input === "text" && (
         <div className="mb-2">
           <input
@@ -313,6 +307,7 @@ function FlowRunner({ flow, onExit, onFinish }) {
         </div>
       )}
 
+      {/* INFO */}
       {current.input === "info" && (
         <button
           onClick={handleInfoNext}
@@ -322,14 +317,13 @@ function FlowRunner({ flow, onExit, onFinish }) {
         </button>
       )}
 
+      {/* NAVIGATION */}
       <div className="flex gap-2 mt-4">
         <button
           onClick={goBack}
           disabled={history.length === 0}
           className={`flex-1 px-4 py-2 rounded text-white ${
-            history.length === 0
-              ? "bg-yellow-300 cursor-not-allowed"
-              : "bg-yellow-500 hover:bg-yellow-600"
+            history.length === 0 ? "bg-yellow-300 cursor-not-allowed" : "bg-yellow-500 hover:bg-yellow-600"
           }`}
         >
           ⬅️ Back
@@ -342,6 +336,7 @@ function FlowRunner({ flow, onExit, onFinish }) {
         </button>
       </div>
 
+      {/* MEDIA */}
       {mediaToShow && (
         <div id="media-section" className="mt-6">
           {mediaToShow === "image" && current.media?.image && (
@@ -350,9 +345,7 @@ function FlowRunner({ flow, onExit, onFinish }) {
               alt="Step illustration"
               className="max-w-full rounded border"
               onLoad={() =>
-                document
-                  .getElementById("media-section")
-                  ?.scrollIntoView({ behavior: "smooth" })
+                document.getElementById("media-section")?.scrollIntoView({ behavior: "smooth" })
               }
             />
           )}
@@ -362,15 +355,14 @@ function FlowRunner({ flow, onExit, onFinish }) {
               controls
               className="max-w-full rounded border"
               onLoadedData={() =>
-                document
-                  .getElementById("media-section")
-                  ?.scrollIntoView({ behavior: "smooth" })
+                document.getElementById("media-section")?.scrollIntoView({ behavior: "smooth" })
               }
             />
           )}
         </div>
       )}
 
+      {/* FEEDBACK */}
       {showFeedback && (
         <FeedbackModal
           visible={showFeedback}

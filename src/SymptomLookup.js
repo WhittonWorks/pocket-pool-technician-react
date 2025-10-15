@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import SymptomLookupCard from "./components/SymptomLookupCard";
+import SymptomLookupCard from "./components/ui/SymptomLookupCard";
 
 function SymptomLookup({ symptoms, onSelectSymptom }) {
   const [query, setQuery] = useState("");

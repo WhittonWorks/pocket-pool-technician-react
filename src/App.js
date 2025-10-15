@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Layout from "./Layout";
-import FlowRunner from "./FlowRunner";
+import FlowRunner from "./components/containers/FlowRunner";
+import FeedbackLog from "./components/containers/FeedbackLog";
 import ErrorLookup from "./ErrorLookup";
 import SymptomLookup from "./SymptomLookup";
-import FeedbackLog from "./components/FeedbackLog";
 import errors from "./errors";
 import symptoms from "./symptoms";
 import { findFlow } from "./flows";

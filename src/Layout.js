@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import FeedbackButton from "./components/FeedbackButton";
+import FeedbackButton from "./components/ui/FeedbackButton";
 
 function Layout({ sidebar, children }) {
   const [menuOpen, setMenuOpen] = useState(false);

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { shareFeedback } from "../utils/shareFeedback";
+import { shareFeedback } from "../../utils/shareFeedback"; // ✅ fixed import (named export)
 
 function FeedbackModal({
   visible,
@@ -14,7 +14,7 @@ function FeedbackModal({
   const [notes, setNotes] = useState("");
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
-  const [showThankYou, setShowThankYou] = useState(false); // ✅ new state
+  const [showThankYou, setShowThankYou] = useState(false); // ✅ after-send screen
 
   if (!visible) return null;
 
@@ -37,45 +37,40 @@ function FeedbackModal({
       date: new Date().toLocaleString(),
     };
 
-    // Save to localStorage
+    // 🧠 Save to localStorage
     const existing = JSON.parse(localStorage.getItem("ppt_feedback") || "[]");
     localStorage.setItem(
       "ppt_feedback",
       JSON.stringify([...existing, feedbackEntry])
     );
 
-    // Show confirmation + prompt to share
-    alert(
-      "✅ Feedback received — thank you for helping us improve the Compact Pool Technician!"
-    );
+    alert("✅ Feedback received — thank you for helping us improve the Compact Pool Technician!");
 
     const stored = JSON.parse(localStorage.getItem("ppt_feedback") || "[]");
-    if (
-      window.confirm(
-        "Would you like to send this feedback to Whitton Works now?"
-      )
-    ) {
+
+    if (window.confirm("Would you like to send this feedback to Whitton Works now?")) {
+      // ✉️ Trigger feedback sharing utility
       shareFeedback(stored);
-      // ✅ Show “thank you” screen after email opens
+
+      // ✅ Show “thank you” confirmation
       setShowThankYou(true);
       setTimeout(() => {
         setShowThankYou(false);
         onSubmit?.(feedbackEntry);
         onClose?.();
-      }, 4000); // Auto-close after 4 seconds
+      }, 4000);
     } else {
       onSubmit?.(feedbackEntry);
       onClose?.();
     }
   };
 
+  // 🟢 Thank-you screen (shown briefly after sharing)
   if (showThankYou) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
         <div className="bg-white rounded shadow-lg p-6 max-w-md w-11/12 text-center text-gray-800">
-          <h2 className="text-2xl font-bold mb-2 text-green-600">
-            ✅ Feedback Sent!
-          </h2>
+          <h2 className="text-2xl font-bold mb-2 text-green-600">✅ Feedback Sent!</h2>
           <p className="text-gray-700 mb-2">
             Thank you for helping us improve the Compact Pool Technician.
           </p>
@@ -87,6 +82,7 @@ function FeedbackModal({
     );
   }
 
+  // 🧩 Main feedback form
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white rounded shadow-lg p-6 max-w-md w-11/12 text-gray-800">
@@ -95,7 +91,7 @@ function FeedbackModal({
           How accurate or helpful was this diagnostic flow?
         </p>
 
-        {/* Rating Options */}
+        {/* Rating buttons */}
         <div className="flex justify-between mb-4">
           {["Accurate", "Needs Work", "Wrong Flow"].map((label) => (
             <button
@@ -112,7 +108,7 @@ function FeedbackModal({
           ))}
         </div>
 
-        {/* Notes */}
+        {/* Notes field */}
         <textarea
           className="border rounded p-2 w-full mb-3 text-gray-800"
           rows="3"
@@ -121,7 +117,7 @@ function FeedbackModal({
           onChange={(e) => setNotes(e.target.value)}
         />
 
-        {/* Optional Contact Fields */}
+        {/* Optional contact info */}
         <div className="mb-3">
           <label className="block text-sm font-semibold mb-1">
             Name (optional)
@@ -148,23 +144,15 @@ function FeedbackModal({
           />
         </div>
 
-        {/* Context Info */}
+        {/* Diagnostic context info */}
         <div className="bg-gray-50 border rounded p-2 text-sm text-gray-600 mb-4">
-          <p>
-            <strong>Brand:</strong> {brand || "N/A"}
-          </p>
-          <p>
-            <strong>Model:</strong> {model || "N/A"}
-          </p>
-          <p>
-            <strong>Outcome:</strong> {outcome || "N/A"}
-          </p>
-          <p>
-            <strong>Date:</strong> {new Date().toLocaleString()}
-          </p>
+          <p><strong>Brand:</strong> {brand || "N/A"}</p>
+          <p><strong>Model:</strong> {model || "N/A"}</p>
+          <p><strong>Outcome:</strong> {outcome || "N/A"}</p>
+          <p><strong>Date:</strong> {new Date().toLocaleString()}</p>
         </div>
 
-        {/* Buttons */}
+        {/* Submit + Close buttons */}
         <div className="flex justify-between">
           <button
             onClick={handleSubmit}

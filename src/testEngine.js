@@ -1,4 +1,4 @@
-import createSymptomLinkEngine from "./utils/SymptomLinkEngine";
+import createSymptomLinkEngine from "./engine/symptomLinkEngine";
 
 const engine = createSymptomLinkEngine();
 
