@@ -2,8 +2,10 @@
 // ------------------------------------------------------------
 // 💡 FlowEngine — centralized logic router for all diagnostic flows
 // Handles branching by model, serial, gas type, revision, etc.
-// Safe, extensible logic engine with no eval() use.
-// Now supports numeric comparisons for advanced logic routing.
+// Fully sandboxed, safe, and now supports compound logic:
+//  - && (AND), || (OR), ! (NOT)
+//  - String checks (startsWith, includes)
+//  - Numeric comparisons (> < >= <= ==)
 // ------------------------------------------------------------
 
 import { jandy as serialJandy } from "../tools/serial";
@@ -12,10 +14,7 @@ import { jandy as modelJandy } from "../tools/model";
 export default function createFlowEngine() {
   console.log("✅ FlowEngine initialized");
 
-  /**
-   * Decode both model and serial numbers
-   * and merge them into one normalized metadata object.
-   */
+  // Decode model + serial and merge metadata
   function decodeEquipment(brand, modelInput, serialInput) {
     const modelStr = modelInput?.trim()?.toUpperCase() || "";
     const serialStr = serialInput?.trim()?.toUpperCase() || "";
@@ -28,7 +27,6 @@ export default function createFlowEngine() {
         modelInfo = modelJandy.decodeJandyJxiModel(modelStr);
         serialInfo = serialJandy.decodeJandyJxiSerial(serialStr);
         break;
-      // 🧩 Extend here later for Hayward, Pentair, etc.
       default:
         console.warn(`⚠️ Unsupported brand: ${brand}`);
     }
@@ -50,13 +48,13 @@ export default function createFlowEngine() {
 
   /**
    * 🧠 Safe evaluator for logic rules
-   * Replaces eval() with a secure regex-based parser.
    * Supports:
    *  - value.startsWith('...')
    *  - value.includes('...')
    *  - answers.modelInfo.gasType === '...'
    *  - answers.serialInfo.revision.includes('...')
-   *  - Numeric comparisons: value >, <, >=, <=
+   *  - value > / < / >= / <= / ==
+   *  - Compound logic with &&, ||, and !
    */
   function safeEvaluate(condition, answers = {}, value = "") {
     try {
@@ -68,43 +66,60 @@ export default function createFlowEngine() {
             : String(value ?? ""),
       };
 
-      // Handle numeric context (for number comparisons)
       const numValue = parseFloat(ctx.value);
       const isNum = !isNaN(numValue);
 
-      // Supported pattern tests
-      const checks = [
-        // Gas type equality
-        {
-          regex: /answers\.modelInfo\.gasType\s*===\s*['"]([^'"]+)['"]/,
-          test: (m) => ctx.answers?.modelInfo?.gasType === m[1],
-        },
-        // Serial revision includes
-        {
-          regex: /answers\.serialInfo\.revision\.includes\(['"]([^'"]+)['"]\)/,
-          test: (m) => ctx.answers?.serialInfo?.revision?.includes(m[1]),
-        },
-        // String startsWith
-        {
-          regex: /value\.startsWith\(['"]([^'"]+)['"]\)/,
-          test: (m) => ctx.value.startsWith(m[1]),
-        },
-        // String includes
-        {
-          regex: /value\.includes\(['"]([^'"]+)['"]\)/,
-          test: (m) => ctx.value.includes(m[1]),
-        },
-        // --- Numeric comparisons ---
-        { regex: /value\s*>\s*(-?\d+(\.\d+)?)/, test: (m) => isNum && numValue > parseFloat(m[1]) },
-        { regex: /value\s*<\s*(-?\d+(\.\d+)?)/, test: (m) => isNum && numValue < parseFloat(m[1]) },
-        { regex: /value\s*>=\s*(-?\d+(\.\d+)?)/, test: (m) => isNum && numValue >= parseFloat(m[1]) },
-        { regex: /value\s*<=\s*(-?\d+(\.\d+)?)/, test: (m) => isNum && numValue <= parseFloat(m[1]) },
-        { regex: /value\s*==\s*(-?\d+(\.\d+)?)/, test: (m) => isNum && numValue === parseFloat(m[1]) },
-      ];
+      // --- Base condition evaluator ---
+      const testSingle = (cond) => {
+        const checks = [
+          {
+            regex: /answers\.modelInfo\.gasType\s*===\s*['"]([^'"]+)['"]/,
+            test: (m) => ctx.answers?.modelInfo?.gasType === m[1],
+          },
+          {
+            regex: /answers\.serialInfo\.revision\.includes\(['"]([^'"]+)['"]\)/,
+            test: (m) => ctx.answers?.serialInfo?.revision?.includes(m[1]),
+          },
+          {
+            regex: /value\.startsWith\(['"]([^'"]+)['"]\)/,
+            test: (m) => ctx.value.startsWith(m[1]),
+          },
+          {
+            regex: /value\.includes\(['"]([^'"]+)['"]\)/,
+            test: (m) => ctx.value.includes(m[1]),
+          },
+          // Numeric comparisons
+          { regex: /value\s*>\s*(-?\d+(\.\d+)?)/, test: (m) => isNum && numValue > parseFloat(m[1]) },
+          { regex: /value\s*<\s*(-?\d+(\.\d+)?)/, test: (m) => isNum && numValue < parseFloat(m[1]) },
+          { regex: /value\s*>=\s*(-?\d+(\.\d+)?)/, test: (m) => isNum && numValue >= parseFloat(m[1]) },
+          { regex: /value\s*<=\s*(-?\d+(\.\d+)?)/, test: (m) => isNum && numValue <= parseFloat(m[1]) },
+          { regex: /value\s*==\s*(-?\d+(\.\d+)?)/, test: (m) => isNum && numValue === parseFloat(m[1]) },
+        ];
 
-      for (const { regex, test } of checks) {
-        const m = condition.match(regex);
-        if (m && test(m)) return true;
+        for (const { regex, test } of checks) {
+          const match = cond.match(regex);
+          if (match && test(match)) return true;
+        }
+        return false;
+      };
+
+      // --- Handle compound expressions safely ---
+      // Split by logical OR (||)
+      const orGroups = condition.split("||").map((g) => g.trim());
+      for (const orGroup of orGroups) {
+        // Within each OR group, split by AND (&&)
+        const andParts = orGroup.split("&&").map((p) => p.trim());
+        let andResult = true;
+        for (const part of andParts) {
+          const isNegated = part.startsWith("!");
+          const cleaned = isNegated ? part.slice(1).trim() : part;
+          const res = testSingle(cleaned);
+          if (isNegated ? res : !res) {
+            andResult = false;
+            break;
+          }
+        }
+        if (andResult) return true; // if any OR branch succeeds
       }
 
       return false;
@@ -114,10 +129,7 @@ export default function createFlowEngine() {
     }
   }
 
-  /**
-   * Determine the correct next node in a flow.
-   * Evaluates using safeEvaluate().
-   */
+  // Determine next node
   function findNextNode(logicArray, answers = {}, value = "") {
     if (!Array.isArray(logicArray)) return null;
 
@@ -131,10 +143,7 @@ export default function createFlowEngine() {
     return null;
   }
 
-  /**
-   * High-level helper for automatic routing
-   * (e.g., Rev G vs Rev H, NG vs LP)
-   */
+  // Automatic routing helper
   function autoRoute(equipmentInfo) {
     if (!equipmentInfo) return null;
 
@@ -148,18 +157,10 @@ export default function createFlowEngine() {
     return null;
   }
 
-  return {
-    decodeEquipment,
-    findNextNode,
-    autoRoute,
-    safeEvaluate, // exported for internal tests
-  };
+  return { decodeEquipment, findNextNode, autoRoute, safeEvaluate };
 }
 
-/**
- * ✅ External entry point for FlowRunner and tests
- * Evaluates a single node’s logic block against answers/value.
- */
+// ✅ Externally exposed logic evaluator
 export function evaluateLogic(node, answers, value = "") {
   if (!node || !Array.isArray(node.logic)) return null;
 
