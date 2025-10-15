@@ -2,7 +2,8 @@
 // ------------------------------------------------------------
 // 💡 FlowEngine — centralized logic router for all diagnostic flows
 // Handles branching by model, serial, gas type, revision, etc.
-// Future-proof for all brands: Jandy, Hayward, Pentair, etc.
+// Safe, extensible logic engine with no eval() use.
+// Now supports numeric comparisons for advanced logic routing.
 // ------------------------------------------------------------
 
 import { jandy as serialJandy } from "../tools/serial";
@@ -27,7 +28,7 @@ export default function createFlowEngine() {
         modelInfo = modelJandy.decodeJandyJxiModel(modelStr);
         serialInfo = serialJandy.decodeJandyJxiSerial(serialStr);
         break;
-      // 🧩 Add other brands here later
+      // 🧩 Extend here later for Hayward, Pentair, etc.
       default:
         console.warn(`⚠️ Unsupported brand: ${brand}`);
     }
@@ -48,22 +49,82 @@ export default function createFlowEngine() {
   }
 
   /**
-   * Determine the correct next node in a flow.
-   * Accepts a node’s logic array and the collected answers.
+   * 🧠 Safe evaluator for logic rules
+   * Replaces eval() with a secure regex-based parser.
+   * Supports:
+   *  - value.startsWith('...')
+   *  - value.includes('...')
+   *  - answers.modelInfo.gasType === '...'
+   *  - answers.serialInfo.revision.includes('...')
+   *  - Numeric comparisons: value >, <, >=, <=
    */
-  function findNextNode(logicArray, answers = {}) {
+  function safeEvaluate(condition, answers = {}, value = "") {
+    try {
+      const ctx = {
+        answers,
+        value:
+          typeof value === "string"
+            ? value.replaceAll('"', "")
+            : String(value ?? ""),
+      };
+
+      // Handle numeric context (for number comparisons)
+      const numValue = parseFloat(ctx.value);
+      const isNum = !isNaN(numValue);
+
+      // Supported pattern tests
+      const checks = [
+        // Gas type equality
+        {
+          regex: /answers\.modelInfo\.gasType\s*===\s*['"]([^'"]+)['"]/,
+          test: (m) => ctx.answers?.modelInfo?.gasType === m[1],
+        },
+        // Serial revision includes
+        {
+          regex: /answers\.serialInfo\.revision\.includes\(['"]([^'"]+)['"]\)/,
+          test: (m) => ctx.answers?.serialInfo?.revision?.includes(m[1]),
+        },
+        // String startsWith
+        {
+          regex: /value\.startsWith\(['"]([^'"]+)['"]\)/,
+          test: (m) => ctx.value.startsWith(m[1]),
+        },
+        // String includes
+        {
+          regex: /value\.includes\(['"]([^'"]+)['"]\)/,
+          test: (m) => ctx.value.includes(m[1]),
+        },
+        // --- Numeric comparisons ---
+        { regex: /value\s*>\s*(-?\d+(\.\d+)?)/, test: (m) => isNum && numValue > parseFloat(m[1]) },
+        { regex: /value\s*<\s*(-?\d+(\.\d+)?)/, test: (m) => isNum && numValue < parseFloat(m[1]) },
+        { regex: /value\s*>=\s*(-?\d+(\.\d+)?)/, test: (m) => isNum && numValue >= parseFloat(m[1]) },
+        { regex: /value\s*<=\s*(-?\d+(\.\d+)?)/, test: (m) => isNum && numValue <= parseFloat(m[1]) },
+        { regex: /value\s*==\s*(-?\d+(\.\d+)?)/, test: (m) => isNum && numValue === parseFloat(m[1]) },
+      ];
+
+      for (const { regex, test } of checks) {
+        const m = condition.match(regex);
+        if (m && test(m)) return true;
+      }
+
+      return false;
+    } catch (err) {
+      console.error("⚠️ safeEvaluate error:", err, condition);
+      return false;
+    }
+  }
+
+  /**
+   * Determine the correct next node in a flow.
+   * Evaluates using safeEvaluate().
+   */
+  function findNextNode(logicArray, answers = {}, value = "") {
     if (!Array.isArray(logicArray)) return null;
 
     for (const rule of logicArray) {
-      try {
-        // Replace variables like "answers.modelInfo.gasType" dynamically
-        // eslint-disable-next-line no-eval
-        if (eval(rule.if)) {
-          console.log(`➡️ FlowEngine matched rule: ${rule.if}`);
-          return rule.goto;
-        }
-      } catch (err) {
-        console.error("⚠️ FlowEngine logic error:", err, rule);
+      if (safeEvaluate(rule.if, answers, value)) {
+        console.log(`➡️ FlowEngine matched rule: ${rule.if}`);
+        return rule.goto;
       }
     }
 
@@ -71,22 +132,19 @@ export default function createFlowEngine() {
   }
 
   /**
-   * High-level helper for branching flows automatically
-   * (e.g., route to NG vs LP, Rev G vs Rev H, etc.)
+   * High-level helper for automatic routing
+   * (e.g., Rev G vs Rev H, NG vs LP)
    */
   function autoRoute(equipmentInfo) {
     if (!equipmentInfo) return null;
 
-    // Jandy JXi example
     if (equipmentInfo.brand === "Jandy" && /JXI/.test(equipmentInfo.model)) {
       if (equipmentInfo.revision?.includes("Rev G")) return "rev_g_start";
       if (equipmentInfo.revision?.includes("Rev H")) return "rev_h_start";
-
       if (equipmentInfo.gasType === "Natural Gas") return "rev_g_ng_pressure";
       if (equipmentInfo.gasType === "Propane") return "rev_g_lp_pressure";
     }
 
-    // Default fallback
     return null;
   }
 
@@ -94,27 +152,23 @@ export default function createFlowEngine() {
     decodeEquipment,
     findNextNode,
     autoRoute,
+    safeEvaluate, // exported for internal tests
   };
 }
 
 /**
- * ✅ Evaluate logic for a node given the current answers.
- * This allows FlowRunner and other systems to run flow logic directly.
+ * ✅ External entry point for FlowRunner and tests
+ * Evaluates a single node’s logic block against answers/value.
  */
-export function evaluateLogic(node, answers) {
+export function evaluateLogic(node, answers, value = "") {
   if (!node || !Array.isArray(node.logic)) return null;
 
+  const engine = createFlowEngine();
+
   for (const rule of node.logic) {
-    try {
-      // Use sandboxed Function for safety; supports e.g. "answers.modelInfo.gasType === 'Natural Gas'"
-     // eslint-disable-next-line no-new-func
-const fn = new Function("answers", `return ${rule.if}`); // safe: trusted internal JSON
-      if (fn(answers)) {
-        console.log(`🧠 Logic match: ${rule.if} → ${rule.goto}`);
-        return rule.goto;
-      }
-    } catch (err) {
-      console.error("⚠️ evaluateLogic error:", err, rule.if);
+    if (engine.safeEvaluate(rule.if, answers, value)) {
+      console.log(`🧠 Logic match: ${rule.if} → ${rule.goto}`);
+      return rule.goto;
     }
   }
 
