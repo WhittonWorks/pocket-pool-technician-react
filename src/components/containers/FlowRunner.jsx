@@ -3,7 +3,8 @@ import FeedbackModal from "../ui/FeedbackModal";
 import AppSettings from "../../config/appSettings";
 import { jandy as serialJandy } from "../../tools/serial";
 import { jandy as modelJandy } from "../../tools/model";
-import { evaluateLogic } from "../../engine/flowEngine"; // ✅ centralized logic helper
+import { evaluateLogic } from "../../engine/flowEngine"; // centralized logic helper
+import { useFlow } from "../../context/FlowContext"; // ✅ NEW import
 
 // 🧠 Merge helper: unify serial + model data into one equipment object
 function mergeEquipmentInfo(serialInfo, modelInfo) {
@@ -25,21 +26,39 @@ function mergeEquipmentInfo(serialInfo, modelInfo) {
 }
 
 function FlowRunner({ flow, onExit, onFinish }) {
+  const { startFlow, endFlow } = useFlow(); // ✅ Global flow state control
+
   const [currentId, setCurrentId] = useState(flow.start);
   const [answers, setAnswers] = useState({ model: flow.model });
   const [history, setHistory] = useState([]);
   const [mediaToShow, setMediaToShow] = useState(null);
   const [showFeedback, setShowFeedback] = useState(false);
-
   const [selectedChoice, setSelectedChoice] = useState(null);
   const [numberInput, setNumberInput] = useState("");
   const [textInput, setTextInput] = useState("");
 
+  // ✅ Always define current before conditionally rendering
   const current = flow.nodes[currentId];
+
+  // 🔵 Trigger global "flow active" state when mounted / unmounted
+  useEffect(() => {
+    startFlow(flow.title || "Active Flow");
+    console.log("🟦 FlowRunner mounted — LoadBar ON");
+
+    return () => {
+      endFlow();
+      console.log("⬜ FlowRunner unmounted — LoadBar OFF");
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // 🧭 AUTO-ROUTING EFFECT — runs immediately when a logic-only info node is loaded
   useEffect(() => {
-    if (current?.input === "info" && Array.isArray(current.logic) && current.logic.length > 0) {
+    if (
+      current?.input === "info" &&
+      Array.isArray(current.logic) &&
+      current.logic.length > 0
+    ) {
       console.log("⚙️ Auto-routing node detected:", current.id);
       const nextNode = evaluateLogic(current, answers);
       if (nextNode) {
@@ -50,8 +69,10 @@ function FlowRunner({ flow, onExit, onFinish }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentId]);
 
-  if (!current) return <p>⚠️ Invalid step.</p>;
-
+  // ✅ Safe conditional render (AFTER hooks)
+  if (!current) {
+    return <p className="text-red-600">⚠️ Invalid step or missing node.</p>;
+  }
   // 🧹 Reset UI states between nodes
   function resetLocalUI() {
     setSelectedChoice(null);
@@ -161,8 +182,10 @@ function FlowRunner({ flow, onExit, onFinish }) {
         serialInfo: info,
         equipmentInfo: merged,
       }));
-      if (info.revision === "Rev G or earlier") return goTo("rev_g_start", upperVal);
-      if (info.revision === "Rev H or newer") return goTo("rev_h_start", upperVal);
+      if (info.revision === "Rev G or earlier")
+        return goTo("rev_g_start", upperVal);
+      if (info.revision === "Rev H or newer")
+        return goTo("rev_h_start", upperVal);
     }
 
     if (currentId === "enter_model") {
@@ -190,7 +213,9 @@ function FlowRunner({ flow, onExit, onFinish }) {
   // 💬 Feedback handling
   function handleFeedbackSubmit() {
     console.log("✅ Feedback submitted after diagnostic.");
-    alert("✅ Feedback received — thank you for helping us improve the Compact Pool Technician!");
+    alert(
+      "✅ Feedback received — thank you for helping us improve the Compact Pool Technician!"
+    );
     setShowFeedback(false);
     onExit?.();
   }
@@ -198,6 +223,7 @@ function FlowRunner({ flow, onExit, onFinish }) {
   // ---------------- UI ----------------
   return (
     <div className="p-4 border rounded bg-white shadow text-gray-800">
+      
       <h3 className="font-bold mb-3">{current.text}</h3>
 
       {/* MEDIA */}
@@ -232,7 +258,9 @@ function FlowRunner({ flow, onExit, onFinish }) {
                 key={label}
                 onClick={() => setSelectedChoice(label)}
                 className={`block w-full text-left p-2 mb-2 border rounded ${
-                  active ? "bg-green-200 border-green-500" : "bg-gray-100 hover:bg-gray-200"
+                  active
+                    ? "bg-green-200 border-green-500"
+                    : "bg-gray-100 hover:bg-gray-200"
                 }`}
               >
                 {label}
@@ -243,7 +271,9 @@ function FlowRunner({ flow, onExit, onFinish }) {
             onClick={() => goTo(current.choices[selectedChoice], selectedChoice)}
             disabled={!selectedChoice}
             className={`w-full px-4 py-2 mt-2 rounded text-white ${
-              selectedChoice ? "bg-green-600 hover:bg-green-700" : "bg-green-300 cursor-not-allowed"
+              selectedChoice
+                ? "bg-green-600 hover:bg-green-700"
+                : "bg-green-300 cursor-not-allowed"
             }`}
           >
             ➡️ Next
@@ -323,7 +353,9 @@ function FlowRunner({ flow, onExit, onFinish }) {
           onClick={goBack}
           disabled={history.length === 0}
           className={`flex-1 px-4 py-2 rounded text-white ${
-            history.length === 0 ? "bg-yellow-300 cursor-not-allowed" : "bg-yellow-500 hover:bg-yellow-600"
+            history.length === 0
+              ? "bg-yellow-300 cursor-not-allowed"
+              : "bg-yellow-500 hover:bg-yellow-600"
           }`}
         >
           ⬅️ Back
@@ -345,7 +377,9 @@ function FlowRunner({ flow, onExit, onFinish }) {
               alt="Step illustration"
               className="max-w-full rounded border"
               onLoad={() =>
-                document.getElementById("media-section")?.scrollIntoView({ behavior: "smooth" })
+                document
+                  .getElementById("media-section")
+                  ?.scrollIntoView({ behavior: "smooth" })
               }
             />
           )}
@@ -355,7 +389,9 @@ function FlowRunner({ flow, onExit, onFinish }) {
               controls
               className="max-w-full rounded border"
               onLoadedData={() =>
-                document.getElementById("media-section")?.scrollIntoView({ behavior: "smooth" })
+                document
+                  .getElementById("media-section")
+                  ?.scrollIntoView({ behavior: "smooth" })
               }
             />
           )}

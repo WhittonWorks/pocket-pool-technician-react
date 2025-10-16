@@ -1,12 +1,15 @@
+// src/Layout.js
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import FeedbackButton from "./components/ui/FeedbackButton";
 import LoadBar from "./components/ui/LoadBar";
+import { useFlow } from "./context/FlowContext"; // ✅ NEW — connects to global flow state
 
 function Layout({ sidebar, children }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const location = useLocation();
+  const { isFlowActive } = useFlow(); // ✅ watch global flow activity
 
   // 📱 Responsive resize listener
   useEffect(() => {
@@ -17,32 +20,11 @@ function Layout({ sidebar, children }) {
 
   return (
     <div className="flex h-screen flex-col md:flex-row relative">
-      {/* 🔵 Persistent Load Bar — route debugger */}
-      {(() => {
-        console.log("🧭 Full path detected:", location.pathname);
+      {/* 🔵 Load bar — now tied to global flow activity */}
+     
 
-        if (location.pathname.match(/flow/i)) {
-          console.log("🚀 LoadBar should be visible now");
-          return (
-            <div className="fixed top-0 left-0 w-full z-50">
-              <LoadBar />
-              <div
-                style={{
-                  height: "6px",
-                  width: "100%",
-                  background: "red", // 🔴 debug: always visible if rendered
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  zIndex: 9999,
-                }}
-              ></div>
-            </div>
-          );
-        }
-
-        return null;
-      })()}
+      {/* 🧭 Debug info */}
+      {console.log("🧭 Current route:", location.pathname, "| Flow Active:", isFlowActive)}
 
       {/* 🧭 Mobile top bar */}
       {isMobile && (

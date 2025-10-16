@@ -1,33 +1,38 @@
 // src/components/ui/LoadBar.jsx
 import React, { useEffect, useState } from "react";
+import { useFlow } from "../../context/FlowContext"; // ✅ pull flow activity globally
 
 /**
- * 💡 LoadBar — Minimal progress indicator
+ * 💡 LoadBar — Persistent global progress indicator
+ * - Auto-shows whenever a flow is active
  * - No numbers or percentage
- * - Moves pixel-by-pixel until complete
- * - Automatically loops until hidden
+ * - Moves pixel-by-pixel for subtle motion
  */
-export default function LoadBar({ active }) {
+export default function LoadBar() {
+  const { isFlowActive } = useFlow(); // 👈 read global state
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    if (!active) {
+    if (!isFlowActive) {
       setProgress(0);
       return;
     }
 
     let animation;
-    function animate() {
+    const animate = () => {
       setProgress((prev) => {
         const next = prev + Math.random() * 2; // small random speed for realism
         return next >= 100 ? 0 : next;
       });
       animation = requestAnimationFrame(animate);
-    }
+    };
 
     animation = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animation);
-  }, [active]);
+  }, [isFlowActive]);
+
+  // Hide bar completely when inactive
+  if (!isFlowActive) return null;
 
   return (
     <div
