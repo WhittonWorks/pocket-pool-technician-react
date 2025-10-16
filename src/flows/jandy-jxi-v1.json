@@ -199,51 +199,43 @@
       "terminal": true
     },
     
-    "rev_g_gas": {
+  "rev_g_gas": {
   "id": "rev_g_gas",
-  "text": "Measure 24 VAC at Brown (gas valve) → Yellow (Ground). Expect 22–26 VAC.\nDoes the valve open?",
+  "text": "Does the gas valve open during the call for heat?",
   "input": "yesno",
-  "pass": "rev_g_branch_gas_type",
+  "pass": "rev_g_flame",
+  "fail": "rev_g_check_gas_valve_voltage"
+},
+
+"rev_g_check_gas_valve_voltage": {
+  "id": "rev_g_check_gas_valve_voltage",
+  "text": "Measure for 24 VAC at the gas valve during the entire call-for-heat cycle. Is 24 VAC present?",
+  "input": "yesno",
+  "pass": "rev_g_check_static_pressure",
+  "fail": "rev_g_icb_failed"
+},
+
+"rev_g_check_static_pressure": {
+  "id": "rev_g_check_static_pressure",
+  "text": "Measure static inlet gas pressure with the heater idle. Is it greater than 10 inWC?",
+  "input": "yesno",
+  "pass": "rev_g_high_inlet_pressure",
   "fail": "rev_g_gas_valve_mechanical_fail"
 },
 
-"rev_g_branch_gas_type": {
-  "id": "rev_g_branch_gas_type",
-  "text": "Auto-routing by gas type (based on model number)…",
+"rev_g_high_inlet_pressure": {
+  "id": "rev_g_high_inlet_pressure",
+  "text": "Inlet gas pressure exceeds 10 inWC. Lower the supply-line pressure to 5 – 10 inWC before proceeding.",
   "input": "info",
-  "logic": [
-    { "if": "answers.modelInfo && answers.modelInfo.gasType === 'Natural Gas'", "goto": "rev_g_ng_pressure" },
-    { "if": "answers.modelInfo && answers.modelInfo.gasType === 'Propane'", "goto": "rev_g_lp_pressure" }
-  ],
-  "default": "rev_g_ng_pressure"
-},
-    
-   "rev_g_ng_pressure": {
-  "id": "rev_g_ng_pressure",
-  "text": "Check static inlet gas pressure with heater idle — expect 5.0–10.5 inWC.\nThen check dynamic manifold pressure during ignition — expect 1.8–2.0 inWC.",
-  "input": "number",
-  "unit": "inWC",
-  "range": [1.8, 10.5],
-  "pass": "rev_g_flame",
-  "fail": "rev_g_low_gas_supply"
+  "terminal": true
 },
 
-"rev_g_lp_pressure": {
-  "id": "rev_g_lp_pressure",
-  "text": "Check static inlet gas pressure with heater idle — expect 11.0–13.0 inWC.\nThen check dynamic manifold pressure during ignition — expect 6.8–7.0 inWC.",
-  "input": "number",
-  "unit": "inWC",
-  "range": [6.8, 13.0],
-  "pass": "rev_g_flame",
-  "fail": "rev_g_low_gas_supply"
+"rev_g_gas_valve_mechanical_fail": {
+  "id": "rev_g_gas_valve_mechanical_fail",
+  "text": "Gas valve received 24 VAC and inlet pressure ≤ 10 inWC but did not open. Replace gas valve (P/N R0452400).",
+  "input": "info",
+  "terminal": true
 },
-
-    "rev_g_gas_valve_mechanical_fail": {
-      "id": "rev_g_gas_valve_mechanical_fail",
-      "text": "Valve received correct voltage and resistance in spec but did not open. Replace Gas Valve (P/N R0452400) — likely age, corrosion, or debris.",
-      "input": "info",
-      "terminal": true
-    },
         "rev_g_flame": {
       "id": "rev_g_flame",
       "text": "Do burners ignite and stay lit > 7 s?",
@@ -472,49 +464,41 @@
     
 "rev_h_gas": {
   "id": "rev_h_gas",
-  "text": "Measure 24 VAC at Brown (gas valve) → Yellow (Ground). Expect 22–26 VAC.\nDoes the valve open?",
+  "text": "Does the gas valve open during the call for heat?",
   "input": "yesno",
-  "pass": "rev_h_branch_gas_type",
+  "pass": "rev_h_flame",
+  "fail": "rev_h_check_gas_valve_voltage"
+},
+
+"rev_h_check_gas_valve_voltage": {
+  "id": "rev_h_check_gas_valve_voltage",
+  "text": "Measure for 24 VAC at the gas valve during the entire call-for-heat cycle. Is 24 VAC present?",
+  "input": "yesno",
+  "pass": "rev_h_check_static_pressure",
+  "fail": "rev_h_icb_failed"
+},
+
+"rev_h_check_static_pressure": {
+  "id": "rev_h_check_static_pressure",
+  "text": "Measure static inlet gas pressure with the heater idle. Is it greater than 10 inWC?",
+  "input": "yesno",
+  "pass": "rev_h_high_inlet_pressure",
   "fail": "rev_h_gas_valve_mechanical_fail"
 },
 
-"rev_h_branch_gas_type": {
-  "id": "rev_h_branch_gas_type",
-  "text": "Auto-routing by gas type (based on model number)…",
+"rev_h_high_inlet_pressure": {
+  "id": "rev_h_high_inlet_pressure",
+  "text": "Inlet gas pressure exceeds 10 inWC. Lower the supply-line pressure to 5–10 inWC before proceeding.",
   "input": "info",
-  "logic": [
-    { "if": "answers.modelInfo && answers.modelInfo.gasType === 'Natural Gas'", "goto": "rev_h_ng_pressure" },
-    { "if": "answers.modelInfo && answers.modelInfo.gasType === 'Propane'", "goto": "rev_h_lp_pressure" }
-  ],
-  "default": "rev_h_ng_pressure"
-},
-    
-    "rev_h_ng_pressure": {
-  "id": "rev_h_ng_pressure",
-  "text": "Check static inlet gas pressure with heater idle — expect 5.0–10.5 inWC.\nThen check dynamic manifold pressure during ignition — expect 1.8–2.0 inWC.",
-  "input": "number",
-  "unit": "inWC",
-  "range": [1.8, 10.5],
-  "pass": "rev_h_flame",
-  "fail": "rev_h_low_gas_supply"
+  "terminal": true
 },
 
-"rev_h_lp_pressure": {
-  "id": "rev_h_lp_pressure",
-  "text": "Check static inlet gas pressure with heater idle — expect 11.0–13.0 inWC.\nThen check dynamic manifold pressure during ignition — expect 6.8–7.0 inWC.",
-  "input": "number",
-  "unit": "inWC",
-  "range": [6.8, 13.0],
-  "pass": "rev_h_flame",
-  "fail": "rev_h_low_gas_supply"
+"rev_h_gas_valve_mechanical_fail": {
+  "id": "rev_h_gas_valve_mechanical_fail",
+  "text": "Gas valve received 24 VAC and inlet pressure ≤ 10 inWC but did not open. Replace gas valve (P/N R0452400).",
+  "input": "info",
+  "terminal": true
 },
-
-    "rev_h_gas_valve_mechanical_fail": {
-      "id": "rev_h_gas_valve_mechanical_fail",
-      "text": "Valve received correct voltage and resistance but did not open — replace Gas Valve (P/N R0452400).",
-      "input": "info",
-      "terminal": true
-    },
 
     "rev_h_flame": {
       "id": "rev_h_flame",
