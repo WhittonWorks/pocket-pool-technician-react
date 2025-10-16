@@ -21,7 +21,7 @@
     },
     "enter_serial": {
       "id": "enter_serial",
-      "text": "Enter the full serial number from the JXi heater.\n\n- Rev G or earlier: starts with B and is 9 characters long (2017 & earlier)\n- Rev H or newer: starts with LB and is 18 characters long (2018+)",
+      "text": "Enter the full serial number from the JXi heater.\n\n- Rev G or earlier: starts with B and is 9 characters long. Use B12AE5678 to test this live\n- Rev H or newer: starts with LB and is 18 characters long (2018+)",
       "input": "text",
       "logic": [
         { "if": "value.startsWith('B') && !value.startsWith('LB')", "goto": "rev_g_start" },

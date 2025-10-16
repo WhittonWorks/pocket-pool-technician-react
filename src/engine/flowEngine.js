@@ -2,7 +2,7 @@
 // ------------------------------------------------------------
 // 💡 FlowEngine — centralized logic router for all diagnostic flows
 // Handles branching by model, serial, gas type, revision, etc.
-// Fully sandboxed, safe, and now supports compound logic:
+// Fully sandboxed, safe, and supports compound logic:
 //  - && (AND), || (OR), ! (NOT)
 //  - String checks (startsWith, includes)
 //  - Numeric comparisons (> < >= <= ==)
@@ -14,7 +14,7 @@ import { jandy as modelJandy } from "../tools/model";
 export default function createFlowEngine() {
   console.log("✅ FlowEngine initialized");
 
-  // Decode model + serial and merge metadata
+  // 🔹 Decode model + serial and merge metadata
   function decodeEquipment(brand, modelInput, serialInput) {
     const modelStr = modelInput?.trim()?.toUpperCase() || "";
     const serialStr = serialInput?.trim()?.toUpperCase() || "";
@@ -46,90 +46,118 @@ export default function createFlowEngine() {
     return { modelInfo, serialInfo, equipmentInfo };
   }
 
-  /**
-   * 🧠 Safe evaluator for logic rules
-   * Supports:
-   *  - value.startsWith('...')
-   *  - value.includes('...')
-   *  - answers.modelInfo.gasType === '...'
-   *  - answers.serialInfo.revision.includes('...')
-   *  - value > / < / >= / <= / ==
-   *  - Compound logic with &&, ||, and !
-   */
+  // ------------------------------------------------------------
+  // 🧠 Safe evaluator for logic rules
+  // Supports:
+  //  - value.startsWith('...')
+  //  - value.includes('...')
+  //  - answers.modelInfo.gasType === '...'
+  //  - answers.serialInfo.revision.includes('...')
+  //  - value > / < / >= / <= / ==
+  //  - Compound logic with &&, ||, and !
+  // ------------------------------------------------------------
   function safeEvaluate(condition, answers = {}, value = "") {
     try {
       const ctx = {
         answers,
         value:
           typeof value === "string"
-            ? value.replaceAll('"', "")
-            : String(value ?? ""),
+            ? value.trim().toUpperCase()
+            : String(value || "").toUpperCase(),
       };
 
-      const numValue = parseFloat(ctx.value);
-      const isNum = !isNaN(numValue);
+      console.log("🧩 [safeEvaluate] Testing condition:", {
+        condition,
+        value: ctx.value,
+        answers: ctx.answers,
+      });
 
-      // --- Base condition evaluator ---
-      const testSingle = (cond) => {
-        const checks = [
-          {
-            regex: /answers\.modelInfo\.gasType\s*===\s*['"]([^'"]+)['"]/,
-            test: (m) => ctx.answers?.modelInfo?.gasType === m[1],
-          },
-          {
-            regex: /answers\.serialInfo\.revision\.includes\(['"]([^'"]+)['"]\)/,
-            test: (m) => ctx.answers?.serialInfo?.revision?.includes(m[1]),
-          },
-          {
-            regex: /value\.startsWith\(['"]([^'"]+)['"]\)/,
-            test: (m) => ctx.value.startsWith(m[1]),
-          },
-          {
-            regex: /value\.includes\(['"]([^'"]+)['"]\)/,
-            test: (m) => ctx.value.includes(m[1]),
-          },
-          // Numeric comparisons
-          { regex: /value\s*>\s*(-?\d+(\.\d+)?)/, test: (m) => isNum && numValue > parseFloat(m[1]) },
-          { regex: /value\s*<\s*(-?\d+(\.\d+)?)/, test: (m) => isNum && numValue < parseFloat(m[1]) },
-          { regex: /value\s*>=\s*(-?\d+(\.\d+)?)/, test: (m) => isNum && numValue >= parseFloat(m[1]) },
-          { regex: /value\s*<=\s*(-?\d+(\.\d+)?)/, test: (m) => isNum && numValue <= parseFloat(m[1]) },
-          { regex: /value\s*==\s*(-?\d+(\.\d+)?)/, test: (m) => isNum && numValue === parseFloat(m[1]) },
-        ];
+      // Split compound logic (&&, ||)
+      const parts = condition.split(/\s*(&&|\|\|)\s*/);
+      let result = null;
+      let operator = null;
 
-        for (const { regex, test } of checks) {
-          const match = cond.match(regex);
-          if (match && test(match)) return true;
+      for (const part of parts) {
+        if (part === "&&" || part === "||") {
+          operator = part;
+          continue;
         }
-        return false;
-      };
 
-      // --- Handle compound expressions safely ---
-      // Split by logical OR (||)
-      const orGroups = condition.split("||").map((g) => g.trim());
-      for (const orGroup of orGroups) {
-        // Within each OR group, split by AND (&&)
-        const andParts = orGroup.split("&&").map((p) => p.trim());
-        let andResult = true;
-        for (const part of andParts) {
-          const isNegated = part.startsWith("!");
-          const cleaned = isNegated ? part.slice(1).trim() : part;
-          const res = testSingle(cleaned);
-          if (isNegated ? res : !res) {
-            andResult = false;
-            break;
-          }
+        const subResult = evaluateSingle(part, ctx);
+        console.log("   ↳ Subcondition:", part, "=>", subResult);
+
+        if (result === null) {
+          result = subResult;
+        } else if (operator === "&&") {
+          result = result && subResult;
+        } else if (operator === "||") {
+          result = result || subResult;
         }
-        if (andResult) return true; // if any OR branch succeeds
       }
 
-      return false;
+      console.log("✅ [safeEvaluate] Final result:", result);
+      return result;
     } catch (err) {
-      console.error("⚠️ safeEvaluate error:", err, condition);
+      console.error("⚠️ [safeEvaluate] Error evaluating:", condition, err);
       return false;
     }
   }
 
-  // Determine next node
+  // 🔍 Helper — evaluate a single expression safely
+  function evaluateSingle(expression, ctx) {
+    expression = expression.trim();
+
+    // Handle NOT (!) prefix
+    let negate = false;
+    if (expression.startsWith("!")) {
+      negate = true;
+      expression = expression.slice(1).trim();
+    }
+
+    const numValue = parseFloat(ctx.value);
+    const isNum = !isNaN(numValue);
+
+    const checks = [
+      // String conditions
+      {
+        regex: /^value\.startsWith\(['"]([^'"]+)['"]\)/,
+        test: (m) => ctx.value.startsWith(m[1].toUpperCase()),
+      },
+      {
+        regex: /^value\.includes\(['"]([^'"]+)['"]\)/,
+        test: (m) => ctx.value.includes(m[1].toUpperCase()),
+      },
+      {
+        regex: /^answers\.modelInfo\.gasType\s*===\s*['"]([^'"]+)['"]/,
+        test: (m) => ctx.answers?.modelInfo?.gasType === m[1],
+      },
+      {
+        regex: /^answers\.serialInfo\.revision\.includes\(['"]([^'"]+)['"]\)/,
+        test: (m) => ctx.answers?.serialInfo?.revision?.includes(m[1]),
+      },
+
+      // Numeric comparisons
+      { regex: /value\s*>\s*(-?\d+(\.\d+)?)/, test: (m) => isNum && numValue > parseFloat(m[1]) },
+      { regex: /value\s*<\s*(-?\d+(\.\d+)?)/, test: (m) => isNum && numValue < parseFloat(m[1]) },
+      { regex: /value\s*>=\s*(-?\d+(\.\d+)?)/, test: (m) => isNum && numValue >= parseFloat(m[1]) },
+      { regex: /value\s*<=\s*(-?\d+(\.\d+)?)/, test: (m) => isNum && numValue <= parseFloat(m[1]) },
+      { regex: /value\s*==\s*(-?\d+(\.\d+)?)/, test: (m) => isNum && numValue === parseFloat(m[1]) },
+    ];
+
+    for (const { regex, test } of checks) {
+      const match = expression.match(regex);
+      if (match) {
+        const res = test(match);
+        return negate ? !res : res;
+      }
+    }
+
+    return false;
+  }
+
+  // ------------------------------------------------------------
+  // 🔀 Determine next node in flow
+  // ------------------------------------------------------------
   function findNextNode(logicArray, answers = {}, value = "") {
     if (!Array.isArray(logicArray)) return null;
 
@@ -139,11 +167,12 @@ export default function createFlowEngine() {
         return rule.goto;
       }
     }
-
     return null;
   }
 
-  // Automatic routing helper
+  // ------------------------------------------------------------
+  // 🤖 Auto-routing by brand/model metadata
+  // ------------------------------------------------------------
   function autoRoute(equipmentInfo) {
     if (!equipmentInfo) return null;
 
@@ -160,7 +189,9 @@ export default function createFlowEngine() {
   return { decodeEquipment, findNextNode, autoRoute, safeEvaluate };
 }
 
-// ✅ Externally exposed logic evaluator
+// ------------------------------------------------------------
+// ✅ External logic evaluator (for FlowRunner)
+// ------------------------------------------------------------
 export function evaluateLogic(node, answers, value = "") {
   if (!node || !Array.isArray(node.logic)) return null;
 
