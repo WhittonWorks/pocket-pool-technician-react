@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import FeedbackButton from "./components/ui/FeedbackButton";
 import LoadBar from "./components/ui/LoadBar";
-import { useLocation } from "react-router-dom";
 
 function Layout({ sidebar, children }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
   const location = useLocation();
-  const isFlowActive = location.pathname.includes("/flow"); // show bar when in any flow
 
-  // 📱 Keep track of resize events for responsive behavior
+  // 📱 Responsive resize listener
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", handleResize);
@@ -19,8 +17,32 @@ function Layout({ sidebar, children }) {
 
   return (
     <div className="flex h-screen flex-col md:flex-row relative">
-      {/* 🔵 Global Load Bar (active during flow) */}
-      <LoadBar active={isFlowActive} />
+      {/* 🔵 Persistent Load Bar — route debugger */}
+      {(() => {
+        console.log("🧭 Full path detected:", location.pathname);
+
+        if (location.pathname.match(/flow/i)) {
+          console.log("🚀 LoadBar should be visible now");
+          return (
+            <div className="fixed top-0 left-0 w-full z-50">
+              <LoadBar />
+              <div
+                style={{
+                  height: "6px",
+                  width: "100%",
+                  background: "red", // 🔴 debug: always visible if rendered
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  zIndex: 9999,
+                }}
+              ></div>
+            </div>
+          );
+        }
+
+        return null;
+      })()}
 
       {/* 🧭 Mobile top bar */}
       {isMobile && (
@@ -47,7 +69,7 @@ function Layout({ sidebar, children }) {
         {children}
       </main>
 
-      {/* 🧠 Global Feedback Button (fixed position, always visible) */}
+      {/* 💬 Global Feedback Button */}
       <FeedbackButton />
     </div>
   );
