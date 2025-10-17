@@ -8,16 +8,24 @@ function ErrorLookup({ errors, onSelectError }) {
   const [selectedType, setSelectedType] = useState("All");
 
   // 🔹 Flatten all brand error files into a single searchable list
+  //    ✅ Includes fallback logic for nested flowTarget structure (Option A)
   const allErrors = Object.values(errors).flatMap((file) =>
     file.errors.map((e) => ({
       ...e,
       source: file.title,
+      brand: e.brand || e.flowTarget?.brand || file.brand || "Unknown",
+      equipmentType:
+        e.equipmentType ||
+        e.flowTarget?.equipmentType ||
+        file.equipmentType ||
+        "Unknown",
+      model: e.model || e.flowTarget?.model || file.model || "Unknown",
     }))
   );
 
-  // 🔹 Extract unique brand and type lists
-  const brands = ["All", ...new Set(allErrors.map((e) => e.brand || "Unknown"))];
-  const types = ["All", ...new Set(allErrors.map((e) => e.equipmentType || "Unknown"))];
+  // 🔹 Extract unique brand and type lists for dropdown filters
+  const brands = ["All", ...new Set(allErrors.map((e) => e.brand))];
+  const types = ["All", ...new Set(allErrors.map((e) => e.equipmentType))];
 
   // 🔹 Synonyms for tech language
   const synonymMap = {
@@ -31,7 +39,9 @@ function ErrorLookup({ errors, onSelectError }) {
   // 🔹 Expand query with synonyms
   const expandQuery = (input) => {
     const words = input.toLowerCase().split(/\s+/).filter(Boolean);
-    return [...new Set(words.flatMap((w) => [w, ...(synonymMap[w] || [])]))].join(" ");
+    return [...new Set(words.flatMap((w) => [w, ...(synonymMap[w] || [])]))].join(
+      " "
+    );
   };
 
   // 🔹 Configure Fuse.js for fuzzy search
@@ -51,8 +61,10 @@ function ErrorLookup({ errors, onSelectError }) {
 
   // 🔹 Apply brand and type filters to search results
   const filteredResults = results.filter((r) => {
-    const brandMatch = selectedBrand === "All" || (r.brand || "Unknown") === selectedBrand;
-    const typeMatch = selectedType === "All" || (r.equipmentType || "Unknown") === selectedType;
+    const brandMatch =
+      selectedBrand === "All" || r.brand === selectedBrand;
+    const typeMatch =
+      selectedType === "All" || r.equipmentType === selectedType;
     return brandMatch && typeMatch;
   });
 
