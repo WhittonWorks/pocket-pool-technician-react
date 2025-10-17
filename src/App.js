@@ -1,3 +1,4 @@
+// src/App.js
 import React, { useState, useEffect } from "react";
 import Layout from "./Layout";
 import FlowRunner from "./components/containers/FlowRunner";
@@ -55,6 +56,7 @@ function App() {
 
   const equipmentTypes = brand ? Object.keys(models[brand]) : [];
 
+  // 🔄 Reset everything back to the main home menu
   function resetToHome() {
     setMode(null);
     setStep("brand");
@@ -62,25 +64,34 @@ function App() {
     setEquipmentType(null);
     setModel(null);
     setSidebarCollapsed(false);
+    sessionStorage.removeItem("jumpToNode");
   }
 
+  // 🧭 Called when clicking "Start Diagnosis From Here" in Error/Symptom lookup
   function launchFlowFromSymptom(flowTarget) {
     if (!flowTarget) return alert("⚠️ Invalid data.");
+
     const { brand, equipmentType, model, startNode } = flowTarget;
     const flow = findFlow(brand, equipmentType, model);
     if (!flow) return alert("⚠️ Diagnostic flow not found.");
-    if (startNode && flow.nodes[startNode]) flow.start = startNode;
+
+    console.log("🚀 Launching flow:", brand, equipmentType, model, "Jump Node:", startNode);
+
+    // Save jump target for FlowRunner
+    sessionStorage.setItem("jumpToNode", startNode || "");
+
     setBrand(brand);
     setEquipmentType(equipmentType);
     setModel(model);
     setMode("diagnostics");
   }
 
+  // 🧩 Sidebar navigation / flow selection
   function renderSidebar() {
     if (!mode) {
       return (
         <div>
-          {/* 🧾 Test PDF button (optional developer tool) */}
+          {/* 🧾 Test PDF button (developer tool) */}
           <button
             style={{ ...btnStyle, background: "#007bff", marginBottom: 16 }}
             onClick={() =>
@@ -228,6 +239,7 @@ function App() {
       );
   }
 
+  // 🧠 Main render
   return (
     <Layout sidebar={sidebarCollapsed ? null : renderSidebar()}>
       <h1 className="text-2xl font-bold mb-4">Compact Pool Technician🚀</h1>
@@ -236,12 +248,15 @@ function App() {
         <>
           {(() => {
             const flow = findFlow(brand, equipmentType, model);
+            const jumpNode = sessionStorage.getItem("jumpToNode");
+
             return flow ? (
               <FlowRunner
                 key={flow.id}
                 flow={flow}
+                jumpTo={jumpNode || null}
                 onExit={resetToHome}
-                onFinish={(answers) => createReportPDF(answers, flow)} // ✅ uses modular PDF generator
+                onFinish={(answers) => createReportPDF(answers, flow)}
               />
             ) : (
               <p>
