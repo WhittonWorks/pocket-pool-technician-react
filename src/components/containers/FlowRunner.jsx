@@ -3,8 +3,8 @@ import FeedbackModal from "../ui/FeedbackModal";
 import AppSettings from "../../config/appSettings";
 import { jandy as serialJandy } from "../../tools/serial";
 import { jandy as modelJandy } from "../../tools/model";
-import { evaluateLogic } from "../../engine/flowEngine"; // centralized logic helper
-import { useFlow } from "../../context/FlowContext"; // ✅ NEW import
+import { evaluateLogic } from "../../engine/flowEngine";
+import { useFlow } from "../../context/FlowContext";
 
 // 🧠 Merge helper: unify serial + model data into one equipment object
 function mergeEquipmentInfo(serialInfo, modelInfo) {
@@ -26,7 +26,7 @@ function mergeEquipmentInfo(serialInfo, modelInfo) {
 }
 
 function FlowRunner({ flow, onExit, onFinish, jumpTo, entryMode, errorCode }) {
-  const { startFlow, endFlow } = useFlow(); // ✅ Global flow state control
+  const { startFlow, endFlow } = useFlow();
 
   const [currentId, setCurrentId] = useState(flow.start);
   const [answers, setAnswers] = useState({ model: flow.model });
@@ -40,7 +40,7 @@ function FlowRunner({ flow, onExit, onFinish, jumpTo, entryMode, errorCode }) {
 
   const current = flow.nodes[currentId];
 
-  // 🔵 Trigger global "flow active" state when mounted / unmounted
+  // 🔵 Trigger global "flow active" state
   useEffect(() => {
     startFlow(flow.title || "Active Flow");
     console.log("🟦 FlowRunner mounted — LoadBar ON");
@@ -52,29 +52,21 @@ function FlowRunner({ flow, onExit, onFinish, jumpTo, entryMode, errorCode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 🧭 AUTO-ROUTING EFFECT — runs immediately when a logic-only info node is loaded
+  // 🧭 Handle auto-routing info-only nodes
   useEffect(() => {
-    if (
-      current?.input === "info" &&
-      Array.isArray(current.logic) &&
-      current.logic.length > 0
-    ) {
-      console.log("⚙️ Auto-routing node detected:", current.id);
+    if (current?.input === "info" && Array.isArray(current.logic) && current.logic.length > 0) {
       const nextNode = evaluateLogic(current, answers);
-      if (nextNode) {
-        console.log("➡️ Auto-advancing to:", nextNode);
-        goTo(nextNode);
-      }
+      if (nextNode) goTo(nextNode);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentId]);
 
-  // 🚀 Jump-to handler — executes once model + serial validation complete
+  // 🚀 Handle pending jump *after model verification*
   useEffect(() => {
     if (!pendingJump || !flow.nodes[pendingJump]) return;
 
-    // Skip jump until model + serial are both entered
-    if (currentId === "enter_model" || currentId === "enter_serial") return;
+    // Wait until we're past the model/serial entry screens
+    if (["enter_model", "enter_serial"].includes(currentId)) return;
 
     console.log(`🚀 Executing scheduled jump to: ${pendingJump}`);
     goTo(pendingJump);
@@ -82,11 +74,9 @@ function FlowRunner({ flow, onExit, onFinish, jumpTo, entryMode, errorCode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentId, pendingJump]);
 
-  if (!current) {
-    return <p className="text-red-600">⚠️ Invalid step or missing node.</p>;
-  }
+  if (!current) return <p className="text-red-600">⚠️ Invalid step or missing node.</p>;
 
-  // 🧹 Reset UI states between nodes
+  // 🧹 Reset UI states
   function resetLocalUI() {
     setSelectedChoice(null);
     setNumberInput("");
@@ -94,19 +84,12 @@ function FlowRunner({ flow, onExit, onFinish, jumpTo, entryMode, errorCode }) {
     setMediaToShow(null);
   }
 
-  // 🔀 Navigation
+  // 🔀 Navigation helpers
   function goTo(nextId, value) {
     if (!flow.nodes[nextId]) return console.warn("❌ Invalid node:", nextId);
 
-    setAnswers((prev) =>
-      value !== undefined ? { ...prev, [currentId]: value } : prev
-    );
-
-    setHistory((prev) => [
-      ...prev,
-      { id: currentId, selectedChoice, numberInput, textInput },
-    ]);
-
+    setAnswers((prev) => (value !== undefined ? { ...prev, [currentId]: value } : prev));
+    setHistory((prev) => [...prev, { id: currentId, selectedChoice, numberInput, textInput }]);
     setCurrentId(nextId);
     resetLocalUI();
   }
@@ -121,7 +104,7 @@ function FlowRunner({ flow, onExit, onFinish, jumpTo, entryMode, errorCode }) {
     setHistory((h) => h.slice(0, -1));
   }
 
-  // ✅ Basic handlers
+  // ✅ Logic + input handlers
   function handleYesNo(nextId, value) {
     goTo(nextId, value);
   }
@@ -129,26 +112,21 @@ function FlowRunner({ flow, onExit, onFinish, jumpTo, entryMode, errorCode }) {
   function handleNumberNext() {
     const val = parseFloat(numberInput);
     if (isNaN(val)) return;
-    const inRange =
-      Array.isArray(current.range) &&
-      val >= current.range[0] &&
-      val <= current.range[1];
+    const inRange = Array.isArray(current.range) && val >= current.range[0] && val <= current.range[1];
     const nextId = inRange ? current.pass : current.fail;
     if (nextId) goTo(nextId, val);
   }
 
-  // ✅ Unified logic evaluation
   function processLogic() {
     const nextNode = evaluateLogic(current, answers);
     if (nextNode) {
-      console.log("🧭 Auto-routing to:", nextNode);
       goTo(nextNode);
       return true;
     }
     return false;
   }
 
-  // ⚙️ Info node progression
+  // ⚙️ Info nodes
   function handleInfoNext() {
     if (processLogic()) return;
 
@@ -159,7 +137,7 @@ function FlowRunner({ flow, onExit, onFinish, jumpTo, entryMode, errorCode }) {
         outcome: current.success ? "Success" : "Failure",
       };
 
-      // ✅ Include error jump metadata if applicable
+      // Include jump metadata for error/symptom starts
       if (entryMode === "error_jump") {
         finalAnswers.entryMode = "error_jump";
         finalAnswers.errorCode = errorCode || "Unknown";
@@ -173,7 +151,6 @@ function FlowRunner({ flow, onExit, onFinish, jumpTo, entryMode, errorCode }) {
       }
 
       if (AppSettings.FEEDBACK_MODAL_ENABLED) {
-        console.log("🧠 Triggering feedback modal automatically...");
         setShowFeedback(true);
       } else {
         onExit?.();
@@ -181,59 +158,49 @@ function FlowRunner({ flow, onExit, onFinish, jumpTo, entryMode, errorCode }) {
     } else if (current.pass) goTo(current.pass);
   }
 
-  // 🧠 Text input handler — serial/model decoding
+  // 🧠 Text handler — model/serial decoding + jump prep
   function handleTextNext() {
     const val = textInput.trim();
     if (!val) return;
     const upperVal = val.toUpperCase();
     setAnswers((prev) => ({ ...prev, [currentId]: upperVal }));
 
+    // SERIAL ENTRY
     if (currentId === "enter_serial") {
       const info = serialJandy.decodeJandyJxiSerial(upperVal);
       if (!info.valid) {
-        console.warn("❌ Invalid serial format:", upperVal);
         if (current.default) return goTo(current.default, upperVal);
         return;
       }
+
       console.log("🧠 Serial decoded:", info);
       const merged = mergeEquipmentInfo(info, answers.modelInfo);
-      setAnswers((prev) => ({
-        ...prev,
-        serialInfo: info,
-        equipmentInfo: merged,
-      }));
-      if (info.revision === "Rev G or earlier")
-        return goTo("rev_g_start", upperVal);
-      if (info.revision === "Rev H or newer")
-        return goTo("rev_h_start", upperVal);
+      setAnswers((prev) => ({ ...prev, serialInfo: info, equipmentInfo: merged }));
+
+      // Choose flow start depending on revision
+      if (info.revision === "Rev G or earlier") return goTo("rev_g_start", upperVal);
+      if (info.revision === "Rev H or newer") return goTo("rev_h_start", upperVal);
     }
 
+    // MODEL ENTRY
     if (currentId === "enter_model") {
       const info = modelJandy.decodeJandyJxiModel(upperVal);
       if (!info.valid) {
-        console.warn("❌ Invalid model format:", upperVal);
         if (current.default) return goTo(current.default, upperVal);
         return;
       }
-      console.log("🧠 Model decoded:", info);
-      const merged = mergeEquipmentInfo(answers.serialInfo, info);
-      setAnswers((prev) => ({
-        ...prev,
-        modelInfo: info,
-        equipmentInfo: merged,
-      }));
 
       console.log("✅ Model verified:", info.model);
+      const merged = mergeEquipmentInfo(answers.serialInfo, info);
+      setAnswers((prev) => ({ ...prev, modelInfo: info, equipmentInfo: merged }));
 
-      // 🧭 If a jump target exists, schedule it AFTER serial entry
+      // If a jump target exists, hold it until after serial
       if (pendingJump && flow.nodes[pendingJump]) {
-        console.log(`🧩 Jumping to node "${pendingJump}" after model confirmation`);
-        setPendingJump(pendingJump); // keep until after serial step
+        console.log(`🧩 Model verified — preparing to jump to "${pendingJump}" after serial entry`);
         return goTo("enter_serial", upperVal);
       }
 
-      // 🟩 Default path
-      console.log("➡️ Proceeding to serial entry...");
+      // Default path
       return goTo("enter_serial", upperVal);
     }
 
@@ -243,10 +210,7 @@ function FlowRunner({ flow, onExit, onFinish, jumpTo, entryMode, errorCode }) {
 
   // 💬 Feedback handling
   function handleFeedbackSubmit() {
-    console.log("✅ Feedback submitted after diagnostic.");
-    alert(
-      "✅ Feedback received — thank you for helping us improve the Compact Pool Technician!"
-    );
+    alert("✅ Feedback received — thank you for helping us improve the Compact Pool Technician!");
     setShowFeedback(false);
     onExit?.();
   }
@@ -288,9 +252,7 @@ function FlowRunner({ flow, onExit, onFinish, jumpTo, entryMode, errorCode }) {
                 key={label}
                 onClick={() => setSelectedChoice(label)}
                 className={`block w-full text-left p-2 mb-2 border rounded ${
-                  active
-                    ? "bg-green-200 border-green-500"
-                    : "bg-gray-100 hover:bg-gray-200"
+                  active ? "bg-green-200 border-green-500" : "bg-gray-100 hover:bg-gray-200"
                 }`}
               >
                 {label}
@@ -356,7 +318,11 @@ function FlowRunner({ flow, onExit, onFinish, jumpTo, entryMode, errorCode }) {
             value={textInput}
             onChange={(e) => setTextInput(e.target.value)}
             className="border p-2 rounded w-full mb-2"
-            placeholder="Enter serial or model number"
+            placeholder={
+              currentId === "enter_model"
+                ? "Enter model number (e.g., JXI400NK)"
+                : "Enter serial number (e.g., B12AE5678)"
+            }
           />
           <button
             onClick={handleTextNext}
@@ -398,7 +364,7 @@ function FlowRunner({ flow, onExit, onFinish, jumpTo, entryMode, errorCode }) {
         </button>
       </div>
 
-      {/* MEDIA */}
+      {/* MEDIA PREVIEW */}
       {mediaToShow && (
         <div id="media-section" className="mt-6">
           {mediaToShow === "image" && current.media?.image && (
@@ -407,9 +373,7 @@ function FlowRunner({ flow, onExit, onFinish, jumpTo, entryMode, errorCode }) {
               alt="Step illustration"
               className="max-w-full rounded border"
               onLoad={() =>
-                document
-                  .getElementById("media-section")
-                  ?.scrollIntoView({ behavior: "smooth" })
+                document.getElementById("media-section")?.scrollIntoView({ behavior: "smooth" })
               }
             />
           )}
@@ -419,9 +383,7 @@ function FlowRunner({ flow, onExit, onFinish, jumpTo, entryMode, errorCode }) {
               controls
               className="max-w-full rounded border"
               onLoadedData={() =>
-                document
-                  .getElementById("media-section")
-                  ?.scrollIntoView({ behavior: "smooth" })
+                document.getElementById("media-section")?.scrollIntoView({ behavior: "smooth" })
               }
             />
           )}
