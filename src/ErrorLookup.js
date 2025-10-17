@@ -1,14 +1,26 @@
 import React, { useState, useMemo } from "react";
 import Fuse from "fuse.js";
 
-function ErrorLookup({ errors, onSelectError }) {
+/**
+ * ✅ Auto-import all JSON files from /errors folder dynamically
+ *    Each new file dropped in /src/errors will be included automatically.
+ */
+const errorFiles = require.context("./errors", false, /\.json$/);
+const errors = Object.fromEntries(
+  errorFiles.keys().map((key) => [
+    key.replace("./", "").replace(".json", ""),
+    errorFiles(key),
+  ])
+);
+
+function ErrorLookup({ onSelectError }) {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState(null);
   const [selectedBrand, setSelectedBrand] = useState("All");
   const [selectedType, setSelectedType] = useState("All");
+  const [selectedModel, setSelectedModel] = useState("All");
 
-  // 🔹 Flatten all brand error files into a single searchable list
-  //    ✅ Includes fallback logic for nested flowTarget structure (Option A)
+  // 🔹 Flatten error data + normalize brand/type/model
   const allErrors = Object.values(errors).flatMap((file) =>
     file.errors.map((e) => ({
       ...e,
@@ -20,14 +32,34 @@ function ErrorLookup({ errors, onSelectError }) {
         file.equipmentType ||
         "Unknown",
       model: e.model || e.flowTarget?.model || file.model || "Unknown",
+      metadata: e.metadata || {},
     }))
   );
 
-  // 🔹 Extract unique brand and type lists for dropdown filters
+  // 🔹 Create brand/type/model dropdown lists
   const brands = ["All", ...new Set(allErrors.map((e) => e.brand))];
-  const types = ["All", ...new Set(allErrors.map((e) => e.equipmentType))];
+  const types = [
+    "All",
+    ...new Set(
+      allErrors
+        .filter((e) => selectedBrand === "All" || e.brand === selectedBrand)
+        .map((e) => e.equipmentType)
+    ),
+  ];
+  const models = [
+    "All",
+    ...new Set(
+      allErrors
+        .filter(
+          (e) =>
+            (selectedBrand === "All" || e.brand === selectedBrand) &&
+            (selectedType === "All" || e.equipmentType === selectedType)
+        )
+        .map((e) => e.model)
+    ),
+  ];
 
-  // 🔹 Synonyms for tech language
+  // 🔹 Synonyms for tech terminology
   const synonymMap = {
     flow: ["circulation", "pressure", "pump", "low flow", "switch", "no flow"],
     ignite: ["fire", "light", "flame", "burn"],
@@ -36,15 +68,12 @@ function ErrorLookup({ errors, onSelectError }) {
     power: ["voltage", "energize", "relay", "transformer"],
   };
 
-  // 🔹 Expand query with synonyms
   const expandQuery = (input) => {
     const words = input.toLowerCase().split(/\s+/).filter(Boolean);
-    return [...new Set(words.flatMap((w) => [w, ...(synonymMap[w] || [])]))].join(
-      " "
-    );
+    return [...new Set(words.flatMap((w) => [w, ...(synonymMap[w] || [])]))].join(" ");
   };
 
-  // 🔹 Configure Fuse.js for fuzzy search
+  // 🔹 Configure Fuse.js
   const fuse = useMemo(() => {
     return new Fuse(allErrors, {
       keys: ["code", "title", "meaning", "description", "fix", "source"],
@@ -54,21 +83,32 @@ function ErrorLookup({ errors, onSelectError }) {
     });
   }, [errors]);
 
-  // 🔍 Perform fuzzy search
+  // 🔍 Run fuzzy search
   const results = search.trim()
     ? fuse.search(expandQuery(search)).map((r) => r.item)
-    : [];
+    : allErrors;
 
-  // 🔹 Apply brand and type filters to search results
-  const filteredResults = results.filter((r) => {
-    const brandMatch =
-      selectedBrand === "All" || r.brand === selectedBrand;
-    const typeMatch =
-      selectedType === "All" || r.equipmentType === selectedType;
-    return brandMatch && typeMatch;
+  // 🧹 Deduplicate results by brand/model/code combo
+  const dedupedResults = results.filter(
+    (v, i, self) =>
+      i ===
+      self.findIndex(
+        (t) =>
+          t.code === v.code &&
+          t.brand === v.brand &&
+          t.model === v.model
+      )
+  );
+
+  // 🔹 Apply filters
+  const filteredResults = dedupedResults.filter((r) => {
+    const brandMatch = selectedBrand === "All" || r.brand === selectedBrand;
+    const typeMatch = selectedType === "All" || r.equipmentType === selectedType;
+    const modelMatch = selectedModel === "All" || r.model === selectedModel;
+    return brandMatch && typeMatch && modelMatch;
   });
 
-  // ✅ Select a result (expand details)
+  // ✅ Select result
   function handleSelect(err) {
     setSelected(err);
     setSearch(err.code || err.title || "");
@@ -78,11 +118,15 @@ function ErrorLookup({ errors, onSelectError }) {
     <div className="p-4 border rounded bg-white shadow text-gray-800">
       <h2 className="text-xl font-bold mb-2">Error Code Lookup</h2>
 
-      {/* 🔹 Brand & Type Filters */}
+      {/* 🔹 Filters: Brand → Equipment Type → Model */}
       <div className="flex flex-wrap gap-2 mb-3">
         <select
           value={selectedBrand}
-          onChange={(e) => setSelectedBrand(e.target.value)}
+          onChange={(e) => {
+            setSelectedBrand(e.target.value);
+            setSelectedType("All");
+            setSelectedModel("All");
+          }}
           className="border p-2 rounded bg-white text-gray-900"
         >
           {brands.map((b) => (
@@ -92,11 +136,24 @@ function ErrorLookup({ errors, onSelectError }) {
 
         <select
           value={selectedType}
-          onChange={(e) => setSelectedType(e.target.value)}
+          onChange={(e) => {
+            setSelectedType(e.target.value);
+            setSelectedModel("All");
+          }}
           className="border p-2 rounded bg-white text-gray-900"
         >
           {types.map((t) => (
             <option key={t}>{t}</option>
+          ))}
+        </select>
+
+        <select
+          value={selectedModel}
+          onChange={(e) => setSelectedModel(e.target.value)}
+          className="border p-2 rounded bg-white text-gray-900"
+        >
+          {models.map((m) => (
+            <option key={m}>{m}</option>
           ))}
         </select>
       </div>
@@ -113,7 +170,7 @@ function ErrorLookup({ errors, onSelectError }) {
         className="border p-2 rounded w-full bg-white text-gray-900 placeholder-gray-500"
       />
 
-      {/* 💡 No search results */}
+      {/* 💡 No results */}
       {search && filteredResults.length === 0 && !selected && (
         <p className="text-red-600 mt-4">❌ No matching errors found.</p>
       )}
@@ -128,7 +185,9 @@ function ErrorLookup({ errors, onSelectError }) {
               className="p-2 hover:bg-gray-200 cursor-pointer text-gray-800"
             >
               <strong>{r.code}</strong> — {r.title}{" "}
-              <span className="text-xs text-gray-500">({r.source})</span>
+              <span className="text-xs text-gray-500">
+                ({r.brand} {r.model})
+              </span>
             </li>
           ))}
         </ul>
@@ -140,6 +199,7 @@ function ErrorLookup({ errors, onSelectError }) {
           <h3 className="font-bold text-lg">
             {selected.code} — {selected.title}
           </h3>
+
           {selected.meaning && (
             <p>
               <strong>Meaning:</strong> {selected.meaning}
@@ -155,8 +215,32 @@ function ErrorLookup({ errors, onSelectError }) {
               <strong>Fix:</strong> {selected.fix}
             </p>
           )}
+
+          {/* 🧠 Optional metadata display */}
+          {selected.metadata && Object.keys(selected.metadata).length > 0 && (
+            <div className="text-sm text-gray-700 mt-2">
+              {selected.metadata.severity && (
+                <p>
+                  <strong>Severity:</strong> {selected.metadata.severity}
+                </p>
+              )}
+              {selected.metadata.frequency && (
+                <p>
+                  <strong>Frequency:</strong> {selected.metadata.frequency}
+                </p>
+              )}
+              {selected.metadata.lastUpdated && (
+                <p>
+                  <strong>Last Updated:</strong> {selected.metadata.lastUpdated}
+                </p>
+              )}
+            </div>
+          )}
+
           <p className="text-sm text-gray-500 mt-2">
-            <em>Source: {selected.source}</em>
+            <em>
+              Source: {selected.source} | {selected.brand} {selected.model}
+            </em>
           </p>
 
           {/* 🚀 Start Flow */}
