@@ -25,7 +25,7 @@ function mergeEquipmentInfo(serialInfo, modelInfo) {
   };
 }
 
-function FlowRunner({ flow, onExit, onFinish }) {
+function FlowRunner({ flow, onExit, onFinish, jumpTo, entryMode, errorCode }) {
   const { startFlow, endFlow } = useFlow(); // ✅ Global flow state control
 
   const [currentId, setCurrentId] = useState(flow.start);
@@ -36,8 +36,8 @@ function FlowRunner({ flow, onExit, onFinish }) {
   const [selectedChoice, setSelectedChoice] = useState(null);
   const [numberInput, setNumberInput] = useState("");
   const [textInput, setTextInput] = useState("");
+  const [pendingJump, setPendingJump] = useState(jumpTo || null);
 
-  // ✅ Always define current before conditionally rendering
   const current = flow.nodes[currentId];
 
   // 🔵 Trigger global "flow active" state when mounted / unmounted
@@ -69,10 +69,23 @@ function FlowRunner({ flow, onExit, onFinish }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentId]);
 
-  // ✅ Safe conditional render (AFTER hooks)
+  // 🚀 Jump-to handler — executes once model + serial validation complete
+  useEffect(() => {
+    if (!pendingJump || !flow.nodes[pendingJump]) return;
+
+    // Skip jump until model + serial are both entered
+    if (currentId === "enter_model" || currentId === "enter_serial") return;
+
+    console.log(`🚀 Executing scheduled jump to: ${pendingJump}`);
+    goTo(pendingJump);
+    setPendingJump(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentId, pendingJump]);
+
   if (!current) {
     return <p className="text-red-600">⚠️ Invalid step or missing node.</p>;
   }
+
   // 🧹 Reset UI states between nodes
   function resetLocalUI() {
     setSelectedChoice(null);
@@ -146,6 +159,13 @@ function FlowRunner({ flow, onExit, onFinish }) {
         outcome: current.success ? "Success" : "Failure",
       };
 
+      // ✅ Include error jump metadata if applicable
+      if (entryMode === "error_jump") {
+        finalAnswers.entryMode = "error_jump";
+        finalAnswers.errorCode = errorCode || "Unknown";
+        finalAnswers.startNode = pendingJump || currentId;
+      }
+
       try {
         if (typeof onFinish === "function") onFinish(finalAnswers);
       } catch (err) {
@@ -202,6 +222,17 @@ function FlowRunner({ flow, onExit, onFinish }) {
         modelInfo: info,
         equipmentInfo: merged,
       }));
+
+      console.log("✅ Model verified:", info.model);
+
+      // 🧭 If a jump target exists, schedule it AFTER serial entry
+      if (pendingJump && flow.nodes[pendingJump]) {
+        console.log(`🧩 Jumping to node "${pendingJump}" after model confirmation`);
+        setPendingJump(pendingJump); // keep until after serial step
+        return goTo("enter_serial", upperVal);
+      }
+
+      // 🟩 Default path
       console.log("➡️ Proceeding to serial entry...");
       return goTo("enter_serial", upperVal);
     }
@@ -223,7 +254,6 @@ function FlowRunner({ flow, onExit, onFinish }) {
   // ---------------- UI ----------------
   return (
     <div className="p-4 border rounded bg-white shadow text-gray-800">
-      
       <h3 className="font-bold mb-3">{current.text}</h3>
 
       {/* MEDIA */}
