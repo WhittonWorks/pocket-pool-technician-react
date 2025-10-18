@@ -1,5 +1,5 @@
 {
-  "short_name": "CPT",
+  "short_name": "CPT v2",
   "name": "Compact Pool Technician",
   "icons": [
     {
@@ -8,12 +8,12 @@
       "type": "image/x-icon"
     },
     {
-      "src": "CPT-Logo-192.png",
+      "src": "CPT-Logo-192-v2.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "CPT-Logo-512.png",
+      "src": "CPT-Logo-512-v2.png",
       "type": "image/png",
       "sizes": "512x512"
     }
