@@ -10,6 +10,11 @@ import reportWebVitals from './reportWebVitals';
 import { AppSettingsProvider } from './context/AppSettingsContext';
 import { FlowProvider } from './context/FlowContext'; // <-- NEW import
 
+// ✅ Force browsers to refresh the manifest & icons
+const manifestLink = document.querySelector("link[rel='manifest']");
+if (manifestLink) {
+  manifestLink.href = `${manifestLink.href}?v=${Date.now()}`;
+}
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
