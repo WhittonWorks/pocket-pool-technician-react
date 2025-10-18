@@ -1,5 +1,3 @@
-Perfect — here’s your entire README.md expanded with a clear new section for the templates. I kept all of the Create React App boilerplate at the bottom so nothing is lost, and only added a Repository Structure section that includes /templates.
-
 # Pocket Pool Technician (React Build)
 
 **React-based diagnostic app for pool service technicians — JSON-driven, offline-ready, and built to scale across all pool equipment.**
