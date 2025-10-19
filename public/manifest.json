@@ -1,26 +1,31 @@
 {
   "short_name": "CPT",
   "name": "Compact Pool Technician",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#FFD300",
+  "theme_color": "#0B73FF",
+  "description": "Guided diagnostics, error codes, and symptom lookup for pool equipment — works offline.",
   "icons": [
     {
+      "src": "CPT-Logo-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "CPT-Logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
       "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
+      "sizes": "16x16 24x24 32x32 64x64",
       "type": "image/x-icon"
-    },
-    {
-      "src": "CPT-Logo-192-v2.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "CPT-Logo-512-v2.png",
-      "type": "image/png",
-      "sizes": "512x512"
     }
   ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#0B73FF",
-  "background_color": "#FFD300",
-  "orientation": "portrait-primary"
+  "prefer_related_applications": false
 }
