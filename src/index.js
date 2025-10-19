@@ -1,28 +1,28 @@
 // src/index.js
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
 
 // ✅ Context Providers
-import { AppSettingsProvider } from './context/AppSettingsContext';
-import { FlowProvider } from './context/FlowContext';
+import { AppSettingsProvider } from "./context/AppSettingsContext";
+import { FlowProvider } from "./context/FlowContext";
 
-// ✅ Enable full PWA offline caching & auto-update
-import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+// ✅ Service Worker Registration (for offline + auto-update)
+import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 
-// ✅ Force browsers to refresh the manifest & icons (cache buster)
+// ✅ Bust browser cache for manifest/icons (ensures new icons and splash show)
 const manifestLink = document.querySelector("link[rel='manifest']");
 if (manifestLink) {
   manifestLink.href = `${manifestLink.href}?v=${Date.now()}`;
 }
 
-// ✅ Create root element
-const root = ReactDOM.createRoot(document.getElementById('root'));
+// ✅ Create React root
+const root = ReactDOM.createRoot(document.getElementById("root"));
 
-// ✅ Render app wrapped in both providers
+// ✅ Render application with both context providers
 root.render(
   <React.StrictMode>
     <AppSettingsProvider>
@@ -35,19 +35,19 @@ root.render(
   </React.StrictMode>
 );
 
-// ✅ Performance monitoring (optional)
+// ✅ Report performance metrics (optional)
 reportWebVitals();
 
-// ✅ Register service worker for offline caching
+// ✅ Register the service worker for full offline support
 serviceWorkerRegistration.register({
   onUpdate: (registration) => {
-    console.log('♻️ New version available. Refresh to update.');
+    console.log("♻️ New version available. Refreshing to update...");
     if (registration && registration.waiting) {
-      registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      registration.waiting.postMessage({ type: "SKIP_WAITING" });
       window.location.reload();
     }
   },
   onSuccess: () => {
-    console.log('✅ Content cached for offline use.');
-  }
+    console.log("✅ App cached for offline use — ready when you are!");
+  },
 });
