@@ -1,4 +1,4 @@
-// src/serviceWorkerRegistration.js
+// the src/serviceWorkerRegistration.js
 // Enables the app to cache assets for offline use and update gracefully.
 
 const isLocalhost = Boolean(
