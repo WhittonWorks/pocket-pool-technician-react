@@ -8,18 +8,20 @@ import reportWebVitals from './reportWebVitals';
 
 // ✅ Context Providers
 import { AppSettingsProvider } from './context/AppSettingsContext';
-import { FlowProvider } from './context/FlowContext'; // <-- NEW import
+import { FlowProvider } from './context/FlowContext';
 
-// ✅ Force browsers to refresh the manifest & icons
+// ✅ Force browsers to refresh the manifest & icons (cache buster)
 const manifestLink = document.querySelector("link[rel='manifest']");
 if (manifestLink) {
   manifestLink.href = `${manifestLink.href}?v=${Date.now()}`;
 }
+
+// ✅ Create root element
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
+// ✅ Render app wrapped in both providers
 root.render(
   <React.StrictMode>
-    {/* ✅ Wrap in both providers (AppSettings → Flow) */}
     <AppSettingsProvider>
       <FlowProvider>
         <BrowserRouter>
@@ -30,5 +32,21 @@ root.render(
   </React.StrictMode>
 );
 
-// Performance monitoring (optional)
+// ✅ Performance monitoring (optional)
 reportWebVitals();
+
+// ✅ Enable full PWA offline caching & auto-update
+import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+serviceWorkerRegistration.register({
+  onUpdate: (registration) => {
+    console.log('♻️ New version available. Refresh to update.');
+    // Optional: automatically activate new SW immediately
+    if (registration && registration.waiting) {
+      registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      window.location.reload();
+    }
+  },
+  onSuccess: () => {
+    console.log('✅ Content cached for offline use.');
+  }
+});
