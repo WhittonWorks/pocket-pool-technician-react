@@ -2,22 +2,32 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+
     <!-- ✅ Correct favicon -->
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- ✅ Updated theme color to your blue -->
     <meta name="theme-color" content="#0B73FF" />
+
+    <!-- ✅ iOS PWA requirements -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Compact Pool Technician" />
+
     <meta
       name="description"
       content="Compact Pool Technician — Offline-ready diagnostic app for pool professionals."
     />
 
-    <!-- ✅ Apple Touch Icon -->
+    <!-- ✅ App icons -->
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/CPT-Logo-512.png" />
 
-    <!-- ✅ Force iOS and Netlify to refresh the manifest -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.webmanifest?v=3" />
+    <!-- ✅ Correct manifest reference -->
+    <link
+      rel="manifest"
+      href="%PUBLIC_URL%/manifest.webmanifest"
+      type="application/manifest+json"
+    />
 
     <title>Compact Pool Technician</title>
   </head>
