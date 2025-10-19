@@ -242,7 +242,7 @@ function App() {
   // 🧠 Main render
   return (
     <Layout sidebar={sidebarCollapsed ? null : renderSidebar()}>
-      <h1 className="text-2xl font-bold mb-4">Compact Pool Technician🚀</h1>
+      <h1 className="text-2xl font-bold mb-4">Compact Pool Technicians🚀</h1>
 
       {mode === "diagnostics" && model && (
         <>
