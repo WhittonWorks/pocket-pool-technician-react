@@ -10,6 +10,9 @@ import reportWebVitals from './reportWebVitals';
 import { AppSettingsProvider } from './context/AppSettingsContext';
 import { FlowProvider } from './context/FlowContext';
 
+// ✅ Enable full PWA offline caching & auto-update
+import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+
 // ✅ Force browsers to refresh the manifest & icons (cache buster)
 const manifestLink = document.querySelector("link[rel='manifest']");
 if (manifestLink) {
@@ -35,12 +38,10 @@ root.render(
 // ✅ Performance monitoring (optional)
 reportWebVitals();
 
-// ✅ Enable full PWA offline caching & auto-update
-import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+// ✅ Register service worker for offline caching
 serviceWorkerRegistration.register({
   onUpdate: (registration) => {
     console.log('♻️ New version available. Refresh to update.');
-    // Optional: automatically activate new SW immediately
     if (registration && registration.waiting) {
       registration.waiting.postMessage({ type: 'SKIP_WAITING' });
       window.location.reload();
