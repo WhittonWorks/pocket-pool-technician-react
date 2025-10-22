@@ -8,7 +8,7 @@ import SymptomLookup from "./SymptomLookup";
 import errors from "./errors";
 import symptoms from "./symptoms";
 import { findFlow } from "./flows";
-import createReportPDF from "./utils/pdf/createReportPDF"; // ✅ modular PDF generator import
+import createReportPDF from "./utils/pdf/createReportPDF";
 
 function App() {
   const [mode, setMode] = useState(null);
@@ -18,7 +18,9 @@ function App() {
   const [model, setModel] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [manuals, setManuals] = useState({});
 
+  // 📱 Handle responsive layout
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
@@ -26,6 +28,26 @@ function App() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // 📘 Attempt to load /docs/manifest.json (for manuals)
+  useEffect(() => {
+    async function loadManuals() {
+      try {
+        const response = await fetch("/docs/manifest.json");
+        if (!response.ok) {
+          console.warn("No manifest.json found, skipping manuals.");
+          return;
+        }
+        const data = await response.json();
+        setManuals(data);
+        console.log("📘 Manuals loaded:", data);
+      } catch (err) {
+        console.warn("Manuals not available or invalid JSON.", err);
+      }
+    }
+    loadManuals();
+  }, []);
+
+  // 🔧 Brand / model structure
   const brands = ["Jandy", "Hayward", "Pentair"];
   const models = {
     Jandy: {
@@ -56,7 +78,7 @@ function App() {
 
   const equipmentTypes = brand ? Object.keys(models[brand]) : [];
 
-  // 🔄 Reset everything back to the main home menu
+  // 🔄 Reset to home
   function resetToHome() {
     setMode(null);
     setStep("brand");
@@ -67,7 +89,7 @@ function App() {
     sessionStorage.removeItem("jumpToNode");
   }
 
-  // 🧭 Called when clicking "Start Diagnosis From Here" in Error/Symptom lookup
+  // 🧭 Launch flow
   function launchFlowFromSymptom(flowTarget) {
     if (!flowTarget) return alert("⚠️ Invalid data.");
 
@@ -75,23 +97,20 @@ function App() {
     const flow = findFlow(brand, equipmentType, model);
     if (!flow) return alert("⚠️ Diagnostic flow not found.");
 
-    console.log("🚀 Launching flow:", brand, equipmentType, model, "Jump Node:", startNode);
-
-    // Save jump target for FlowRunner
     sessionStorage.setItem("jumpToNode", startNode || "");
-
     setBrand(brand);
     setEquipmentType(equipmentType);
     setModel(model);
     setMode("diagnostics");
   }
 
-  // 🧩 Sidebar navigation / flow selection
+  // 🧩 Sidebar
   function renderSidebar() {
+    // --- Home menu (mode not selected) ---
     if (!mode) {
       return (
         <div>
-          {/* 🧾 Test PDF button (developer tool) */}
+          {/* 🧾 Developer test PDF */}
           <button
             style={{ ...btnStyle, background: "#007bff", marginBottom: 16 }}
             onClick={() =>
@@ -113,25 +132,38 @@ function App() {
           </button>
 
           <h3 className="font-bold mb-2">Choose Mode</h3>
+
           <button style={btnStyle} onClick={() => setMode("diagnostics")}>
             🔍 Guided Diagnostics
           </button>
+
           <button style={btnStyle} onClick={() => setMode("errors")}>
             ⚡ Error Code Lookup
           </button>
+
           <button style={btnStyle} onClick={() => setMode("symptoms")}>
             🩺 Symptom Lookup
           </button>
+
           <button
             style={{ ...btnStyle, background: "#FFD300", color: "#000" }}
             onClick={() => setMode("feedback")}
           >
             🧠 Feedback Log
           </button>
+
+          {/* 📘 Manuals button now visible */}
+          <button
+            style={{ ...btnStyle, background: "#0099cc" }}
+            onClick={() => setMode("manuals")}
+          >
+            📘 Manuals
+          </button>
         </div>
       );
     }
 
+    // --- Diagnostics ---
     if (mode === "diagnostics") {
       if (step === "brand") {
         return (
@@ -205,7 +237,8 @@ function App() {
       }
     }
 
-    if (mode === "errors")
+    // --- Error lookup ---
+    if (mode === "errors") {
       return (
         <div>
           <button onClick={() => setMode(null)} style={backStyle}>
@@ -214,8 +247,10 @@ function App() {
           <ErrorLookup errors={errors} onSelectError={launchFlowFromSymptom} />
         </div>
       );
+    }
 
-    if (mode === "symptoms")
+    // --- Symptom lookup ---
+    if (mode === "symptoms") {
       return (
         <div>
           <button onClick={() => setMode(null)} style={backStyle}>
@@ -227,8 +262,10 @@ function App() {
           />
         </div>
       );
+    }
 
-    if (mode === "feedback")
+    // --- Feedback log ---
+    if (mode === "feedback") {
       return (
         <div>
           <button onClick={() => setMode(null)} style={backStyle}>
@@ -237,13 +274,44 @@ function App() {
           <FeedbackLog />
         </div>
       );
+    }
+
+    // --- Manuals ---
+    if (mode === "manuals") {
+      return (
+        <div>
+          <button onClick={() => setMode(null)} style={backStyle}>
+            ← Back
+          </button>
+          <h3 className="font-bold mb-2">📘 Equipment Manuals</h3>
+
+          {Object.keys(manuals).length === 0 ? (
+            <p>No manuals found in /public/docs.</p>
+          ) : (
+            Object.entries(manuals).map(([brand, files]) => (
+              <div key={brand} style={{ marginBottom: 16 }}>
+                <h4 style={{ fontWeight: "bold", marginBottom: 6 }}>{brand}</h4>
+                {files.map((file) => (
+                  <button
+                    key={file.path}
+                    style={btnStyle}
+                    onClick={() => window.open(file.path, "_blank")}
+                  >
+                    {file.name}
+                  </button>
+                ))}
+              </div>
+            ))
+          )}
+        </div>
+      );
+    }
   }
 
-  // 🧠 Main render
+  // --- Main render ---
   return (
     <Layout sidebar={sidebarCollapsed ? null : renderSidebar()}>
-      <h1 className="text-2xl font-bold mb-4">Compact Pool Technicians🚀</h1>
-
+      <h1 className="text-2xl font-bold mb-4">Compact Pool Technicians 🚀</h1>
       {mode === "diagnostics" && model && (
         <>
           {(() => {
@@ -272,6 +340,7 @@ function App() {
   );
 }
 
+// --- Styling ---
 const btnStyle = {
   display: "block",
   width: "100%",

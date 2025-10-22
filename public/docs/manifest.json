@@ -1,0 +1,12 @@
+{
+  "Jandy": [
+    { "name": "JXi Heater Manual.pdf", "path": "/docs/jandy/jxi-heater-manual.pdf" },
+    { "name": "AquaPure Manual.pdf", "path": "/docs/jandy/aquapure-manual.pdf" }
+  ],
+  "Hayward": [
+    { "name": "Universal H-Series Manual.pdf", "path": "/docs/hayward/universal-h-series-manual.pdf" }
+  ],
+  "Pentair": [
+    { "name": "MasterTemp Manual.pdf", "path": "/docs/pentair/mastertemp-manual.pdf" }
+  ]
+}
