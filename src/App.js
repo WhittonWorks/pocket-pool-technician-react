@@ -32,7 +32,7 @@ function App() {
   useEffect(() => {
     async function loadManuals() {
       try {
-        const response = await fetch("/docs/manifest.json");
+        const response = await fetch(process.env.PUBLIC_URL + "/docs/manifest.json");
         if (!response.ok) {
           console.warn("No manifest.json found, skipping manuals.");
           return;
