@@ -9,6 +9,7 @@ import errors from "./errors";
 import symptoms from "./symptoms";
 import { findFlow } from "./flows";
 import createReportPDF from "./utils/pdf/createReportPDF";
+// import ManualViewer from "./components/ManualViewer"; // ⛔️ temporarily disabled for stability
 
 function App() {
   const [mode, setMode] = useState(null);
@@ -19,6 +20,7 @@ function App() {
   const [isMobile, setIsMobile] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [manuals, setManuals] = useState({});
+  const [selectedManual, setSelectedManual] = useState(null);
 
   // 📱 Handle responsive layout
   useEffect(() => {
@@ -28,11 +30,11 @@ function App() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // 📘 Attempt to load /docs/manifest.json (for manuals)
+  // 📘 Load manifest (fetch now points to /manuals/)
   useEffect(() => {
     async function loadManuals() {
       try {
-        const response = await fetch(process.env.PUBLIC_URL + "/docs/manifest.json");
+        const response = await fetch("/manuals/manifest.json");
         if (!response.ok) {
           console.warn("No manifest.json found, skipping manuals.");
           return;
@@ -47,7 +49,6 @@ function App() {
     loadManuals();
   }, []);
 
-  // 🔧 Brand / model structure
   const brands = ["Jandy", "Hayward", "Pentair"];
   const models = {
     Jandy: {
@@ -59,7 +60,11 @@ function App() {
       Automation: ["AquaLink RS", "iQ20/iQ30"],
     },
     Hayward: {
-      Heaters: ["Universal H-Series", "Universal H-Series Digital (HFDN)", "HeatPro"],
+      Heaters: [
+        "Universal H-Series",
+        "Universal H-Series Digital (HFDN)",
+        "HeatPro",
+      ],
       Pumps: ["TriStar VS", "Super Pump XE"],
       Filters: ["SwimClear Cartridge", "ProGrid DE"],
       WaterCare: ["AquaRite 900", "AquaRite"],
@@ -78,7 +83,6 @@ function App() {
 
   const equipmentTypes = brand ? Object.keys(models[brand]) : [];
 
-  // 🔄 Reset to home
   function resetToHome() {
     setMode(null);
     setStep("brand");
@@ -87,16 +91,14 @@ function App() {
     setModel(null);
     setSidebarCollapsed(false);
     sessionStorage.removeItem("jumpToNode");
+    setSelectedManual(null);
   }
 
-  // 🧭 Launch flow
   function launchFlowFromSymptom(flowTarget) {
     if (!flowTarget) return alert("⚠️ Invalid data.");
-
     const { brand, equipmentType, model, startNode } = flowTarget;
     const flow = findFlow(brand, equipmentType, model);
     if (!flow) return alert("⚠️ Diagnostic flow not found.");
-
     sessionStorage.setItem("jumpToNode", startNode || "");
     setBrand(brand);
     setEquipmentType(equipmentType);
@@ -104,13 +106,11 @@ function App() {
     setMode("diagnostics");
   }
 
-  // 🧩 Sidebar
   function renderSidebar() {
-    // --- Home menu (mode not selected) ---
+    // --- Home ---
     if (!mode) {
       return (
         <div>
-          {/* 🧾 Developer test PDF */}
           <button
             style={{ ...btnStyle, background: "#007bff", marginBottom: 16 }}
             onClick={() =>
@@ -132,27 +132,21 @@ function App() {
           </button>
 
           <h3 className="font-bold mb-2">Choose Mode</h3>
-
           <button style={btnStyle} onClick={() => setMode("diagnostics")}>
             🔍 Guided Diagnostics
           </button>
-
           <button style={btnStyle} onClick={() => setMode("errors")}>
             ⚡ Error Code Lookup
           </button>
-
           <button style={btnStyle} onClick={() => setMode("symptoms")}>
             🩺 Symptom Lookup
           </button>
-
           <button
             style={{ ...btnStyle, background: "#FFD300", color: "#000" }}
             onClick={() => setMode("feedback")}
           >
             🧠 Feedback Log
           </button>
-
-          {/* 📘 Manuals button now visible */}
           <button
             style={{ ...btnStyle, background: "#0099cc" }}
             onClick={() => setMode("manuals")}
@@ -276,39 +270,19 @@ function App() {
       );
     }
 
-    // --- Manuals ---
+    // --- Manuals (temporarily simplified) ---
     if (mode === "manuals") {
       return (
         <div>
           <button onClick={() => setMode(null)} style={backStyle}>
             ← Back
           </button>
-          <h3 className="font-bold mb-2">📘 Equipment Manuals</h3>
-
-          {Object.keys(manuals).length === 0 ? (
-            <p>No manuals found in /public/docs.</p>
-          ) : (
-            Object.entries(manuals).map(([brand, files]) => (
-              <div key={brand} style={{ marginBottom: 16 }}>
-                <h4 style={{ fontWeight: "bold", marginBottom: 6 }}>{brand}</h4>
-                {files.map((file) => (
-                  <button
-                    key={file.path}
-                    style={btnStyle}
-                    onClick={() => window.open(file.path, "_blank")}
-                  >
-                    {file.name}
-                  </button>
-                ))}
-              </div>
-            ))
-          )}
+          <p>🛠 Manuals page temporarily disabled for debugging.</p>
         </div>
       );
     }
   }
 
-  // --- Main render ---
   return (
     <Layout sidebar={sidebarCollapsed ? null : renderSidebar()}>
       <h1 className="text-2xl font-bold mb-4">Compact Pool Technicians 🚀</h1>
@@ -317,7 +291,6 @@ function App() {
           {(() => {
             const flow = findFlow(brand, equipmentType, model);
             const jumpNode = sessionStorage.getItem("jumpToNode");
-
             return flow ? (
               <FlowRunner
                 key={flow.id}
@@ -340,7 +313,6 @@ function App() {
   );
 }
 
-// --- Styling ---
 const btnStyle = {
   display: "block",
   width: "100%",

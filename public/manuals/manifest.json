@@ -1,0 +1,11 @@
+{
+  "Jandy": [
+    { "name": "JXi Manual", "path": "/manuals/jandy/JXi-Manual.pdf" }
+  ],
+  "Hayward": [
+    { "name": "Universal H-Series Manual", "path": "/manuals/hayward/universal-h-series-manual.pdf" }
+  ],
+  "Pentair": [
+    { "name": "MasterTemp Manual", "path": "/manuals/pentair/mastertemp-manual.pdf" }
+  ]
+}

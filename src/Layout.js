@@ -7,13 +7,14 @@ import { useFlow } from "./context/FlowContext"; // ✅ NEW — connects to glob
 
 function Layout({ sidebar, children }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(false); // ✅ Default to false
   const location = useLocation();
   const { isFlowActive } = useFlow(); // ✅ watch global flow activity
 
-  // 📱 Responsive resize listener
+  // 📱 Responsive resize listener (safe)
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize(); // ✅ Set initial value
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -21,7 +22,6 @@ function Layout({ sidebar, children }) {
   return (
     <div className="flex h-screen flex-col md:flex-row relative">
       {/* 🔵 Load bar — now tied to global flow activity */}
-     
 
       {/* 🧭 Debug info */}
       {console.log("🧭 Current route:", location.pathname, "| Flow Active:", isFlowActive)}
