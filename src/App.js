@@ -1,4 +1,3 @@
-// src/App.js
 import React, { useState, useEffect } from "react";
 import Layout from "./Layout";
 import FlowRunner from "./components/containers/FlowRunner";
@@ -9,7 +8,7 @@ import errors from "./errors";
 import symptoms from "./symptoms";
 import { findFlow } from "./flows";
 import createReportPDF from "./utils/pdf/createReportPDF";
-// import ManualViewer from "./components/ManualViewer"; // ⛔️ temporarily disabled for stability
+import ManualViewer from "./components/ManualViewer";
 
 function App() {
   const [mode, setMode] = useState(null);
@@ -107,7 +106,6 @@ function App() {
   }
 
   function renderSidebar() {
-    // --- Home ---
     if (!mode) {
       return (
         <div>
@@ -157,7 +155,6 @@ function App() {
       );
     }
 
-    // --- Diagnostics ---
     if (mode === "diagnostics") {
       if (step === "brand") {
         return (
@@ -231,7 +228,6 @@ function App() {
       }
     }
 
-    // --- Error lookup ---
     if (mode === "errors") {
       return (
         <div>
@@ -243,7 +239,6 @@ function App() {
       );
     }
 
-    // --- Symptom lookup ---
     if (mode === "symptoms") {
       return (
         <div>
@@ -258,7 +253,6 @@ function App() {
       );
     }
 
-    // --- Feedback log ---
     if (mode === "feedback") {
       return (
         <div>
@@ -270,14 +264,32 @@ function App() {
       );
     }
 
-    // --- Manuals (temporarily simplified) ---
+    // --- Manuals (LIVE) ---
     if (mode === "manuals") {
       return (
         <div>
           <button onClick={() => setMode(null)} style={backStyle}>
             ← Back
           </button>
-          <p>🛠 Manuals page temporarily disabled for debugging.</p>
+          <h3 className="font-bold mb-2">Choose a Manual</h3>
+          {!selectedManual ? (
+            Object.entries(manuals).map(([brand, brandManuals]) => (
+              <div key={brand}>
+                <h4>{brand}</h4>
+                {brandManuals.map((manual) => (
+                  <button
+                    key={manual.path}
+                    style={btnStyle}
+                    onClick={() => setSelectedManual(manual.path)}
+                  >
+                    {manual.name}
+                  </button>
+                ))}
+              </div>
+            ))
+          ) : (
+            <ManualViewer fileUrl={selectedManual} />
+          )}
         </div>
       );
     }
