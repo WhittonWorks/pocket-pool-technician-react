@@ -7,26 +7,26 @@ import { useFlow } from "./context/FlowContext"; // ✅ NEW — connects to glob
 
 function Layout({ sidebar, children }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false); // ✅ Default to false
+  const [isMobile, setIsMobile] = useState(false);
   const location = useLocation();
-  const { isFlowActive } = useFlow(); // ✅ watch global flow activity
+  const { isFlowActive } = useFlow();
 
-  // 📱 Responsive resize listener (safe)
+  // 📱 Handle screen size
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
-    handleResize(); // ✅ Set initial value
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const isHome = location.pathname === "/" && !isFlowActive && isMobile;
+
   return (
     <div className="flex h-screen flex-col md:flex-row relative">
-      {/* 🔵 Load bar — now tied to global flow activity */}
-
       {/* 🧭 Debug info */}
-      {console.log("🧭 Current route:", location.pathname, "| Flow Active:", isFlowActive)}
+      {console.log("🧭 Route:", location.pathname, "| Flow Active:", isFlowActive)}
 
-      {/* 🧭 Mobile top bar */}
+      {/* 📱 Top bar */}
       {isMobile && (
         <header className="bg-gray-900 text-white flex items-center justify-between px-4 py-3">
           <span className="font-bold">PPT</span>
@@ -46,12 +46,16 @@ function Layout({ sidebar, children }) {
         </aside>
       )}
 
-      {/* 🧩 Main content area */}
-      <main className="flex-1 p-4 bg-gray-100 overflow-auto relative">
+      {/* 🧩 Main content */}
+      <main
+        className={`flex-1 p-4 bg-gray-100 overflow-auto relative ${
+          isHome ? "flex flex-col items-center justify-center text-center" : ""
+        }`}
+      >
         {children}
       </main>
 
-      {/* 💬 Global Feedback Button */}
+      {/* 💬 Feedback */}
       <FeedbackButton />
     </div>
   );
