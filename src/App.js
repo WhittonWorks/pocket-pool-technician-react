@@ -21,7 +21,6 @@ function App() {
   const [manuals, setManuals] = useState({});
   const [selectedManual, setSelectedManual] = useState(null);
 
-  // 📱 Handle responsive layout
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
@@ -29,7 +28,6 @@ function App() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // 📘 Load manifest (fetch now points to /manuals/)
   useEffect(() => {
     async function loadManuals() {
       try {
@@ -59,11 +57,7 @@ function App() {
       Automation: ["AquaLink RS", "iQ20/iQ30"],
     },
     Hayward: {
-      Heaters: [
-        "Universal H-Series",
-        "Universal H-Series Digital (HFDN)",
-        "HeatPro",
-      ],
+      Heaters: ["Universal H-Series", "Universal H-Series Digital (HFDN)", "HeatPro"],
       Pumps: ["TriStar VS", "Super Pump XE"],
       Filters: ["SwimClear Cartridge", "ProGrid DE"],
       WaterCare: ["AquaRite 900", "AquaRite"],
@@ -108,7 +102,7 @@ function App() {
   function renderSidebar() {
     if (!mode) {
       return (
-        <div>
+        <div className={isMobile ? "flex flex-col items-center justify-center text-center w-full" : ""}>
           <button
             style={{ ...btnStyle, background: "#007bff", marginBottom: 16 }}
             onClick={() =>
@@ -159,19 +153,10 @@ function App() {
       if (step === "brand") {
         return (
           <div>
-            <button onClick={() => setMode(null)} style={backStyle}>
-              ← Back
-            </button>
+            <button onClick={() => setMode(null)} style={backStyle}>← Back</button>
             <h3 className="font-bold mb-2">Choose Brand</h3>
             {brands.map((b) => (
-              <button
-                key={b}
-                onClick={() => {
-                  setBrand(b);
-                  setStep("type");
-                }}
-                style={btnStyle}
-              >
+              <button key={b} onClick={() => { setBrand(b); setStep("type"); }} style={btnStyle}>
                 {b}
               </button>
             ))}
@@ -182,19 +167,10 @@ function App() {
       if (step === "type") {
         return (
           <div>
-            <button onClick={() => setStep("brand")} style={backStyle}>
-              ← Back
-            </button>
+            <button onClick={() => setStep("brand")} style={backStyle}>← Back</button>
             <h3 className="font-bold mb-2">{brand} Equipment</h3>
             {equipmentTypes.map((t) => (
-              <button
-                key={t}
-                onClick={() => {
-                  setEquipmentType(t);
-                  setStep("model");
-                }}
-                style={btnStyle}
-              >
+              <button key={t} onClick={() => { setEquipmentType(t); setStep("model"); }} style={btnStyle}>
                 {t}
               </button>
             ))}
@@ -205,21 +181,10 @@ function App() {
       if (step === "model") {
         return (
           <div>
-            <button onClick={() => setStep("type")} style={backStyle}>
-              ← Back
-            </button>
-            <h3 className="font-bold mb-2">
-              {brand} {equipmentType}
-            </h3>
+            <button onClick={() => setStep("type")} style={backStyle}>← Back</button>
+            <h3 className="font-bold mb-2">{brand} {equipmentType}</h3>
             {models[brand][equipmentType].map((m) => (
-              <button
-                key={m}
-                onClick={() => {
-                  setModel(m);
-                  if (isMobile) setSidebarCollapsed(true);
-                }}
-                style={btnStyle}
-              >
+              <button key={m} onClick={() => { setModel(m); if (isMobile) setSidebarCollapsed(true); }} style={btnStyle}>
                 {m}
               </button>
             ))}
@@ -231,9 +196,7 @@ function App() {
     if (mode === "errors") {
       return (
         <div>
-          <button onClick={() => setMode(null)} style={backStyle}>
-            ← Back
-          </button>
+          <button onClick={() => setMode(null)} style={backStyle}>← Back</button>
           <ErrorLookup errors={errors} onSelectError={launchFlowFromSymptom} />
         </div>
       );
@@ -242,13 +205,8 @@ function App() {
     if (mode === "symptoms") {
       return (
         <div>
-          <button onClick={() => setMode(null)} style={backStyle}>
-            ← Back
-          </button>
-          <SymptomLookup
-            symptoms={symptoms}
-            onSelectSymptom={launchFlowFromSymptom}
-          />
+          <button onClick={() => setMode(null)} style={backStyle}>← Back</button>
+          <SymptomLookup symptoms={symptoms} onSelectSymptom={launchFlowFromSymptom} />
         </div>
       );
     }
@@ -256,32 +214,23 @@ function App() {
     if (mode === "feedback") {
       return (
         <div>
-          <button onClick={() => setMode(null)} style={backStyle}>
-            ← Back
-          </button>
+          <button onClick={() => setMode(null)} style={backStyle}>← Back</button>
           <FeedbackLog />
         </div>
       );
     }
 
-    // --- Manuals (LIVE) ---
     if (mode === "manuals") {
       return (
         <div>
-          <button onClick={() => setMode(null)} style={backStyle}>
-            ← Back
-          </button>
+          <button onClick={() => setMode(null)} style={backStyle}>← Back</button>
           <h3 className="font-bold mb-2">Choose a Manual</h3>
           {!selectedManual ? (
             Object.entries(manuals).map(([brand, brandManuals]) => (
               <div key={brand}>
                 <h4>{brand}</h4>
                 {brandManuals.map((manual) => (
-                  <button
-                    key={manual.path}
-                    style={btnStyle}
-                    onClick={() => setSelectedManual(manual.path)}
-                  >
+                  <button key={manual.path} style={btnStyle} onClick={() => setSelectedManual(manual.path)}>
                     {manual.name}
                   </button>
                 ))}
@@ -298,29 +247,21 @@ function App() {
   return (
     <Layout sidebar={sidebarCollapsed ? null : renderSidebar()}>
       <h1 className="text-2xl font-bold mb-4">Compact Pool Technicians 🚀</h1>
-      {mode === "diagnostics" && model && (
-        <>
-          {(() => {
-            const flow = findFlow(brand, equipmentType, model);
-            const jumpNode = sessionStorage.getItem("jumpToNode");
-            return flow ? (
-              <FlowRunner
-                key={flow.id}
-                flow={flow}
-                jumpTo={jumpNode || null}
-                onExit={resetToHome}
-                onFinish={(answers) => createReportPDF(answers, flow)}
-              />
-            ) : (
-              <p>
-                ✅ You chose <strong>{brand}</strong> →{" "}
-                <strong>{equipmentType}</strong> → <strong>{model}</strong> — but
-                no diagnostic flow exists yet.
-              </p>
-            );
-          })()}
-        </>
-      )}
+      {mode === "diagnostics" && model && (() => {
+        const flow = findFlow(brand, equipmentType, model);
+        const jumpNode = sessionStorage.getItem("jumpToNode");
+        return flow ? (
+          <FlowRunner
+            key={flow.id}
+            flow={flow}
+            jumpTo={jumpNode || null}
+            onExit={resetToHome}
+            onFinish={(answers) => createReportPDF(answers, flow)}
+          />
+        ) : (
+          <p>✅ You chose <strong>{brand}</strong> → <strong>{equipmentType}</strong> → <strong>{model}</strong> — but no diagnostic flow exists yet.</p>
+        );
+      })()}
     </Layout>
   );
 }
