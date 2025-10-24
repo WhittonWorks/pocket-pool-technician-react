@@ -229,7 +229,7 @@ function App() {
         element={
           <Layout>
             <main className="flex-1 p-4 overflow-auto">
-              <h1 className="text-2xl font-bold mb-4">Compact Pool Technician 🚀</h1>
+              <h1 className="text-2xl font-bold mb-4">Compact Pool Technicians 🚀</h1>
               <HomeMenu />
             </main>
           </Layout>
