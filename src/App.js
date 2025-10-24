@@ -11,7 +11,7 @@ import errors from "./errors";
 import symptoms from "./symptoms";
 import { findFlow } from "./flows";
 import createReportPDF from "./utils/pdf/createReportPDF";
-import HomeMenu from "./components/HomeMenu";
+import HomeMenu from "./pages/HomePage";
 
 function App() {
   const [step, setStep] = useState("brand");

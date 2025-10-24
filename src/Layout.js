@@ -1,17 +1,13 @@
-// src/Layout.js
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import FeedbackButton from "./components/ui/FeedbackButton";
-import LoadBar from "./components/ui/LoadBar";
-import { useFlow } from "./context/FlowContext"; // ✅ NEW — connects to global flow state
+import { useFlow } from "./context/FlowContext";
 
-function Layout({ sidebar, children }) {
-  const [menuOpen, setMenuOpen] = useState(false);
+function Layout({ children }) {
   const [isMobile, setIsMobile] = useState(false);
   const location = useLocation();
   const { isFlowActive } = useFlow();
 
-  // 📱 Handle screen size
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
@@ -22,33 +18,20 @@ function Layout({ sidebar, children }) {
   const isHome = location.pathname === "/" && !isFlowActive && isMobile;
 
   return (
-    <div className="flex h-screen flex-col md:flex-row relative">
-      {/* 🧭 Debug info */}
+    <div className="flex h-screen flex-col bg-gray-100">
+      {/* 🧭 Debug */}
       {console.log("🧭 Route:", location.pathname, "| Flow Active:", isFlowActive)}
 
-      {/* 📱 Top bar */}
+      {/* 📱 Optional top bar (brand/logo) */}
       {isMobile && (
         <header className="bg-gray-900 text-white flex items-center justify-between px-4 py-3">
-          <span className="font-bold">PPT</span>
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="bg-gray-700 px-3 py-1 rounded hover:bg-gray-600"
-          >
-            {menuOpen ? "Close Menu" : "Menu"}
-          </button>
+          <span className="font-bold">CPT</span>
         </header>
-      )}
-
-      {/* 📋 Sidebar */}
-      {(menuOpen || !isMobile) && (
-        <aside className="w-full md:w-64 bg-gray-900 text-white p-4">
-          {sidebar}
-        </aside>
       )}
 
       {/* 🧩 Main content */}
       <main
-        className={`flex-1 p-4 bg-gray-100 overflow-auto relative ${
+        className={`flex-1 overflow-auto p-4 ${
           isHome ? "flex flex-col items-center justify-center text-center" : ""
         }`}
       >
