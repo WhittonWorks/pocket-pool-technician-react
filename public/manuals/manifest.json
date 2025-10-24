@@ -1,8 +1,26 @@
 {
+  "aquacal": [
+    {
+      "name": "Aquacal ",
+      "path": "/manuals/aquacal/Aquacal .pdf"
+    }
+  ],
   "hayward": [
     {
       "name": "HSeries",
       "path": "/manuals/hayward/HSeries.pdf"
+    },
+    {
+      "name": "Hayward HC.pdf",
+      "path": "/manuals/hayward/Hayward HC.pdf.pdf"
+    },
+    {
+      "name": "Hayward HP50HA ABG Heat Pump Troubleshooting Guide.pdf",
+      "path": "/manuals/hayward/Hayward HP50HA ABG Heat Pump Troubleshooting Guide.pdf.pdf"
+    },
+    {
+      "name": "Heat-Pump TSG",
+      "path": "/manuals/hayward/Heat-Pump_TSG.pdf"
     },
     {
       "name": "Hfdn-manual",
@@ -14,6 +32,22 @@
     }
   ],
   "jandy": [
+    {
+      "name": "APURE1400",
+      "path": "/manuals/jandy/APURE1400.pdf"
+    },
+    {
+      "name": "FPA Sanitation & Levolor Flip Guide",
+      "path": "/manuals/jandy/FPA Sanitation & Levolor Flip Guide.pdf"
+    },
+    {
+      "name": "FPA AutomationTCX",
+      "path": "/manuals/jandy/FPA_AutomationTCX.pdf"
+    },
+    {
+      "name": "FPA heatpump",
+      "path": "/manuals/jandy/FPA_heatpump.pdf"
+    },
     {
       "name": "JXi-Manual",
       "path": "/manuals/jandy/JXi-Manual.pdf"
