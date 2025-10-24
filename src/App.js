@@ -157,7 +157,9 @@ function App() {
         path="/manuals"
         element={
           <Layout>
-            <ManualsPage />
+            <main className="flex-1 p-4 overflow-auto">
+              <ManualsPage />
+            </main>
           </Layout>
         }
       />
@@ -165,48 +167,60 @@ function App() {
         path="/feedback"
         element={
           <Layout>
-            <FeedbackLog />
+            <main className="flex-1 p-4 overflow-auto">
+              <FeedbackLog />
+            </main>
           </Layout>
         }
       />
       <Route
         path="/errors"
         element={
-          <Layout sidebar={renderSidebar()}>{/* sidebar shows filtered errors */}</Layout>
+          <Layout sidebar={renderSidebar()}>
+            <main className="flex-1 p-4 overflow-auto">
+              <p className="text-lg mb-2 font-semibold">Select an error to view diagnostics</p>
+            </main>
+          </Layout>
         }
       />
       <Route
         path="/symptoms"
         element={
-          <Layout sidebar={renderSidebar()}>{/* sidebar shows filtered symptoms */}</Layout>
+          <Layout sidebar={renderSidebar()}>
+            <main className="flex-1 p-4 overflow-auto">
+              <p className="text-lg mb-2 font-semibold">Select a symptom to view diagnostics</p>
+            </main>
+          </Layout>
         }
       />
       <Route
         path="/diagnostics"
         element={
           <Layout sidebar={sidebarCollapsed ? null : renderSidebar()}>
-            {model ? (
-              (() => {
-                const flow = findFlow(brand, equipmentType, model);
-                const jumpNode = sessionStorage.getItem("jumpToNode");
-                return flow ? (
-                  <FlowRunner
-                    key={flow.id}
-                    flow={flow}
-                    jumpTo={jumpNode || null}
-                    onExit={resetToHome}
-                    onFinish={(answers) => createReportPDF(answers, flow)}
-                  />
-                ) : (
-                  <p>
-                    ✅ You chose <strong>{brand}</strong> → <strong>{equipmentType}</strong> →{" "}
-                    <strong>{model}</strong> — but no diagnostic flow exists yet.
-                  </p>
-                );
-              })()
-            ) : (
-              <p className="text-lg">Start selecting brand/type/model...</p>
-            )}
+            <main className="flex-1 p-4 overflow-auto">
+              {model ? (
+                (() => {
+                  const flow = findFlow(brand, equipmentType, model);
+                  const jumpNode = sessionStorage.getItem("jumpToNode");
+                  return flow ? (
+                    <FlowRunner
+                      key={flow.id}
+                      flow={flow}
+                      jumpTo={jumpNode || null}
+                      onExit={resetToHome}
+                      onFinish={(answers) => createReportPDF(answers, flow)}
+                    />
+                  ) : (
+                    <p>
+                      ✅ You chose <strong>{brand}</strong> → <strong>{equipmentType}</strong> →{" "}
+                      <strong>{model}</strong> — but no diagnostic flow exists yet.
+                    </p>
+                  );
+                })()
+              ) : (
+                <p className="text-lg">Start selecting brand/type/model...</p>
+              )}
+            </main>
           </Layout>
         }
       />
@@ -214,8 +228,10 @@ function App() {
         path="/"
         element={
           <Layout>
-            <h1 className="text-2xl font-bold mb-4">Compact Pool Technician 🚀</h1>
-            <HomeMenu />
+            <main className="flex-1 p-4 overflow-auto">
+              <h1 className="text-2xl font-bold mb-4">Compact Pool Technician 🚀</h1>
+              <HomeMenu />
+            </main>
           </Layout>
         }
       />
