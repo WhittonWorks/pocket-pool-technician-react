@@ -42,4 +42,3 @@ function ManualsPage() {
 }
 
 export default ManualsPage;
-To put in the manuals page
