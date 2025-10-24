@@ -1,11 +1,28 @@
 {
-  "Jandy": [
-    { "name": "JXi Manual", "path": "/manuals/jandy/JXi-Manual.pdf" }
+  "hayward": [
+    {
+      "name": "HSeries",
+      "path": "/manuals/hayward/HSeries.pdf"
+    },
+    {
+      "name": "Hfdn-manual",
+      "path": "/manuals/hayward/Hfdn-manual.pdf"
+    },
+    {
+      "name": "Prologic Aqualogic manual",
+      "path": "/manuals/hayward/Prologic_Aqualogic_manual.pdf"
+    }
   ],
-  "Hayward": [
-    { "name": "Universal H-Series Manual", "path": "/manuals/hayward/universal-h-series-manual.pdf" }
+  "jandy": [
+    {
+      "name": "JXi-Manual",
+      "path": "/manuals/jandy/JXi-Manual.pdf"
+    }
   ],
-  "Pentair": [
-    { "name": "MasterTemp Manual", "path": "/manuals/pentair/mastertemp-manual.pdf" }
+  "pentair": [
+    {
+      "name": "MasterTemp",
+      "path": "/manuals/pentair/MasterTemp.pdf"
+    }
   ]
 }
