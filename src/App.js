@@ -1,5 +1,6 @@
+// src/App.js
 import React, { useState, useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Layout from "./Layout";
 import FlowRunner from "./components/containers/FlowRunner";
 import FeedbackLog from "./components/containers/FeedbackLog";
@@ -10,16 +11,17 @@ import errors from "./errors";
 import symptoms from "./symptoms";
 import { findFlow } from "./flows";
 import createReportPDF from "./utils/pdf/createReportPDF";
-import HomeMenu from "./components/HomeMenu"; // ✅ NEW IMPORT
+import HomeMenu from "./components/HomeMenu";
 
 function App() {
-  const [mode, setMode] = useState(null);
   const [step, setStep] = useState("brand");
   const [brand, setBrand] = useState(null);
   const [equipmentType, setEquipmentType] = useState(null);
   const [model, setModel] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  const location = useLocation();
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -59,7 +61,6 @@ function App() {
   const equipmentTypes = brand ? Object.keys(models[brand]) : [];
 
   function resetToHome() {
-    setMode(null);
     setStep("brand");
     setBrand(null);
     setEquipmentType(null);
@@ -80,19 +81,13 @@ function App() {
     setBrand(brand);
     setEquipmentType(equipmentType);
     setModel(model);
-    setMode("diagnostics");
   }
 
   function renderSidebar() {
-    if (!mode) {
-      return null; // Sidebar buttons moved to HomeMenu
-    }
-
-    if (mode === "diagnostics") {
+    if (location.pathname === "/diagnostics") {
       if (step === "brand") {
         return (
           <div>
-            <button onClick={() => setMode(null)} style={backStyle}>← Back</button>
             <h3 className="font-bold mb-2">Choose Brand</h3>
             {brands.map((b) => (
               <button key={b} onClick={() => {
@@ -141,41 +136,19 @@ function App() {
       }
     }
 
-    if (mode === "errors") {
+    if (location.pathname === "/errors") {
       return (
-        <div>
-          <button onClick={() => setMode(null)} style={backStyle}>← Back</button>
-          <ErrorLookup errors={errors} onSelectError={launchFlowFromSymptom} />
-        </div>
+        <ErrorLookup errors={errors} onSelectError={launchFlowFromSymptom} />
       );
     }
 
-    if (mode === "symptoms") {
+    if (location.pathname === "/symptoms") {
       return (
-        <div>
-          <button onClick={() => setMode(null)} style={backStyle}>← Back</button>
-          <SymptomLookup symptoms={symptoms} onSelectSymptom={launchFlowFromSymptom} />
-        </div>
+        <SymptomLookup symptoms={symptoms} onSelectSymptom={launchFlowFromSymptom} />
       );
     }
 
-    if (mode === "feedback") {
-      return (
-        <div>
-          <button onClick={() => setMode(null)} style={backStyle}>← Back</button>
-          <FeedbackLog />
-        </div>
-      );
-    }
-
-    if (mode === "manuals") {
-      return (
-        <div>
-          <button onClick={() => setMode(null)} style={backStyle}>← Back</button>
-          <ManualsPage />
-        </div>
-      );
-    }
+    return null;
   }
 
   return (
@@ -189,15 +162,30 @@ function App() {
         }
       />
       <Route
-        path="*"
+        path="/feedback"
+        element={
+          <Layout>
+            <FeedbackLog />
+          </Layout>
+        }
+      />
+      <Route
+        path="/errors"
+        element={
+          <Layout sidebar={renderSidebar()}>{/* sidebar shows filtered errors */}</Layout>
+        }
+      />
+      <Route
+        path="/symptoms"
+        element={
+          <Layout sidebar={renderSidebar()}>{/* sidebar shows filtered symptoms */}</Layout>
+        }
+      />
+      <Route
+        path="/diagnostics"
         element={
           <Layout sidebar={sidebarCollapsed ? null : renderSidebar()}>
-            <h1 className="text-2xl font-bold mb-4">Compact Pool Technicians 🚀</h1>
-
-            {/* ✅ SHOW HOMEPAGE BUTTONS HERE */}
-            {!mode && <HomeMenu setMode={setMode} />}
-
-            {mode === "diagnostics" && model && (
+            {model ? (
               (() => {
                 const flow = findFlow(brand, equipmentType, model);
                 const jumpNode = sessionStorage.getItem("jumpToNode");
@@ -216,7 +204,18 @@ function App() {
                   </p>
                 );
               })()
+            ) : (
+              <p className="text-lg">Start selecting brand/type/model...</p>
             )}
+          </Layout>
+        }
+      />
+      <Route
+        path="/"
+        element={
+          <Layout>
+            <h1 className="text-2xl font-bold mb-4">Compact Pool Technician 🚀</h1>
+            <HomeMenu />
           </Layout>
         }
       />

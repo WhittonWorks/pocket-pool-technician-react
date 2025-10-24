@@ -1,5 +1,6 @@
 // src/components/HomeMenu.js
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import createReportPDF from "../utils/pdf/createReportPDF";
 
 const btnStyle = {
@@ -16,13 +17,16 @@ const btnStyle = {
   fontSize: "16px",
 };
 
-export default function HomeMenu({ setMode }) {
+export default function HomeMenu() {
+  const navigate = useNavigate();
+
   return (
     <div className="p-4 space-y-2">
-      <button style={btnStyle} onClick={() => setMode("manuals")}>📘 Manuals</button>
-      <button style={btnStyle} onClick={() => setMode("diagnostics")}>🧭 Guided Diagnostics</button>
-      <button style={btnStyle} onClick={() => setMode("errors")}>⚠️ Error Code Lookup</button>
-      <button style={btnStyle} onClick={() => setMode("symptoms")}>🤒 Symptom Lookup</button>
+      <button style={btnStyle} onClick={() => navigate("/manuals")}>📘 Manuals</button>
+      <button style={btnStyle} onClick={() => navigate("/diagnostics")}>🧭 Guided Diagnostics</button>
+      <button style={btnStyle} onClick={() => navigate("/errors")}>⚠️ Error Code Lookup</button>
+      <button style={btnStyle} onClick={() => navigate("/symptoms")}>🤒 Symptom Lookup</button>
+
       <button
         style={{ ...btnStyle, background: "#007bff", marginBottom: 16 }}
         onClick={() =>
@@ -42,9 +46,10 @@ export default function HomeMenu({ setMode }) {
       >
         🧾 Generate Test PDF
       </button>
+
       <button
         style={{ ...btnStyle, background: "#FFD300", color: "#000" }}
-        onClick={() => setMode("feedback")}
+        onClick={() => navigate("/feedback")}
       >
         ✉️ Feedback Log
       </button>
