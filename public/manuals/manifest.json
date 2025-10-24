@@ -1,8 +1,8 @@
 {
   "aquacal": [
     {
-      "name": "Aquacal ",
-      "path": "/manuals/aquacal/Aquacal .pdf"
+      "name": "Aquacal",
+      "path": "/manuals/aquacal/Aquacal.pdf"
     }
   ],
   "hayward": [
@@ -11,8 +11,8 @@
       "path": "/manuals/hayward/HSeries.pdf"
     },
     {
-      "name": "Hayward HC.pdf",
-      "path": "/manuals/hayward/Hayward HC.pdf.pdf"
+      "name": "Hayward HC",
+      "path": "/manuals/hayward/Hayward HC.pdf"
     },
     {
       "name": "Hayward HP50HA ABG Heat Pump Troubleshooting Guide.pdf",
