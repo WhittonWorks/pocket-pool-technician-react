@@ -15,9 +15,6 @@ const HomePage = () => {
 
   return (
     <div className="max-w-md mx-auto mt-8 flex flex-col gap-4">
-      <h1 className="text-2xl font-bold text-center mb-6">
-        Compact Pool Technician
-      </h1>
 
       {buttons.map((btn) => {
         const baseClasses =
