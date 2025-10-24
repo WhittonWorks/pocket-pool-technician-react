@@ -1,4 +1,4 @@
-# Pocket Pool Technician (React Build)
+# Compact Pool Technician (React Build)
 
 **React-based diagnostic app for pool service technicians — JSON-driven, offline-ready, and built to scale across all pool equipment.**
 
