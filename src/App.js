@@ -1,4 +1,3 @@
-// src/App.js
 import React, { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import Layout from "./Layout";
@@ -6,11 +5,12 @@ import FlowRunner from "./components/containers/FlowRunner";
 import FeedbackLog from "./components/containers/FeedbackLog";
 import ErrorLookup from "./ErrorLookup";
 import SymptomLookup from "./SymptomLookup";
-import ManualsPage from "./pages/ManualsPage"; // ✅ Correct import
+import ManualsPage from "./pages/ManualsPage";
 import errors from "./errors";
 import symptoms from "./symptoms";
 import { findFlow } from "./flows";
 import createReportPDF from "./utils/pdf/createReportPDF";
+import HomeMenu from "./components/HomeMenu"; // ✅ NEW IMPORT
 
 function App() {
   const [mode, setMode] = useState(null);
@@ -85,47 +85,7 @@ function App() {
 
   function renderSidebar() {
     if (!mode) {
-      return (
-        <div>
-          <button style={btnStyle} onClick={() => setMode("manuals")}>
-            📚 Manuals
-          </button>
-          <button style={btnStyle} onClick={() => setMode("diagnostics")}>
-            🔍 Guided Diagnostics
-          </button>
-          <button style={btnStyle} onClick={() => setMode("errors")}>
-            ⚡ Error Code Lookup
-          </button>
-          <button style={btnStyle} onClick={() => setMode("symptoms")}>
-            🩺 Symptom Lookup
-          </button>
-          <button
-            style={{ ...btnStyle, background: "#007bff", marginBottom: 16 }}
-            onClick={() =>
-              createReportPDF(
-                {
-                  enter_serial: "B1234567",
-                  outcome: "Success",
-                  result: "Rev G heater operating normally.",
-                  rev_g_start: "240 V",
-                  rev_g_240: "220 V",
-                  rev_g_step2: "22 V (✅ pass)",
-                  rev_g_flame: "true",
-                },
-                { brand: "Jandy", model: "JXi" }
-              )
-            }
-          >
-            🧾 Generate Test PDF
-          </button>
-          <button
-            style={{ ...btnStyle, background: "#FFD300", color: "#000" }}
-            onClick={() => setMode("feedback")}
-          >
-            🧠 Feedback Log
-          </button>
-        </div>
-      );
+      return null; // Sidebar buttons moved to HomeMenu
     }
 
     if (mode === "diagnostics") {
@@ -233,6 +193,10 @@ function App() {
         element={
           <Layout sidebar={sidebarCollapsed ? null : renderSidebar()}>
             <h1 className="text-2xl font-bold mb-4">Compact Pool Technicians 🚀</h1>
+
+            {/* ✅ SHOW HOMEPAGE BUTTONS HERE */}
+            {!mode && <HomeMenu setMode={setMode} />}
+
             {mode === "diagnostics" && model && (
               (() => {
                 const flow = findFlow(brand, equipmentType, model);
