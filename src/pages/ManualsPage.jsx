@@ -21,21 +21,25 @@ const ManualsPage = () => {
         <>
           {Object.keys(manuals).map((brand) => (
             <div key={brand} className="mb-6">
-              <h2 className="text-xl font-semibold capitalize text-black mb-2">
-                {brand}
-              </h2>
-              <ul className="list-disc ml-6">
-                {manuals[brand].map((manual) => (
-                  <li key={manual.path}>
-                    <button
-                      onClick={() => setSelectedFile(manual.path)}
-                      className="text-blue-500 hover:underline"
-                    >
-                      {manual.name}
-                    </button>
-                  </li>
-                ))}
-              </ul>
+              <h2 className="text-xl font-semibold capitalize text-black mb-2">{brand}</h2>
+
+              {Object.keys(manuals[brand]).map((category) => (
+                <div key={category} className="ml-4 mb-4">
+                  <h3 className="text-md font-medium text-gray-800 capitalize">{category}</h3>
+                  <ul className="list-disc ml-6">
+                    {manuals[brand][category].map((manual) => (
+                      <li key={manual.path}>
+                        <button
+                          onClick={() => setSelectedFile(manual.path)}
+                          className="text-blue-500 hover:underline"
+                        >
+                          {manual.name}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
           ))}
         </>

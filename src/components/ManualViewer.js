@@ -11,8 +11,18 @@ const ManualViewer = ({ fileUrl }) => {
 
   return (
     <div style={{ height: "90vh", width: "100%" }}>
-      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.12.0/build/pdf.worker.min.js">
-        <Viewer fileUrl={fileUrl} plugins={[defaultLayoutPluginInstance]} />
+      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.0.279/build/pdf.worker.min.js">
+        <Viewer
+          fileUrl={fileUrl}
+          plugins={[defaultLayoutPluginInstance]}
+          renderError={(error) => (
+            <div style={{ color: "red", padding: "1rem" }}>
+              Failed to load PDF: {error?.message || "Unknown error"}
+              <br />
+              Path tried: {fileUrl}
+            </div>
+          )}
+        />
       </Worker>
     </div>
   );
