@@ -10,7 +10,7 @@ const ManualViewer = ({ fileUrl }) => {
   const defaultLayoutPluginInstance = defaultLayoutPlugin();
 
   return (
-    <div style={{ height: "90vh", width: "100%" }}>
+    <div style={{ height: "calc(100dvh - 64px)", width: "100%" }}>
       <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.0.279/build/pdf.worker.min.js">
         <Viewer
           fileUrl={fileUrl}
