@@ -1,3 +1,4 @@
+// src/App.js
 import React, { useState, useEffect } from "react";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Layout from "./Layout";
@@ -13,11 +14,11 @@ import symptoms from "./symptoms";
 import { findFlow } from "./flows";
 import createReportPDF from "./utils/pdf/createReportPDF";
 
-// ✅ Firebase auth imports
-import { handleRedirectResult } from "./firebase/auth";
-import { auth } from "./firebase/auth";
+// ✅ Auth pages
 import LoginPage from "./pages/Auth/LoginPage";
 import SignupPage from "./pages/Auth/SignupPage";
+import { auth, handleRedirectResult } from "./firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 
 function App() {
   const location = useLocation();
@@ -29,34 +30,27 @@ function App() {
   const [isMobile, setIsMobile] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  // 🔐 Auth state
+  // ✅ Auth state
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 🔁 Mobile redirect fix
-  useEffect(() => {
-    handleRedirectResult(); // Handles Google login redirect on mobile
-  }, []);
-
-  // 🔒 Monitor login state
+  // ✅ Detect auth status on startup
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
+      console.log("👤 Firebase user:", user);
+      handleRedirectResult(); // Safe to call after auth state known
       setLoading(false);
     });
     return () => unsubscribe();
   }, []);
 
-  // 📱 Responsive detection
+  // ✅ Handle mobile screen
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  useEffect(() => {
-    handleRedirectResult(); // ✅ Handles Google login redirect on mobile
   }, []);
 
   const brands = ["Jandy", "Hayward", "Pentair"];
@@ -100,13 +94,10 @@ function App() {
 
   function launchFlowFromSymptom(flowTarget) {
     if (!flowTarget) return alert("⚠️ Invalid data.");
-
     const { brand, equipmentType, model, startNode } = flowTarget;
     const flow = findFlow(brand, equipmentType, model);
     if (!flow) return alert("⚠️ Diagnostic flow not found.");
-
     sessionStorage.setItem("jumpToNode", startNode || "");
-
     setBrand(brand);
     setEquipmentType(equipmentType);
     setModel(model);
@@ -166,90 +157,40 @@ function App() {
     }
 
     if (location.pathname === "/errors") {
-      return <ErrorLookup errors={errors} onSelectError={launchFlowFromSymptom} />;
+      return (
+        <ErrorLookup errors={errors} onSelectError={launchFlowFromSymptom} />
+      );
     }
 
     if (location.pathname === "/symptoms") {
-      return <SymptomLookup symptoms={symptoms} onSelectSymptom={launchFlowFromSymptom} />;
+      return (
+        <SymptomLookup symptoms={symptoms} onSelectSymptom={launchFlowFromSymptom} />
+      );
     }
 
     return null;
   }
 
-  // 🔒 Loading and auth gating
-  if (loading) return <div>Loading...</div>;
-
-  // Show landing page if not logged in
-  if (!currentUser) {
+  // ✅ Loading screen while checking auth
+  if (loading) {
     return (
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <div className="h-screen flex items-center justify-center">
+        <p>Loading...</p>
+      </div>
     );
   }
 
-  // ✅ App content when logged in
   return (
     <Routes>
-      {/* 🔐 Auth routes */}
+      {/* 🔐 Auth */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
 
-      {/* 🟨 Landing page (before login) */}
-      <Route
-        path="/landing"
-        element={
-          <Layout>
-            <main className="flex-1 p-4 overflow-auto">
-              <LandingPage />
-            </main>
-          </Layout>
-        }
-      />
-
-      <Route
-        path="/manuals"
-        element={
-          <Layout>
-            <main className="flex-1 p-4 overflow-auto">
-              <ManualsPage />
-            </main>
-          </Layout>
-        }
-      />
-      <Route
-        path="/feedback"
-        element={
-          <Layout>
-            <main className="flex-1 p-4 overflow-auto">
-              <FeedbackLog />
-            </main>
-          </Layout>
-        }
-      />
-      <Route
-        path="/errors"
-        element={
-          <Layout sidebar={renderSidebar()}>
-            <main className="flex-1 p-4 overflow-auto">
-              <p className="text-lg mb-2 font-semibold">Select an error to view diagnostics</p>
-            </main>
-          </Layout>
-        }
-      />
-      <Route
-        path="/symptoms"
-        element={
-          <Layout sidebar={renderSidebar()}>
-            <main className="flex-1 p-4 overflow-auto">
-              <p className="text-lg mb-2 font-semibold">Select a symptom to view diagnostics</p>
-            </main>
-          </Layout>
-        }
-      />
+      {/* ✅ Public routes gated by login */}
+      <Route path="/manuals" element={<Layout><ManualsPage /></Layout>} />
+      <Route path="/feedback" element={<Layout><FeedbackLog /></Layout>} />
+      <Route path="/errors" element={<Layout sidebar={renderSidebar()}><p className="text-lg mb-2 font-semibold">Select an error to view diagnostics</p></Layout>} />
+      <Route path="/symptoms" element={<Layout sidebar={renderSidebar()}><p className="text-lg mb-2 font-semibold">Select a symptom to view diagnostics</p></Layout>} />
       <Route
         path="/diagnostics"
         element={
@@ -270,7 +211,7 @@ function App() {
                   ) : (
                     <p>
                       ✅ You chose <strong>{brand}</strong> → <strong>{equipmentType}</strong> →{" "}
-                      <strong>{model}</strong> — but no diagnostic flow exists yet.
+                      <strong>{model}</strong> -- but no diagnostic flow exists yet.
                     </p>
                   );
                 })()
@@ -281,21 +222,28 @@ function App() {
           </Layout>
         }
       />
+
+      {/* 🏠 Home and Landing */}
       <Route
         path="/"
         element={
-          <Layout>
-            <main className="flex-1 p-4 overflow-auto">
-              <h1 className="text-2xl font-bold mb-4">Compact Pool Technicians 🚀</h1>
-              <HomeMenu />
-            </main>
-          </Layout>
+          currentUser ? (
+            <Layout>
+              <main className="flex-1 p-4 overflow-auto">
+                <h1 className="text-2xl font-bold mb-4">Compact Pool Technicians 🚀</h1>
+                <HomeMenu />
+              </main>
+            </Layout>
+          ) : (
+            <LandingPage />
+          )
         }
       />
     </Routes>
   );
 }
 
+// 🧱 Styles
 const btnStyle = {
   display: "block",
   width: "100%",
