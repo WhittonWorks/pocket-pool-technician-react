@@ -1,4 +1,3 @@
-// src/App.js
 import React, { useState, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import Layout from "./Layout";
@@ -7,12 +6,18 @@ import FeedbackLog from "./components/containers/FeedbackLog";
 import ErrorLookup from "./ErrorLookup";
 import SymptomLookup from "./SymptomLookup";
 import ManualsPage from "./pages/ManualsPage";
+import HomeMenu from "./pages/HomePage";
+import LandingPage from "./pages/LandingPage";
 import errors from "./errors";
 import symptoms from "./symptoms";
 import { findFlow } from "./flows";
 import createReportPDF from "./utils/pdf/createReportPDF";
-import HomeMenu from "./pages/HomePage";
 
+// ✅ Firebase auth imports
+import { handleRedirectResult } from "./firebase/auth";
+import { auth } from "./firebase/auth";
+import LoginPage from "./pages/Auth/LoginPage";
+import SignupPage from "./pages/Auth/SignupPage";
 
 function App() {
   const [step, setStep] = useState("brand");
@@ -29,6 +34,10 @@ function App() {
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    handleRedirectResult(); // ✅ Handles Google login redirect on mobile
   }, []);
 
   const brands = ["Jandy", "Hayward", "Pentair"];
@@ -138,15 +147,11 @@ function App() {
     }
 
     if (location.pathname === "/errors") {
-      return (
-        <ErrorLookup errors={errors} onSelectError={launchFlowFromSymptom} />
-      );
+      return <ErrorLookup errors={errors} onSelectError={launchFlowFromSymptom} />;
     }
 
     if (location.pathname === "/symptoms") {
-      return (
-        <SymptomLookup symptoms={symptoms} onSelectSymptom={launchFlowFromSymptom} />
-      );
+      return <SymptomLookup symptoms={symptoms} onSelectSymptom={launchFlowFromSymptom} />;
     }
 
     return null;
@@ -154,6 +159,22 @@ function App() {
 
   return (
     <Routes>
+      {/* 🔐 Auth routes */}
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignupPage />} />
+
+      {/* 🟨 Landing page (before login) */}
+      <Route
+        path="/landing"
+        element={
+          <Layout>
+            <main className="flex-1 p-4 overflow-auto">
+              <LandingPage />
+            </main>
+          </Layout>
+        }
+      />
+
       <Route
         path="/manuals"
         element={

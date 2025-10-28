@@ -1,35 +1,91 @@
 // src/pages/Auth/LoginPage.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  loginWithEmail,
+  loginWithGoogle,
+  loginWithApple,
+} from "../../firebase/auth";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("🔑 Login submitted", form);
-    navigate("/"); // In future: go to dashboard or profile
+    try {
+      await loginWithEmail(email, password);
+      navigate("/");
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow">
-      <h1 className="text-2xl font-bold mb-6 text-center">🔑 Log In</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input name="email" type="email" placeholder="Email" value={form.email} onChange={handleChange} required className="p-2 border rounded" />
-        <input name="password" type="password" placeholder="Password" value={form.password} onChange={handleChange} required className="p-2 border rounded" />
-        <button type="submit" className="bg-gray-800 text-white py-2 rounded hover:bg-gray-900">
+    <div className="max-w-sm mx-auto mt-12 p-4 bg-white shadow rounded">
+      <h2 className="text-xl font-semibold mb-4">Log In</h2>
+
+      {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
+
+      <form onSubmit={handleLogin} className="space-y-4">
+        <input
+          type="email"
+          placeholder="Email"
+          className="w-full border p-2 rounded"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          className="w-full border p-2 rounded"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded">
           Log In
         </button>
-        <button type="button" onClick={() => navigate("/signup")} className="text-sm underline text-gray-500">
-          Need an account? Sign up →
-        </button>
       </form>
+
+      <div className="mt-4 space-y-2">
+        <button
+          onClick={async () => {
+            try {
+              await loginWithGoogle();
+              navigate("/");
+            } catch (err) {
+              setError(err.message);
+            }
+          }}
+          className="w-full bg-red-500 text-white py-2 rounded"
+        >
+          Continue with Google
+        </button>
+
+        <button
+          onClick={async () => {
+            try {
+              await loginWithApple();
+              navigate("/");
+            } catch (err) {
+              setError(err.message);
+            }
+          }}
+          className="w-full bg-black text-white py-2 rounded"
+        >
+          Continue with Apple
+        </button>
+      </div>
+
+      <p className="text-sm text-center mt-4">
+        Don't have an account?{" "}
+        <button className="underline text-blue-600" onClick={() => navigate("/signup")}>
+          Sign up
+        </button>
+      </p>
     </div>
   );
 };
