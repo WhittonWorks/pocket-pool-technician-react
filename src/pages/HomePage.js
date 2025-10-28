@@ -1,3 +1,4 @@
+// src/pages/HomePage.js
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -14,11 +15,10 @@ const HomePage = () => {
   ];
 
   return (
-    <div className="max-w-md mx-auto mt-8 flex flex-col gap-4">
-
+    <div className="max-w-md mx-auto mt-6 px-4 flex flex-col gap-3 sm:gap-4 sm:px-6">
       {buttons.map((btn) => {
         const baseClasses =
-          "w-full font-semibold py-3 px-6 rounded-lg shadow transition";
+          "w-full font-medium text-base sm:text-lg py-3 sm:py-4 px-4 sm:px-6 rounded-lg shadow transition";
 
         let colorClass = "";
 
