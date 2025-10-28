@@ -7,17 +7,17 @@ import ErrorLookup from "./ErrorLookup";
 import SymptomLookup from "./SymptomLookup";
 import ManualsPage from "./pages/ManualsPage";
 import HomeMenu from "./pages/HomePage";
-import LandingPage from "./pages/LandingPage"; // ✅ NEW
+import LandingPage from "./pages/LandingPage";
 import errors from "./errors";
 import symptoms from "./symptoms";
 import { findFlow } from "./flows";
 import createReportPDF from "./utils/pdf/createReportPDF";
 
-// 🔐 Auth imports
+// ✅ Firebase auth imports
+import { handleRedirectResult } from "./firebase/auth";
+import { auth } from "./firebase/auth";
 import LoginPage from "./pages/Auth/LoginPage";
 import SignupPage from "./pages/Auth/SignupPage";
-import { auth, handleRedirectResult } from "./firebase/auth";
-import { onAuthStateChanged } from "firebase/auth";
 
 function App() {
   const location = useLocation();
@@ -53,6 +53,10 @@ function App() {
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    handleRedirectResult(); // ✅ Handles Google login redirect on mobile
   }, []);
 
   const brands = ["Jandy", "Hayward", "Pentair"];
@@ -190,26 +194,104 @@ function App() {
   // ✅ App content when logged in
   return (
     <Routes>
-      <Route path="/manuals" element={<Layout><main className="flex-1 p-4 overflow-auto"><ManualsPage /></main></Layout>} />
-      <Route path="/feedback" element={<Layout><main className="flex-1 p-4 overflow-auto"><FeedbackLog /></main></Layout>} />
-      <Route path="/errors" element={<Layout sidebar={renderSidebar()}><main className="flex-1 p-4 overflow-auto"><p className="text-lg mb-2 font-semibold">Select an error to view diagnostics</p></main></Layout>} />
-      <Route path="/symptoms" element={<Layout sidebar={renderSidebar()}><main className="flex-1 p-4 overflow-auto"><p className="text-lg mb-2 font-semibold">Select a symptom to view diagnostics</p></main></Layout>} />
-      <Route path="/diagnostics" element={<Layout sidebar={sidebarCollapsed ? null : renderSidebar()}><main className="flex-1 p-4 overflow-auto">{model ? (() => {
-        const flow = findFlow(brand, equipmentType, model);
-        const jumpNode = sessionStorage.getItem("jumpToNode");
-        return flow ? (
-          <FlowRunner
-            key={flow.id}
-            flow={flow}
-            jumpTo={jumpNode || null}
-            onExit={resetToHome}
-            onFinish={(answers) => createReportPDF(answers, flow)}
-          />
-        ) : (
-          <p>✅ You chose <strong>{brand}</strong> → <strong>{equipmentType}</strong> → <strong>{model}</strong> -- but no diagnostic flow exists yet.</p>
-        );
-      })() : <p className="text-lg">Start selecting brand/type/model...</p>}</main></Layout>} />
-      <Route path="/" element={<Layout><main className="flex-1 p-4 overflow-auto"><h1 className="text-2xl font-bold mb-4">Compact Pool Technician 🚀</h1><HomeMenu /></main></Layout>} />
+      {/* 🔐 Auth routes */}
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignupPage />} />
+
+      {/* 🟨 Landing page (before login) */}
+      <Route
+        path="/landing"
+        element={
+          <Layout>
+            <main className="flex-1 p-4 overflow-auto">
+              <LandingPage />
+            </main>
+          </Layout>
+        }
+      />
+
+      <Route
+        path="/manuals"
+        element={
+          <Layout>
+            <main className="flex-1 p-4 overflow-auto">
+              <ManualsPage />
+            </main>
+          </Layout>
+        }
+      />
+      <Route
+        path="/feedback"
+        element={
+          <Layout>
+            <main className="flex-1 p-4 overflow-auto">
+              <FeedbackLog />
+            </main>
+          </Layout>
+        }
+      />
+      <Route
+        path="/errors"
+        element={
+          <Layout sidebar={renderSidebar()}>
+            <main className="flex-1 p-4 overflow-auto">
+              <p className="text-lg mb-2 font-semibold">Select an error to view diagnostics</p>
+            </main>
+          </Layout>
+        }
+      />
+      <Route
+        path="/symptoms"
+        element={
+          <Layout sidebar={renderSidebar()}>
+            <main className="flex-1 p-4 overflow-auto">
+              <p className="text-lg mb-2 font-semibold">Select a symptom to view diagnostics</p>
+            </main>
+          </Layout>
+        }
+      />
+      <Route
+        path="/diagnostics"
+        element={
+          <Layout sidebar={sidebarCollapsed ? null : renderSidebar()}>
+            <main className="flex-1 p-4 overflow-auto">
+              {model ? (
+                (() => {
+                  const flow = findFlow(brand, equipmentType, model);
+                  const jumpNode = sessionStorage.getItem("jumpToNode");
+                  return flow ? (
+                    <FlowRunner
+                      key={flow.id}
+                      flow={flow}
+                      jumpTo={jumpNode || null}
+                      onExit={resetToHome}
+                      onFinish={(answers) => createReportPDF(answers, flow)}
+                    />
+                  ) : (
+                    <p>
+                      ✅ You chose <strong>{brand}</strong> → <strong>{equipmentType}</strong> →{" "}
+                      <strong>{model}</strong> — but no diagnostic flow exists yet.
+                    </p>
+                  );
+                })()
+              ) : (
+                <p className="text-lg">Start selecting brand/type/model...</p>
+              )}
+            </main>
+          </Layout>
+        }
+      />
+      <Route
+        path="/"
+        element={
+          <Layout>
+            <main className="flex-1 p-4 overflow-auto">
+              <h1 className="text-2xl font-bold mb-4">Compact Pool Technicians 🚀</h1>
+              <HomeMenu />
+            </main>
+          </Layout>
+        }
+      />
     </Routes>
   );
 }
