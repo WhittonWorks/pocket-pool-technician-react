@@ -1,6 +1,5 @@
-// src/App.js
 import React, { useState, useEffect } from "react";
-import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import Layout from "./Layout";
 import FlowRunner from "./components/containers/FlowRunner";
 import FeedbackLog from "./components/containers/FeedbackLog";
@@ -14,7 +13,6 @@ import symptoms from "./symptoms";
 import { findFlow } from "./flows";
 import createReportPDF from "./utils/pdf/createReportPDF";
 
-// ✅ Auth pages
 import LoginPage from "./pages/Auth/LoginPage";
 import SignupPage from "./pages/Auth/SignupPage";
 import { auth, handleRedirectResult } from "./firebase/auth";
@@ -22,6 +20,7 @@ import { onAuthStateChanged } from "firebase/auth";
 
 function App() {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [step, setStep] = useState("brand");
   const [brand, setBrand] = useState(null);
@@ -30,22 +29,29 @@ function App() {
   const [isMobile, setIsMobile] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  // ✅ Auth state
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Detect auth status on startup
+  // ✅ Handle auth + redirect results
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
       console.log("👤 Firebase user:", user);
-      handleRedirectResult(); // Safe to call after auth state known
+
+      await handleRedirectResult();
+
+      if (sessionStorage.getItem("redirectLoginSuccess") === "true") {
+        sessionStorage.removeItem("redirectLoginSuccess");
+        navigate("/");
+      }
+
       setLoading(false);
     });
-    return () => unsubscribe();
-  }, []);
 
-  // ✅ Handle mobile screen
+    return () => unsubscribe();
+  }, [navigate]);
+
+  // ✅ Handle screen size
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
@@ -110,10 +116,7 @@ function App() {
           <div>
             <h3 className="font-bold mb-2">Choose Brand</h3>
             {brands.map((b) => (
-              <button key={b} onClick={() => {
-                setBrand(b);
-                setStep("type");
-              }} style={btnStyle}>
+              <button key={b} onClick={() => { setBrand(b); setStep("type"); }} style={btnStyle}>
                 {b}
               </button>
             ))}
@@ -127,10 +130,7 @@ function App() {
             <button onClick={() => setStep("brand")} style={backStyle}>← Back</button>
             <h3 className="font-bold mb-2">{brand} Equipment</h3>
             {equipmentTypes.map((t) => (
-              <button key={t} onClick={() => {
-                setEquipmentType(t);
-                setStep("model");
-              }} style={btnStyle}>
+              <button key={t} onClick={() => { setEquipmentType(t); setStep("model"); }} style={btnStyle}>
                 {t}
               </button>
             ))}
@@ -157,21 +157,16 @@ function App() {
     }
 
     if (location.pathname === "/errors") {
-      return (
-        <ErrorLookup errors={errors} onSelectError={launchFlowFromSymptom} />
-      );
+      return <ErrorLookup errors={errors} onSelectError={launchFlowFromSymptom} />;
     }
 
     if (location.pathname === "/symptoms") {
-      return (
-        <SymptomLookup symptoms={symptoms} onSelectSymptom={launchFlowFromSymptom} />
-      );
+      return <SymptomLookup symptoms={symptoms} onSelectSymptom={launchFlowFromSymptom} />;
     }
 
     return null;
   }
 
-  // ✅ Loading screen while checking auth
   if (loading) {
     return (
       <div className="h-screen flex items-center justify-center">
@@ -182,15 +177,12 @@ function App() {
 
   return (
     <Routes>
-      {/* 🔐 Auth */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
-
-      {/* ✅ Public routes gated by login */}
       <Route path="/manuals" element={<Layout><ManualsPage /></Layout>} />
       <Route path="/feedback" element={<Layout><FeedbackLog /></Layout>} />
-      <Route path="/errors" element={<Layout sidebar={renderSidebar()}><p className="text-lg mb-2 font-semibold">Select an error to view diagnostics</p></Layout>} />
-      <Route path="/symptoms" element={<Layout sidebar={renderSidebar()}><p className="text-lg mb-2 font-semibold">Select a symptom to view diagnostics</p></Layout>} />
+      <Route path="/errors" element={<Layout sidebar={renderSidebar()}><p className="text-lg font-semibold">Select an error to view diagnostics</p></Layout>} />
+      <Route path="/symptoms" element={<Layout sidebar={renderSidebar()}><p className="text-lg font-semibold">Select a symptom to view diagnostics</p></Layout>} />
       <Route
         path="/diagnostics"
         element={
@@ -222,28 +214,11 @@ function App() {
           </Layout>
         }
       />
-
-      {/* 🏠 Home and Landing */}
-      <Route
-        path="/"
-        element={
-          currentUser ? (
-            <Layout>
-              <main className="flex-1 p-4 overflow-auto">
-                <h1 className="text-2xl font-bold mb-4">Compact Pool Technicians 🚀</h1>
-                <HomeMenu />
-              </main>
-            </Layout>
-          ) : (
-            <LandingPage />
-          )
-        }
-      />
+      <Route path="/" element={<LandingPage />} />
     </Routes>
   );
 }
 
-// 🧱 Styles
 const btnStyle = {
   display: "block",
   width: "100%",

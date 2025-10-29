@@ -1,9 +1,17 @@
 // src/pages/LandingPage.js
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { auth } from "../../firebase/auth";
 
 const LandingPage = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (user) {
+      navigate("/diagnostics"); // 🔁 Redirect authenticated users
+    }
+  }, []);
 
   return (
     <div className="h-[100dvh] flex flex-col items-center justify-center px-6 bg-gray-100 text-center">

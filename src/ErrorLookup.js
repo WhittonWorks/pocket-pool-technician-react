@@ -74,14 +74,14 @@ function ErrorLookup({ onSelectError }) {
   };
 
   // 🔹 Configure Fuse.js
-  const fuse = useMemo(() => {
-    return new Fuse(allErrors, {
-      keys: ["code", "title", "meaning", "description", "fix", "source"],
-      threshold: 0.4,
-      distance: 100,
-      minMatchCharLength: 2,
-    });
-  }, [errors]);
+const fuse = useMemo(() => {
+  return new Fuse(allErrors, {
+    keys: ["code", "title", "meaning", "description", "fix", "source"],
+    threshold: 0.4,
+    distance: 100,
+    minMatchCharLength: 2,
+  });
+}, [allErrors]);
 
   // 🔍 Run fuzzy search
   const results = search.trim()
