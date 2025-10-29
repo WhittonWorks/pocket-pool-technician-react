@@ -225,7 +225,7 @@ function App() {
       />
 
       {/* 🏠 Home and Landing */}
-    <Route path="/" element={<p>✅ Root route test successful</p>} />
+    <Route path="/" element={<LandingPage />} />
     </Routes>
   );
 }
