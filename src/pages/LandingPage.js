@@ -1,22 +1,22 @@
-// src/App.js
 import React, { useState, useEffect } from "react";
 import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+
 import Layout from "../Layout";
-import FlowRunner from "./components/containers/FlowRunner";
-import FeedbackLog from "./components/containers/FeedbackLog";
+import FlowRunner from "../components/containers/FlowRunner";
+import FeedbackLog from "../components/containers/FeedbackLog";
 import ErrorLookup from "../ErrorLookup";
 import SymptomLookup from "../SymptomLookup";
-import ManualsPage from "./pages/ManualsPage";
-import HomeMenu from "./pages/HomePage";
-import LandingPage from "./pages/LandingPage";
-import errors from "./errors";
-import symptoms from "./symptoms";
-import { findFlow } from "./flows";
-import createReportPDF from "./utils/pdf/createReportPDF";
+import ManualsPage from "./ManualsPage";
+import LandingPage from "./LandingPage";
 
-import LoginPage from "./pages/Auth/LoginPage";
-import SignupPage from "./pages/Auth/SignupPage";
-import { auth, handleRedirectResult } from "./firebase/auth";
+import errors from "../errors";
+import symptoms from "../symptoms";
+import { findFlow } from "../flows";
+import createReportPDF from "../utils/pdf/createReportPDF";
+
+import LoginPage from "./Auth/LoginPage";
+import SignupPage from "./Auth/SignupPage";
+import { auth, handleRedirectResult } from "../firebase/auth";
 
 function App() {
   const [step, setStep] = useState("brand");
