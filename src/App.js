@@ -1,12 +1,13 @@
 // src/App.js
 import React, { useState, useEffect } from "react";
-import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+// ✅ New
+import { Routes, Route, useLocation } from "react-router-dom";
 import Layout from "./Layout";
 import FlowRunner from "./components/containers/FlowRunner";
 import FeedbackLog from "./components/containers/FeedbackLog";
 import ErrorLookup from "./ErrorLookup";
 import SymptomLookup from "./SymptomLookup";
-import ManualsPage from "./pages/ManualsPage";
+import ManualsPage from "./pages/ManualsPage.jsx";
 import HomeMenu from "./pages/HomePage";
 import LandingPage from "./pages/LandingPage";
 import errors from "./errors";
@@ -224,21 +225,7 @@ function App() {
       />
 
       {/* 🏠 Home and Landing */}
-      <Route
-        path="/"
-        element={
-          currentUser ? (
-            <Layout>
-              <main className="flex-1 p-4 overflow-auto">
-                <h1 className="text-2xl font-bold mb-4">Compact Pool Technicians 🚀</h1>
-                <HomeMenu />
-              </main>
-            </Layout>
-          ) : (
-            <LandingPage />
-          )
-        }
-      />
+    <Route path="/" element={<LandingPage />} />
     </Routes>
   );
 }
