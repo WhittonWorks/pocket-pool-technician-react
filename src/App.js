@@ -225,21 +225,7 @@ function App() {
       />
 
       {/* 🏠 Home and Landing */}
-      <Route
-        path="/"
-        element={
-          currentUser ? (
-            <Layout>
-              <main className="flex-1 p-4 overflow-auto">
-                <h1 className="text-2xl font-bold mb-4">Compact Pool Technicians 🚀</h1>
-                <HomeMenu />
-              </main>
-            </Layout>
-          ) : (
-            <LandingPage />
-          )
-        }
-      />
+    <Route path="/" element={<p>✅ Root route test successful</p>} />
     </Routes>
   );
 }
