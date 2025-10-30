@@ -8,35 +8,37 @@ import {
   signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
-  OAuthProvider
+  OAuthProvider,
+  sendEmailVerification,
 } from "firebase/auth";
 
-import app from "../firebaseConfig"; // ✅ FIXED: import default app instance
+import app from "../firebaseConfig";
 
-// Initialize Auth
+// ✅ Initialize Firebase Auth
 const auth = getAuth(app);
 
-// Google Sign-In
+// ✅ Google Sign-In Provider
 const googleProvider = new GoogleAuthProvider();
 
-// Apple Sign-In
+// ✅ Apple Sign-In Provider
 const appleProvider = new OAuthProvider("apple.com");
 
-// --- Auth Helpers ---
-
+// 🔐 Login with email/password
 export const loginWithEmail = (email, password) => {
   return signInWithEmailAndPassword(auth, email, password);
 };
 
+// 🔐 Signup with email/password
 export const signupWithEmail = (email, password) => {
   return createUserWithEmailAndPassword(auth, email, password);
 };
 
+// 🚪 Log out
 export const logout = () => {
   return signOut(auth);
 };
 
-// ✅ Google Login (detect mobile and redirect if needed)
+// 🔑 Login with Google (detect mobile redirect vs popup)
 export const loginWithGoogle = () => {
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   if (isMobile) {
@@ -46,22 +48,35 @@ export const loginWithGoogle = () => {
   }
 };
 
-// ✅ Apple Login (redirect not needed yet since you’re not using it)
+// 🔑 Login with Apple (popup only for now)
 export const loginWithApple = () => {
   return signInWithPopup(auth, appleProvider);
 };
 
-// ✅ Handle Google login redirect (call this once on app load)
+// 📩 Resend email verification to the current user
+export const resendVerificationEmail = () => {
+  const user = auth.currentUser;
+  if (user) {
+    return sendEmailVerification(user);
+  } else {
+    throw new Error("No authenticated user.");
+  }
+};
+
+// ✅ Handle login redirect result from Google Sign-In
 export const handleRedirectResult = async () => {
   try {
     const result = await getRedirectResult(auth);
     if (result?.user) {
-      console.log("✅ Redirect login success:", result.user);
+      console.log("✅ Google redirect login successful:", result.user);
+      sessionStorage.setItem("redirectLoginSuccess", "true");
+    } else {
+      console.log("ℹ️ No user returned from redirect.");
     }
   } catch (error) {
-    console.error("❌ Redirect login failed:", error);
+    console.error("❌ Google redirect failed:", error.message);
   }
 };
 
-// Export the auth instance for access to currentUser, etc.
+// 🔁 Export auth instance for checking currentUser, etc.
 export { auth };

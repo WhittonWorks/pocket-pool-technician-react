@@ -1,10 +1,7 @@
 // src/pages/LandingPage.js
 import React from "react";
-import { useNavigate } from "react-router-dom";
 
-const LandingPage = () => {
-  const navigate = useNavigate();
-
+export default function LandingPage() {
   return (
     <div className="h-[100dvh] flex flex-col items-center justify-center px-6 bg-gray-100 text-center">
       <h1 className="text-3xl font-bold mb-6">Welcome to Compact Pool Technician</h1>
