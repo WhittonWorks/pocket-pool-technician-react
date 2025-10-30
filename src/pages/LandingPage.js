@@ -1,7 +1,18 @@
 // src/pages/LandingPage.js
-import React from "react";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { auth } from "../../firebase/auth";
 
-export default function LandingPage() {
+const LandingPage = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (user) {
+      navigate("/diagnostics"); // 🔁 Redirect authenticated users
+    }
+  }, []);
+
   return (
     <div className="h-[100dvh] flex flex-col items-center justify-center px-6 bg-gray-100 text-center">
       <h1 className="text-3xl font-bold mb-6">Welcome to Compact Pool Technician</h1>
