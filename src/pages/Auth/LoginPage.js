@@ -1,4 +1,3 @@
-// src/pages/Auth/LoginPage.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -6,8 +5,8 @@ import {
   loginWithGoogle,
   loginWithApple,
   resendVerificationEmail,
+  auth
 } from "../../firebase/auth";
-import { auth } from "../../firebase/auth";
 
 const LoginPage = () => {
   const navigate = useNavigate();

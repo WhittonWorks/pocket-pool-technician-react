@@ -1,0 +1,124 @@
+.
+├── capacitor.config.ts
+├── FETCH_HEAD
+├── jsconfig.json
+├── netlify.toml
+├── package-lock.json
+├── package.json
+├── postcss.config.js
+├── public
+│   ├── _redirects
+│   ├── CPT-Logo-192.png
+│   ├── CPT-Logo-512.png
+│   ├── favicon.ico
+│   ├── index.html
+│   ├── manifest.json
+│   ├── manuals
+│   │   ├── Aquacal
+│   │   ├── Hayward
+│   │   ├── Jandy
+│   │   └── manifest.json
+│   ├── media
+│   │   └── jandy
+│   ├── robots.txt
+│   └── service-worker.js
+├── README.md
+├── scripts
+│   └── generateManualManifest.js
+├── src
+│   ├── App.css
+│   ├── App.js
+│   ├── App.test.js
+│   ├── components
+│   │   ├── containers
+│   │   ├── ManualViewer.js
+│   │   └── ui
+│   ├── config
+│   │   ├── appSettings.js
+│   │   └── branding.js
+│   ├── context
+│   │   ├── AppSettingsContext.jsx
+│   │   ├── DataSyncContext.jsx
+│   │   ├── FeedbackContext.jsx
+│   │   ├── FlowContext.jsx
+│   │   └── UserContext.jsx
+│   ├── engine
+│   │   ├── flowEngine.js
+│   │   └── symptomLinkEngine.js
+│   ├── ErrorLookup.js
+│   ├── errors
+│   │   ├── hayward-hfdn-errors.json
+│   │   ├── hayward-hseries-digital-hfdn-v1.json
+│   │   ├── index.js
+│   │   ├── jandy-aquapure-errors.json
+│   │   ├── jandy-jxi-errors.json
+│   │   ├── jandy-truclear-errors.json
+│   │   ├── jandy-versatemp-errors.json
+│   │   ├── pentair-mastertemp-errors-v1.json
+│   │   └── pentair-ultratemp-errors-v1.json
+│   ├── firebase
+│   │   └── auth.js
+│   ├── firebaseConfig.js
+│   ├── flows
+│   │   ├── aqualink-no-power.json
+│   │   ├── hayward-aquarite.json
+│   │   ├── hayward-hfdn-v1.json
+│   │   ├── hayward-hseries-lownox-v1.json
+│   │   ├── index.js
+│   │   ├── jandy-aqualinkrs.json
+│   │   ├── jandy-aquapure.json
+│   │   ├── jandy-hie2.json
+│   │   ├── jandy-iq30-wifi-v1.json
+│   │   ├── jandy-jxi-v1.json
+│   │   ├── jandy-trudose.json
+│   │   ├── jandy-versatemp.json
+│   │   ├── pentair-mastertemp-v1.json
+│   │   └── pentair-ultratemp-v1.json
+│   ├── hooks
+│   │   └── useUser.js
+│   ├── index.css
+│   ├── index.js
+│   ├── Layout.js
+│   ├── logo.svg
+│   ├── pages
+│   │   ├── Auth
+│   │   ├── DiagnosticsPage.js
+│   │   ├── Feedback.js
+│   │   ├── FlowComplete.js
+│   │   ├── HomePage.js
+│   │   ├── LandingPage.js
+│   │   └── ManualsPage.jsx
+│   ├── preventative
+│   │   ├── hayward-hseries-digital-hfdn-pm-v1.json
+│   │   ├── jandy-jxi-pm-v1.json
+│   │   ├── pentair-mastertemp-pm-v1.json
+│   │   └── pentair-ultratemp-pm-v1.json
+│   ├── reportWebVitals.js
+│   ├── serviceWorkerRegistration.js
+│   ├── setupTests.js
+│   ├── styles.js
+│   ├── SymptomLookup.js
+│   ├── symptoms
+│   │   ├── hayward-hseries-digital-hfdn-v1.json
+│   │   ├── hayward-hseries-lownox-symptoms-v1.json
+│   │   ├── index.js
+│   │   ├── jandy-jxi-symptoms.json
+│   │   ├── jandy-truclear-symptoms.json
+│   │   ├── jandy-verstemp-symptoms.json
+│   │   ├── pentair-mastertemp-symptoms-v1.json
+│   │   └── pentair-ultratemp-symptoms-v1.json
+│   ├── templates
+│   │   ├── error.template.json
+│   │   ├── flow.template.json
+│   │   └── symptom-template.json
+│   ├── testEngine.js
+│   ├── tools
+│   │   ├── model
+│   │   └── serial
+│   └── utils
+│       ├── pdf
+│       └── shareFeedback.js
+├── structure.txt
+└── tailwind.config.js
+
+30 directories, 92 files

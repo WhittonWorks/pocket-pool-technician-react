@@ -1,12 +1,16 @@
-// src/pages/Auth/SignupPage.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { signupWithEmail } from "../../firebase/auth";
-import { sendEmailVerification } from "firebase/auth";
-import { auth } from "../../firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  getAuth,
+} from "firebase/auth";
+import app from "../../firebaseConfig";
 
 const SignupPage = () => {
   const navigate = useNavigate();
+  const auth = getAuth(app);
+
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -27,15 +31,18 @@ const SignupPage = () => {
     setSuccess("");
 
     try {
-      const userCred = await signupWithEmail(form.email, form.password);
+      const userCred = await createUserWithEmailAndPassword(
+        auth,
+        form.email,
+        form.password
+      );
 
-      // ✅ Send email verification
       await sendEmailVerification(userCred.user);
 
       setSuccess("Account created. Check your email to verify your account.");
       setTimeout(() => {
         navigate("/login");
-      }, 3000); // Navigate after short delay
+      }, 3000);
     } catch (err) {
       setError(err.message);
     }
@@ -49,15 +56,51 @@ const SignupPage = () => {
       {success && <p className="text-green-600 text-sm mb-4">{success}</p>}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input name="name" placeholder="Your Name" value={form.name} onChange={handleChange} required className="p-2 border rounded" />
-        <input name="email" type="email" placeholder="Email" value={form.email} onChange={handleChange} required className="p-2 border rounded" />
-        <input name="password" type="password" placeholder="Password" value={form.password} onChange={handleChange} required className="p-2 border rounded" />
-        <input name="business" placeholder="Business Name (optional)" value={form.business} onChange={handleChange} className="p-2 border rounded" />
+        <input
+          name="name"
+          placeholder="Your Name"
+          value={form.name}
+          onChange={handleChange}
+          required
+          className="p-2 border rounded"
+        />
+        <input
+          name="email"
+          type="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={handleChange}
+          required
+          className="p-2 border rounded"
+        />
+        <input
+          name="password"
+          type="password"
+          placeholder="Password"
+          value={form.password}
+          onChange={handleChange}
+          required
+          className="p-2 border rounded"
+        />
+        <input
+          name="business"
+          placeholder="Business Name (optional)"
+          value={form.business}
+          onChange={handleChange}
+          className="p-2 border rounded"
+        />
 
-        <button type="submit" className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+        <button
+          type="submit"
+          className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+        >
           Sign Up
         </button>
-        <button type="button" onClick={() => navigate("/login")} className="text-sm underline text-gray-500">
+        <button
+          type="button"
+          onClick={() => navigate("/login")}
+          className="text-sm underline text-gray-500"
+        >
           Already have an account? Log in →
         </button>
       </form>
