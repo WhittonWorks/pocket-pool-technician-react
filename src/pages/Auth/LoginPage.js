@@ -23,12 +23,13 @@ const LoginPage = () => {
       const userCredential = await loginWithEmail(email, password);
       const user = userCredential.user;
 
-      if (!user.emailVerified) {
-        setError("⚠️ Please verify your email address before logging in.");
-        setShowResend(true);
-        await auth.signOut(); // Optional: auto-logout if unverified
-        return;
-      }
+      // ❌ TEMPORARILY DISABLED: email verification check
+      // if (!user.emailVerified) {
+      //   setError("⚠️ Please verify your email address before logging in.");
+      //   setShowResend(true);
+      //   await auth.signOut(); // Optional: auto-logout if unverified
+      //   return;
+      // }
 
       navigate("/");
     } catch (err) {
