@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   createUserWithEmailAndPassword,
-  // sendEmailVerification, // ❌ Temporarily disabled for testing
   getAuth,
+  updateProfile, // ✅ added
 } from "firebase/auth";
 import app from "../../firebaseConfig";
 
@@ -37,14 +37,13 @@ const SignupPage = () => {
         form.password
       );
 
-      // ❌ Temporarily disable verification to allow instant login
-      // await sendEmailVerification(userCred.user);
+      // ✅ Set the user's display name to their entered name
+      await updateProfile(userCred.user, {
+        displayName: form.name,
+      });
 
       // ✅ Immediately navigate to dashboard (auto-login)
-      navigate("/home");
-
-      // Optionally show message (commented for clean UX)
-      // setSuccess("Account created and logged in automatically.");
+      navigate("/");
 
     } catch (err) {
       setError(err.message);
