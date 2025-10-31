@@ -41,7 +41,7 @@ const SignupPage = () => {
       // await sendEmailVerification(userCred.user);
 
       // ✅ Immediately navigate to dashboard (auto-login)
-      navigate("/");
+      navigate("/home");
 
       // Optionally show message (commented for clean UX)
       // setSuccess("Account created and logged in automatically.");

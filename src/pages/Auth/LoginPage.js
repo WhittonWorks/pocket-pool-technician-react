@@ -31,7 +31,7 @@ const LoginPage = () => {
       //   return;
       // }
 
-      navigate("/");
+      navigate("/home"); // ✅ Redirect to HomePage
     } catch (err) {
       setError(err.message);
     }
@@ -41,7 +41,7 @@ const LoginPage = () => {
     try {
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       await loginWithGoogle();
-      if (!isMobile) navigate("/");
+      if (!isMobile) navigate("/home"); // ✅ Redirect to HomePage
     } catch (err) {
       setError(err.message);
     }
@@ -102,7 +102,7 @@ const LoginPage = () => {
           onClick={async () => {
             try {
               await loginWithApple();
-              navigate("/");
+              navigate("/home"); // ✅ Redirect to HomePage
             } catch (err) {
               setError(err.message);
             }
