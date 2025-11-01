@@ -1,3 +1,4 @@
+// src/App.js
 import React, { useState, useEffect } from "react";
 import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import Layout from "./Layout";
@@ -6,7 +7,7 @@ import FeedbackLog from "./components/containers/FeedbackLog";
 import ErrorLookup from "./ErrorLookup";
 import SymptomLookup from "./SymptomLookup";
 import ManualsPage from "./pages/ManualsPage";
-import HomeMenu from "./pages/HomePage";
+import HomeMenu from "./pages/HomePage"; // ✅ HomePage is used here
 import LandingPage from "./pages/LandingPage";
 import errors from "./errors";
 import symptoms from "./symptoms";
@@ -32,7 +33,7 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Handle auth + redirect results
+  // ✅ Auth check + Google redirect handler
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
@@ -42,7 +43,7 @@ function App() {
 
       if (sessionStorage.getItem("redirectLoginSuccess") === "true") {
         sessionStorage.removeItem("redirectLoginSuccess");
-        navigate("/");
+        navigate("/home"); // ✅ updated to redirect to /home
       }
 
       setLoading(false);
@@ -51,7 +52,7 @@ function App() {
     return () => unsubscribe();
   }, [navigate]);
 
-  // ✅ Handle screen size
+  // ✅ Detect screen size for sidebar behavior
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
@@ -179,10 +180,12 @@ function App() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
+
       <Route path="/manuals" element={<Layout><ManualsPage /></Layout>} />
       <Route path="/feedback" element={<Layout><FeedbackLog /></Layout>} />
       <Route path="/errors" element={<Layout sidebar={renderSidebar()}><p className="text-lg font-semibold">Select an error to view diagnostics</p></Layout>} />
       <Route path="/symptoms" element={<Layout sidebar={renderSidebar()}><p className="text-lg font-semibold">Select a symptom to view diagnostics</p></Layout>} />
+
       <Route
         path="/diagnostics"
         element={
@@ -214,10 +217,10 @@ function App() {
           </Layout>
         }
       />
-      <Route path="/" element={<LandingPage />} />
 
-      {/* 🏠 Home and Landing */}
-    <Route path="/" element={<LandingPage />} />
+      <Route path="/" element={<LandingPage />} /> {/* ✅ Public landing screen */}
+      <Route path="/home" element={<Layout><HomeMenu /></Layout>} /> {/* ✅ Main dashboard */}
+
     </Routes>
   );
 }

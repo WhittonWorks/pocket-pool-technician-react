@@ -31,7 +31,7 @@ const LoginPage = () => {
       //   return;
       // }
 
-      navigate("/"); // ✅ Redirect to HomePage
+      navigate("/home"); // ✅ Redirect to HomePage
     } catch (err) {
       setError(err.message);
     }
