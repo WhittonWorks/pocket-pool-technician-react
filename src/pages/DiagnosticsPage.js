@@ -1,5 +1,4 @@
-// src/pages/DiagnosticsPage.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import FlowRunner from "../components/containers/FlowRunner";
 import createReportPDF from "../utils/pdf/createReportPDF";
@@ -41,12 +40,16 @@ export default function DiagnosticsPage() {
   const [brand, setBrand] = useState(null);
   const [equipmentType, setEquipmentType] = useState(null);
   const [model, setModel] = useState(null);
+  const [flowId, setFlowId] = useState(null);
+
+  const jumpNode = sessionStorage.getItem("jumpToNode");
 
   const reset = () => {
     setStep("brand");
     setBrand(null);
     setEquipmentType(null);
     setModel(null);
+    setFlowId(null);
     sessionStorage.removeItem("jumpToNode");
   };
 
@@ -56,6 +59,14 @@ export default function DiagnosticsPage() {
   };
 
   const equipmentTypes = brand ? Object.keys(models[brand]) : [];
+
+  // 🔁 When model is chosen, update flowId to force FlowRunner re-render
+  useEffect(() => {
+    if (brand && equipmentType && model) {
+      const flow = findFlow(brand, equipmentType, model);
+      if (flow) setFlowId(flow.id);
+    }
+  }, [brand, equipmentType, model]);
 
   return (
     <div className="p-4 max-w-3xl mx-auto">
@@ -97,10 +108,9 @@ export default function DiagnosticsPage() {
       {model ? (
         (() => {
           const flow = findFlow(brand, equipmentType, model);
-          const jumpNode = sessionStorage.getItem("jumpToNode");
           return flow ? (
             <FlowRunner
-              key={flow.id}
+              key={flowId}
               flow={flow}
               jumpTo={jumpNode || null}
               onExit={reset}
