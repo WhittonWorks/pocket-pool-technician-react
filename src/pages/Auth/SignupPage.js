@@ -43,7 +43,7 @@ const SignupPage = () => {
       });
 
       // ✅ Immediately navigate to dashboard (auto-login)
-      navigate("/");
+      navigate("/home");
 
     } catch (err) {
       setError(err.message);

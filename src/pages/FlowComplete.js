@@ -32,7 +32,7 @@ export default function FlowComplete() {
       </button>
 
       <button
-        onClick={() => navigate("/")}
+        onClick={() => navigate("/home")}
         className="bg-gray-400 text-black px-4 py-2 rounded w-48"
       >
         Return Home
