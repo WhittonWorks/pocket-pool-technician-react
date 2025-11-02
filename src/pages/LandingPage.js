@@ -1,21 +1,32 @@
 // src/pages/LandingPage.js
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../firebase/auth";
 import { onAuthStateChanged } from "firebase/auth";
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        navigate("/home"); // ✅ Redirect to homepage with big buttons
+        navigate("/home"); // ✅ Route to HomePage if logged in
+      } else {
+        setCheckingAuth(false); // ✅ Show buttons only if no user
       }
     });
 
-    return () => unsubscribe(); // ✅ Clean up listener on unmount
+    return () => unsubscribe();
   }, [navigate]);
+
+  if (checkingAuth) {
+    return (
+      <div className="h-[100dvh] flex items-center justify-center">
+        <p className="text-lg font-medium">Checking login status...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="h-[100dvh] flex flex-col items-center justify-center px-6 bg-gray-100 text-center">
