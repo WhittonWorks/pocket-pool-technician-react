@@ -7,7 +7,7 @@ import FeedbackLog from "./components/containers/FeedbackLog";
 import ErrorLookup from "./ErrorLookup";
 import SymptomLookup from "./SymptomLookup";
 import ManualsPage from "./pages/ManualsPage";
-import HomeMenu from "./pages/HomePage"; // ✅ HomePage is used here
+import HomeMenu from "./pages/HomePage";
 import LandingPage from "./pages/LandingPage";
 import errors from "./errors";
 import symptoms from "./symptoms";
@@ -43,7 +43,7 @@ function App() {
 
       if (sessionStorage.getItem("redirectLoginSuccess") === "true") {
         sessionStorage.removeItem("redirectLoginSuccess");
-        navigate("/home"); // ✅ updated to redirect to /home
+        navigate("/home"); // ✅ Route to Home
       }
 
       setLoading(false);
@@ -52,7 +52,7 @@ function App() {
     return () => unsubscribe();
   }, [navigate]);
 
-  // ✅ Detect screen size for sidebar behavior
+  // ✅ Detect screen size
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
@@ -112,49 +112,64 @@ function App() {
 
   function renderSidebar() {
     if (location.pathname === "/diagnostics") {
-      if (step === "brand") {
-        return (
-          <div>
-            <h3 className="font-bold mb-2">Choose Brand</h3>
-            {brands.map((b) => (
-              <button key={b} onClick={() => { setBrand(b); setStep("type"); }} style={btnStyle}>
-                {b}
-              </button>
-            ))}
-          </div>
-        );
-      }
+      return (
+        <div>
+          {/* Back to Home */}
+          {step !== "brand" && (
+            <button
+              onClick={() => {
+                resetToHome();
+                navigate("/home");
+              }}
+              style={{
+                ...btnStyle,
+                background: "#7f1d1d",
+                marginBottom: 12,
+              }}
+            >
+              ⬅️ Back to Home
+            </button>
+          )}
 
-      if (step === "type") {
-        return (
-          <div>
-            <button onClick={() => setStep("brand")} style={backStyle}>← Back</button>
-            <h3 className="font-bold mb-2">{brand} Equipment</h3>
-            {equipmentTypes.map((t) => (
-              <button key={t} onClick={() => { setEquipmentType(t); setStep("model"); }} style={btnStyle}>
-                {t}
-              </button>
-            ))}
-          </div>
-        );
-      }
+          {step === "brand" && (
+            <>
+              <h3 className="font-bold mb-2">Choose Brand</h3>
+              {brands.map((b) => (
+                <button key={b} onClick={() => { setBrand(b); setStep("type"); }} style={btnStyle}>
+                  {b}
+                </button>
+              ))}
+            </>
+          )}
 
-      if (step === "model") {
-        return (
-          <div>
-            <button onClick={() => setStep("type")} style={backStyle}>← Back</button>
-            <h3 className="font-bold mb-2">{brand} {equipmentType}</h3>
-            {models[brand][equipmentType].map((m) => (
-              <button key={m} onClick={() => {
-                setModel(m);
-                if (isMobile) setSidebarCollapsed(true);
-              }} style={btnStyle}>
-                {m}
-              </button>
-            ))}
-          </div>
-        );
-      }
+          {step === "type" && (
+            <>
+              <button onClick={() => setStep("brand")} style={backStyle}>← Back</button>
+              <h3 className="font-bold mb-2">{brand} Equipment</h3>
+              {equipmentTypes.map((t) => (
+                <button key={t} onClick={() => { setEquipmentType(t); setStep("model"); }} style={btnStyle}>
+                  {t}
+                </button>
+              ))}
+            </>
+          )}
+
+          {step === "model" && (
+            <>
+              <button onClick={() => setStep("type")} style={backStyle}>← Back</button>
+              <h3 className="font-bold mb-2">{brand} {equipmentType}</h3>
+              {models[brand][equipmentType].map((m) => (
+                <button key={m} onClick={() => {
+                  setModel(m);
+                  if (isMobile) setSidebarCollapsed(true); // ✅ Collapse only *after* model selected
+                }} style={btnStyle}>
+                  {m}
+                </button>
+              ))}
+            </>
+          )}
+        </div>
+      );
     }
 
     if (location.pathname === "/errors") {
@@ -180,11 +195,25 @@ function App() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
-
       <Route path="/manuals" element={<Layout><ManualsPage /></Layout>} />
       <Route path="/feedback" element={<Layout><FeedbackLog /></Layout>} />
-      <Route path="/errors" element={<Layout sidebar={renderSidebar()}><p className="text-lg font-semibold">Select an error to view diagnostics</p></Layout>} />
-      <Route path="/symptoms" element={<Layout sidebar={renderSidebar()}><p className="text-lg font-semibold">Select a symptom to view diagnostics</p></Layout>} />
+
+      <Route
+        path="/errors"
+        element={
+          <Layout sidebar={renderSidebar()}>
+            <p className="text-lg font-semibold">Select an error to view diagnostics</p>
+          </Layout>
+        }
+      />
+      <Route
+        path="/symptoms"
+        element={
+          <Layout sidebar={renderSidebar()}>
+            <p className="text-lg font-semibold">Select a symptom to view diagnostics</p>
+          </Layout>
+        }
+      />
 
       <Route
         path="/diagnostics"
@@ -218,9 +247,8 @@ function App() {
         }
       />
 
-      <Route path="/" element={<LandingPage />} /> {/* ✅ Public landing screen */}
-      <Route path="/home" element={<Layout><HomeMenu /></Layout>} /> {/* ✅ Main dashboard */}
-
+      <Route path="/home" element={<Layout><HomeMenu /></Layout>} />
+      <Route path="/" element={<LandingPage />} />
     </Routes>
   );
 }
