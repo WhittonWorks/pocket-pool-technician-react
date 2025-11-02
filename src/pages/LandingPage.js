@@ -2,16 +2,20 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 
 const LandingPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const user = auth.currentUser;
-    if (user) {
-      navigate("/diagnostics"); // 🔁 Redirect authenticated users
-    }
-  }, []);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        navigate("/home"); // ✅ Redirect to homepage with big buttons
+      }
+    });
+
+    return () => unsubscribe(); // ✅ Clean up listener on unmount
+  }, [navigate]);
 
   return (
     <div className="h-[100dvh] flex flex-col items-center justify-center px-6 bg-gray-100 text-center">
