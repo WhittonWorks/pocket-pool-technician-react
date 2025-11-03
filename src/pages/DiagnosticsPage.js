@@ -1,3 +1,4 @@
+// src/pages/DiagnosticsPage.js
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import FlowRunner from "../components/containers/FlowRunner";
@@ -40,16 +41,30 @@ export default function DiagnosticsPage() {
   const [brand, setBrand] = useState(null);
   const [equipmentType, setEquipmentType] = useState(null);
   const [model, setModel] = useState(null);
-  const [flowId, setFlowId] = useState(null);
 
-  const jumpNode = sessionStorage.getItem("jumpToNode");
+  // ✅ Auto-load decoded data from ModelEntryPage
+  useEffect(() => {
+    const savedBrand = sessionStorage.getItem("decodedBrand");
+    const savedType = sessionStorage.getItem("decodedEquipmentType");
+    const savedModel = sessionStorage.getItem("decodedModel");
+
+    if (savedBrand && savedType && savedModel) {
+      console.log("🧠 Loaded decoded model from session:", {
+        savedBrand,
+        savedType,
+        savedModel,
+      });
+      setBrand(savedBrand);
+      setEquipmentType(savedType);
+      setModel(savedModel);
+    }
+  }, []);
 
   const reset = () => {
     setStep("brand");
     setBrand(null);
     setEquipmentType(null);
     setModel(null);
-    setFlowId(null);
     sessionStorage.removeItem("jumpToNode");
   };
 
@@ -60,17 +75,9 @@ export default function DiagnosticsPage() {
 
   const equipmentTypes = brand ? Object.keys(models[brand]) : [];
 
-  // 🔁 When model is chosen, update flowId to force FlowRunner re-render
-  useEffect(() => {
-    if (brand && equipmentType && model) {
-      const flow = findFlow(brand, equipmentType, model);
-      if (flow) setFlowId(flow.id);
-    }
-  }, [brand, equipmentType, model]);
-
   return (
     <div className="p-4 max-w-3xl mx-auto">
-      {/* ✅ Home button always on brand screen */}
+      {/* ✅ Go Home button (only on brand step) */}
       {step === "brand" && (
         <div className="mb-6">
           <button
@@ -108,18 +115,21 @@ export default function DiagnosticsPage() {
       {model ? (
         (() => {
           const flow = findFlow(brand, equipmentType, model);
+          const jumpNode = sessionStorage.getItem("jumpToNode");
           return flow ? (
             <FlowRunner
-              key={flowId}
+              key={flow.id}
               flow={flow}
               jumpTo={jumpNode || null}
               onExit={reset}
               onFinish={(answers) => createReportPDF(answers, flow)}
             />
           ) : (
-            <p>
-              ✅ You chose <strong>{brand}</strong> → <strong>{equipmentType}</strong> →{" "}
-              <strong>{model}</strong> — but no diagnostic flow exists yet.
+            <p className="text-lg text-gray-700">
+              ❌ No diagnostic flow found for this model:
+              <br />
+              <strong>{brand}</strong> → <strong>{equipmentType}</strong> →{" "}
+              <strong>{model}</strong>
             </p>
           );
         })()
@@ -167,7 +177,9 @@ export default function DiagnosticsPage() {
 
           {step === "model" && (
             <>
-              <h3 className="font-semibold text-lg">Pick Your {brand} {equipmentType} Model:</h3>
+              <h3 className="font-semibold text-lg">
+                Pick Your {brand} {equipmentType} Model:
+              </h3>
               <div className="flex flex-col gap-4">
                 {models[brand][equipmentType].map((m) => (
                   <button

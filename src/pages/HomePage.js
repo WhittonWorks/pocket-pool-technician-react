@@ -5,11 +5,12 @@ import { useNavigate } from "react-router-dom";
 const HomePage = () => {
   const navigate = useNavigate();
 
+  // Each main feature button, with context for ModelEntryPage when applicable
   const buttons = [
     { label: "📚 Manuals", path: "/manuals", color: "gray" },
-    { label: "🧠 Guided Diagnostics", path: "/diagnostics", color: "gray" },
-    { label: "⚠️ Error Code Lookup", path: "/errors", color: "gray" },
-    { label: "🤒 Symptom Lookup", path: "/symptoms", color: "gray" },
+    { label: "🧠 Guided Diagnostics", path: "/model-entry", context: "diagnostic", color: "gray" },
+    { label: "⚠️ Error Code Lookup", path: "/model-entry", context: "error", color: "gray" },
+    { label: "🤒 Symptom Lookup", path: "/model-entry", context: "symptom", color: "gray" },
     { label: "🧾 Generate Test PDF", path: "/generate-pdf", color: "blue" },
     { label: "✉️ Feedback Log", path: "/feedback", color: "yellow" },
   ];
@@ -36,7 +37,15 @@ const HomePage = () => {
         return (
           <button
             key={btn.path}
-            onClick={() => navigate(btn.path)}
+            onClick={() => {
+              // Set launch context for Diagnostics, Errors, and Symptoms
+              if (btn.context) {
+                sessionStorage.setItem("launchContext", btn.context);
+              } else {
+                sessionStorage.removeItem("launchContext");
+              }
+              navigate(btn.path);
+            }}
             className={`${baseClasses} ${colorClass}`}
           >
             {btn.label}

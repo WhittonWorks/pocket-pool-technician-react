@@ -1,26 +1,41 @@
-import React from "react";
+// src/pages/SymptomPage.js
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SymptomLookup from "../SymptomLookup";
-import { findFlow } from "../flows";
 
 function SymptomPage({ setBrand, setEquipmentType, setModel }) {
   const navigate = useNavigate();
 
+  // ✅ Load decoded values (set during ModelEntryPage)
+  const [decodedBrand, setDecodedBrand] = useState("All");
+  const [decodedType, setDecodedType] = useState("All");
+  const [decodedModel, setDecodedModel] = useState("All");
+
+  useEffect(() => {
+    const storedBrand = sessionStorage.getItem("decodedBrand");
+    const storedType = sessionStorage.getItem("decodedType");
+    const storedModel = sessionStorage.getItem("decodedModel");
+
+    if (storedBrand) setDecodedBrand(storedBrand);
+    if (storedType) setDecodedType(storedType);
+    if (storedModel) setDecodedModel(storedModel);
+  }, []);
+
   function handleSelectSymptom(flowTarget) {
     if (!flowTarget) return;
-    const { brand, equipmentType, model } = flowTarget;
+    const { brand, equipmentType, model, startNode } = flowTarget;
 
-    // ✅ Set values so Diagnostics page can render the correct flow
+    // ✅ Set flow context for diagnostics
     setBrand(brand);
     setEquipmentType(equipmentType);
     setModel(model);
 
-    // 🔁 Jump to node if available
-    if (flowTarget.startNode) {
-      sessionStorage.setItem("jumpToNode", flowTarget.startNode);
+    // 🔁 If a jump node exists, store it
+    if (startNode) {
+      sessionStorage.setItem("jumpToNode", startNode);
     }
 
-    // ✅ Navigate to diagnostics
+    // ✅ Go to diagnostics
     navigate("/diagnostics");
   }
 
@@ -33,7 +48,13 @@ function SymptomPage({ setBrand, setEquipmentType, setModel }) {
         ⬅️ Back to Home
       </button>
 
-      <SymptomLookup onSelectSymptom={handleSelectSymptom} />
+      {/* ✅ Pass decoded values into SymptomLookup */}
+      <SymptomLookup
+        onSelectSymptom={handleSelectSymptom}
+        initialBrand={decodedBrand}
+        initialType={decodedType}
+        initialModel={decodedModel}
+      />
     </div>
   );
 }

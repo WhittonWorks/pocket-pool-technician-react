@@ -13,6 +13,7 @@ import SignupPage from "./pages/Auth/SignupPage";
 import DiagnosticsPage from "./pages/DiagnosticsPage";
 import ErrorPage from "./pages/ErrorPage";
 import SymptomPage from "./pages/SymptomPage";
+import ModelEntryPage from "./pages/ModelEntryPage"; // ✅ new import
 
 import errors from "./errors";
 import symptoms from "./symptoms";
@@ -71,6 +72,16 @@ function App() {
       {/* 🔐 Auth */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
+
+      {/* 🧩 Model Entry (decoder first step) */}
+      <Route
+        path="/model-entry"
+        element={
+          <Layout>
+            <ModelEntryPage />
+          </Layout>
+        }
+      />
 
       {/* 📚 Manuals & Feedback */}
       <Route
