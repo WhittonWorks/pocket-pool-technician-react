@@ -1,0 +1,72 @@
+{
+  "Aquacal": {
+    "Heaters": [
+      {
+        "name": "Heatwave Superquiet",
+        "path": "/manuals/Aquacal/Heaters/Heatwave_Superquiet.pdf"
+      }
+    ]
+  },
+  "Hayward": {
+    "Automation": [
+      {
+        "name": "Prologic & Aqualogic",
+        "path": "/manuals/Hayward/Automation/Prologic_&_Aqualogic.pdf"
+      },
+      {
+        "name": "aquaconnect-consumer-troubleshooting-guide",
+        "path": "/manuals/Hayward/Automation/aquaconnect-consumer-troubleshooting-guide.pdf"
+      }
+    ],
+    "Heaters": [
+      {
+        "name": "H100 TSG",
+        "path": "/manuals/Hayward/Heaters/H100_TSG.pdf"
+      },
+      {
+        "name": "HC Series Heater",
+        "path": "/manuals/Hayward/Heaters/HC_Series_Heater.pdf"
+      },
+      {
+        "name": "HP50HA ABG HeatPump Troubleshooting Guide",
+        "path": "/manuals/Hayward/Heaters/HP50HA_ABG HeatPump_Troubleshooting_Guide.pdf"
+      },
+      {
+        "name": "Heat-Pump TSG",
+        "path": "/manuals/Hayward/Heaters/Heat-Pump_TSG.pdf"
+      },
+      {
+        "name": "Hfdn-manual",
+        "path": "/manuals/Hayward/Heaters/Hfdn-manual.pdf"
+      }
+    ]
+  },
+  "Jandy": {
+    "Automation": [
+      {
+        "name": "FPA AutomationTCX",
+        "path": "/manuals/Jandy/Automation/FPA_AutomationTCX.pdf"
+      }
+    ],
+    "Heaters": [
+      {
+        "name": "Fluidra General Heater TSG",
+        "path": "/manuals/Jandy/Heaters/Fluidra_General_Heater_TSG.pdf"
+      },
+      {
+        "name": "JXi-Manual",
+        "path": "/manuals/Jandy/Heaters/JXi-Manual.pdf"
+      }
+    ],
+    "Watercare": [
+      {
+        "name": "APURE1400",
+        "path": "/manuals/Jandy/Watercare/APURE1400.pdf"
+      },
+      {
+        "name": "FPA Sanitation & Levolor Flip Guide",
+        "path": "/manuals/Jandy/Watercare/FPA Sanitation & Levolor Flip Guide.pdf"
+      }
+    ]
+  }
+}

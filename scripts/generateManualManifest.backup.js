@@ -38,7 +38,7 @@ fs.readdirSync(manualsDir).forEach((brand) => {
 });
 
 fs.writeFileSync(
-  path.join(manualsDir, "manuals-manifest.json"),
+  path.join(manualsDir, "manifest.json"),
   JSON.stringify(manifest, null, 2)
 );
 console.log("✅ manuals/manifest.json updated with brand > category > PDFs");

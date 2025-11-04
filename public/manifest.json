@@ -1,62 +1,25 @@
 {
-  "aquacal": [
+  "short_name": "CPT",
+  "name": "Compact Pool Technician",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#FFD300",
+  "theme_color": "#0B73FF",
+  "description": "Guided diagnostics, error codes, and symptom lookup for pool equipment — works offline.",
+  "icons": [
     {
-      "name": "Aquacal",
-      "path": "/manuals/aquacal/Aquacal.pdf"
-    }
-  ],
-  "hayward": [
-    {
-      "name": "Hseries",
-      "path": "/manuals/hayward/HSeries.pdf"
+      "src": "/CPT-Logo-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "name": "Hayward Hc",
-      "path": "/manuals/hayward/Hayward_HC.pdf"
-    },
-    {
-      "name": "Hayward Hp50ha Abg Heatpump Troubleshooting Guide",
-      "path": "/manuals/hayward/Hayward_HP50HA_ABG HeatPump_Troubleshooting_Guide.pdf"
-    },
-    {
-      "name": "Heat Pump Tsg",
-      "path": "/manuals/hayward/Heat-Pump_TSG.pdf"
-    },
-    {
-      "name": "Hfdn Manual",
-      "path": "/manuals/hayward/Hfdn-manual.pdf"
-    },
-    {
-      "name": "Prologic Aqualogic Manual",
-      "path": "/manuals/hayward/Prologic_Aqualogic_manual.pdf"
-    }
-  ],
-  "jandy": [
-    {
-      "name": "Apure1400",
-      "path": "/manuals/jandy/APURE1400.pdf"
-    },
-    {
-      "name": "Fpa Sanitation & Levolor Flip Guide",
-      "path": "/manuals/jandy/FPA Sanitation & Levolor Flip Guide.pdf"
-    },
-    {
-      "name": "Fpa Automationtcx",
-      "path": "/manuals/jandy/FPA_AutomationTCX.pdf"
-    },
-    {
-      "name": "Fpa Heatpump",
-      "path": "/manuals/jandy/FPA_heatpump.pdf"
-    },
-    {
-      "name": "Jxi Manual",
-      "path": "/manuals/jandy/JXi-Manual.pdf"
-    }
-  ],
-  "pentair": [
-    {
-      "name": "Mastertemp",
-      "path": "/manuals/pentair/MasterTemp.pdf"
+      "src": "/CPT-Logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

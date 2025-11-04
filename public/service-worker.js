@@ -1,32 +1,33 @@
 // public/service-worker.js
 // Compact Pool Technician (CPT) — Full offline-first PWA with flows, errors, and symptoms
 
-const CACHE_VERSION = 'v6';
+const CACHE_VERSION = 'v7';
 const CACHE_NAME = `cpt-cache-${CACHE_VERSION}`;
 
 // 🧱 Core shell assets always cached at install
 const CORE_ASSETS = [
   '/',
   '/index.html',
-  '/manifest.webmanifest',
+  '/manifest.json',           // ✅ corrected from manifest.webmanifest
   '/favicon.ico',
   '/CPT-Logo-192.png',
   '/CPT-Logo-512.png',
-  '/static/js/',     // pre-cache app shell bundles
+  '/static/js/',              // pre-cache app shell bundles
   '/static/css/'
 ];
 
-// 🧩 Known JSON assets (flows, errors, symptoms)
+// 🧩 Known JSON assets (flows, errors, symptoms, manuals)
 const DATA_ASSETS = [
   '/flows/jandy-jxi-v1.json',
   '/errors/jandy-jxi-errors-v1.json',
-  '/symptoms/jandy-jxi-symptoms-v1.json'
-  // 👉 Add more model files here as you create them
+  '/symptoms/jandy-jxi-symptoms-v1.json',
+  '/manuals/manifest.json'    // ✅ ensure manuals load offline
+  // 👉 Add more model or manual files here as you create them
 ];
 
 // 🔍 Runtime cache patterns for dynamic resources
 const RUNTIME_PATTERNS = [
-  /\.json$/i,          // diagnostic flows, errors, symptoms
+  /\.json$/i,          // diagnostic flows, errors, symptoms, manuals
   /\/static\/js\//i,   // JS bundles
   /\/static\/css\//i,  // CSS bundles
   /\/media\//i         // any referenced media
@@ -73,7 +74,7 @@ self.addEventListener('fetch', (event) => {
   const req = event.request;
   const url = new URL(req.url);
 
-  // Skip external requests
+  // Skip non-GET or cross-origin requests
   if (req.method !== 'GET' || url.origin !== self.location.origin) return;
 
   const shouldCache = RUNTIME_PATTERNS.some((regex) => regex.test(url.pathname));
@@ -116,6 +117,7 @@ async function networkFirst(req) {
 // 💬 Handle skipWaiting messages
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
+    console.log('[SW] Skip waiting requested, activating new service worker.');
     self.skipWaiting();
   }
 });
