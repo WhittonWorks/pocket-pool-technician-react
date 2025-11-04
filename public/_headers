@@ -1,2 +1,13 @@
 /manifest.json
   Content-Type: application/manifest+json
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/service-worker.js
+  Content-Type: application/javascript
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/CPT-Logo-192.png
+  Cache-Control: public, max-age=31536000, immutable
+
+/CPT-Logo-512.png
+  Cache-Control: public, max-age=31536000, immutable
