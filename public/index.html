@@ -2,30 +2,36 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+
+    <!-- Favicon -->
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Viewport (iOS needs viewport-fit=cover for full-screen PWAs with notches) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+    <!-- Theming -->
     <meta name="theme-color" content="#0B73FF" />
 
-    <!-- ✅ iOS PWA requirements -->
+    <!-- iOS PWA essentials -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Compact Pool Technician" />
+    <meta name="format-detection" content="telephone=no" />
 
+    <!-- Description -->
     <meta
       name="description"
       content="Compact Pool Technician — Offline-ready diagnostic app for pool professionals."
     />
 
-    <!-- ✅ App icons -->
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/CPT-Logo-512.png" />
+    <!-- Icons (iOS prefers 180x180; Android/Chrome pull from manifest) -->
+    <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/CPT-Logo-512.png" />
+    <!-- (Optional) Fallback smaller icon -->
+    <link rel="apple-touch-icon" sizes="152x152" href="%PUBLIC_URL%/CPT-Logo-192.png" />
 
-    <!-- ✅ Correct manifest reference -->
-    <link
-      rel="manifest"
-      href="%PUBLIC_URL%/manifest.json"
-      type="application/manifest+json"
-    />
+    <!-- Web App Manifest (keep simple for iOS) -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
 
     <title>Compact Pool Technician</title>
   </head>
