@@ -1,0 +1,281 @@
+{
+  "id": "jandy-jxiq-v1",
+  "brand": "Jandy",
+  "equipmentType": "Heaters",
+  "model": "JXiQ",
+  "title": "Jandy JXiQ Heater — Guided Troubleshooting",
+  "start": "enter_voltage",
+  "nodes": {
+    "enter_voltage": {
+      "id": "enter_voltage",
+      "text": "Confirm the measured input voltage to the JXiQ heater.",
+      "input": "choice",
+      "choices": {
+        "120 V": "power_check_120",
+        "240 V": "power_check_240"
+      }
+    },
+
+    "power_check_120": {
+      "id": "power_check_120",
+      "text": "Measure power at the input terminals (Black → Red). Expect 110–126 VAC.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [110, 126],
+      "pass": "transformer_check",
+      "fail": "fix_power"
+    },
+
+    "power_check_240": {
+      "id": "power_check_240",
+      "text": "Measure power at the input terminals (Black → Red). Expect 220–252 VAC.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [220, 252],
+      "pass": "transformer_check",
+      "fail": "fix_power"
+    },
+
+    "transformer_check": {
+      "id": "transformer_check",
+      "text": "Verify 24 VAC output from the transformer (Red → Yellow). Expect 22–26 VAC.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [22, 26],
+      "pass": "fuse_check",
+      "fail": "replace_transformer"
+    },
+
+    "fuse_check": {
+      "id": "fuse_check",
+      "text": "Check the 3A low-voltage fuse on the board for continuity.",
+      "input": "yesno",
+      "pass": "pressure_switch_check",
+      "fail": "replace_fuse"
+    },
+
+    "pressure_switch_check": {
+      "id": "pressure_switch_check",
+      "text": "Verify the water pressure switch closes with the pump on. Measure 24 VAC across switch. Expect 22–26 VAC.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [22, 26],
+      "pass": "blower_check",
+      "fail": "replace_pressure_switch"
+    },
+
+    "blower_check": {
+      "id": "blower_check",
+      "text": "Does the blower motor start during pre-purge?",
+      "input": "yesno",
+      "pass": "igniter_check",
+      "fail": "blower_capacitor_check"
+    },
+
+    "blower_capacitor_check": {
+      "id": "blower_capacitor_check",
+      "text": "Measure blower run capacitor (P/N R0614500). Expect 8 µF ±5%.",
+      "input": "number",
+      "unit": "µF",
+      "range": [7.6, 8.4],
+      "pass": "blower_failed",
+      "fail": "replace_capacitor"
+    },
+
+    "blower_failed": {
+      "id": "blower_failed",
+      "text": "Capacitor good but blower not running — replace blower assembly (P/N R0591100).",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_capacitor": {
+      "id": "replace_capacitor",
+      "text": "Replace blower run capacitor (P/N R0614500).",
+      "input": "info",
+      "terminal": true
+    },
+
+    "igniter_check": {
+      "id": "igniter_check",
+      "text": "Does the Hot Surface Igniter glow during ignition?",
+      "input": "yesno",
+      "pass": "gas_valve_check",
+      "fail": "igniter_voltage_check"
+    },
+
+    "igniter_voltage_check": {
+      "id": "igniter_voltage_check",
+      "text": "Measure voltage at Ignition Control Board terminals K → I. Expect 105–130 VAC during ignition.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [105, 130],
+      "pass": "igniter_continuity_check",
+      "fail": "replace_icb"
+    },
+
+    "igniter_continuity_check": {
+      "id": "igniter_continuity_check",
+      "text": "With power off and igniter cool, check continuity. Expect 40–75 Ω.",
+      "input": "number",
+      "unit": "Ω",
+      "range": [40, 75],
+      "pass": "gas_valve_check",
+      "fail": "replace_igniter"
+    },
+
+    "replace_icb": {
+      "id": "replace_icb",
+      "text": "Ignition Control Board not sending voltage — replace board (P/N R0451800).",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_igniter": {
+      "id": "replace_igniter",
+      "text": "Replace Hot Surface Igniter (P/N R0457502).",
+      "input": "info",
+      "terminal": true
+    },
+
+    "gas_valve_check": {
+      "id": "gas_valve_check",
+      "text": "Measure 24 VAC at gas valve during ignition. Expect 22–26 VAC.",
+      "input": "number",
+      "unit": "VAC",
+      "range": [22, 26],
+      "pass": "flame_check",
+      "fail": "replace_icb"
+    },
+
+    "flame_check": {
+      "id": "flame_check",
+      "text": "Do burners ignite and stay lit beyond 7 seconds?",
+      "input": "yesno",
+      "pass": "flame_signal_check",
+      "fail": "flame_sensor_check"
+    },
+
+    "flame_signal_check": {
+      "id": "flame_signal_check",
+      "text": "Measure flame rectification current. Expect ≥ 1.5 µA DC.",
+      "input": "number",
+      "unit": "µA DC",
+      "range": [1.5, 10],
+      "pass": "rs485_comm_check",
+      "fail": "replace_flame_sensor"
+    },
+
+    "replace_flame_sensor": {
+      "id": "replace_flame_sensor",
+      "text": "Flame signal weak — clean or replace flame sensor (P/N R0452502).",
+      "input": "info",
+      "terminal": true
+    },
+
+    "flame_sensor_check": {
+      "id": "flame_sensor_check",
+      "text": "No flame detected. Check gas valve, igniter, and ground connections.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "rs485_comm_check": {
+      "id": "rs485_comm_check",
+      "text": "Verify RS-485 communication between the JXiQ and Aqualink controller.",
+      "input": "yesno",
+      "pass": "versa_flo_check",
+      "fail": "check_comms_wiring"
+    },
+
+    "check_comms_wiring": {
+      "id": "check_comms_wiring",
+      "text": "Check RS-485 wiring for polarity, continuity, and shorts. Correct and retest.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "versa_flo_check": {
+      "id": "versa_flo_check",
+      "text": "If equipped, verify VersaFlo actuator movement during flow mode changes.",
+      "input": "yesno",
+      "pass": "temp_sensor_check",
+      "fail": "versa_flo_service"
+    },
+
+    "versa_flo_service": {
+      "id": "versa_flo_service",
+      "text": "VersaFlo not responding — inspect actuator harness and replace if inoperative.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "temp_sensor_check": {
+      "id": "temp_sensor_check",
+      "text": "Measure temperature sensor resistance (10 kΩ at 77°F). Replace if out of range.",
+      "input": "number",
+      "unit": "kΩ",
+      "range": [9, 11],
+      "pass": "control_board_check",
+      "fail": "replace_temp_sensor"
+    },
+
+    "replace_temp_sensor": {
+      "id": "replace_temp_sensor",
+      "text": "Replace temperature sensor (P/N R0592600).",
+      "input": "info",
+      "terminal": true
+    },
+
+    "control_board_check": {
+      "id": "control_board_check",
+      "text": "Confirm main board LED status and 5 VDC logic supply present.",
+      "input": "yesno",
+      "pass": "success",
+      "fail": "replace_main_board"
+    },
+
+    "replace_main_board": {
+      "id": "replace_main_board",
+      "text": "Replace main control board (P/N R0639400).",
+      "input": "info",
+      "terminal": true
+    },
+
+    "fix_power": {
+      "id": "fix_power",
+      "text": "Correct incoming power wiring, breaker, or supply voltage before continuing.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_transformer": {
+      "id": "replace_transformer",
+      "text": "Replace 24 VAC transformer (P/N R0456301).",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_fuse": {
+      "id": "replace_fuse",
+      "text": "Replace 3A fuse and verify no shorted components before restarting.",
+      "input": "info",
+      "terminal": true
+    },
+
+    "replace_pressure_switch": {
+      "id": "replace_pressure_switch",
+      "text": "Replace pressure switch (P/N R0457001).",
+      "input": "info",
+      "terminal": true
+    },
+
+    "success": {
+      "id": "success",
+      "text": "✅ JXiQ heater operating normally.",
+      "input": "info",
+      "terminal": true,
+      "success": true
+    }
+  }
+}
