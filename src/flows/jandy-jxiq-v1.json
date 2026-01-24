@@ -4,11 +4,46 @@
   "equipmentType": "Heaters",
   "model": "JXiQ",
   "title": "Jandy JXiQ Heater — Guided Troubleshooting",
-  "start": "enter_voltage",
+  "start": "enter_model",
+
   "nodes": {
+    "enter_model": {
+      "id": "enter_model",
+      "text": "Enter the JXiQ model number.\n\nValid examples:\n- JXI200N\n- JXI260NK\n- JXI400NK (400k BTU, Natural Gas, VersaFlo)\n\nFormat:\n- Starts with JXI\n- BTU: 200 / 260 / 400\n- Fuel: N = Natural Gas, P = Propane\n- Optional: C = ASME, K = VersaFlo, S = ASME CuNi\n\nExample: **JXI400NK**",
+      "input": "text",
+      "logic": [
+        { "if": "/^JXI(200|260|400)[NP][CKS]?$/i.test(value)", "goto": "enter_serial" }
+      ],
+      "default": "invalid_model"
+    },
+
+    "invalid_model": {
+      "id": "invalid_model",
+      "text": "❌ Invalid model number.\nExpected format:\nJXI + BTU (200/260/400) + Fuel (N/P) + Optional (C/K/S).",
+      "input": "info",
+      "pass": "enter_model"
+    },
+
+    "enter_serial": {
+      "id": "enter_serial",
+      "text": "Enter the full serial number from the JXiQ label.\n\nCorrect format:\n- 20 characters\n- First 2 = letters A–Z\n- Remaining 18 = letters or digits\n\nExample: **ATEC02050307240489**",
+      "input": "text",
+      "logic": [
+        { "if": "/^[A-Z]{2}[A-Z0-9]{18}$/i.test(value)", "goto": "enter_voltage" }
+      ],
+      "default": "invalid_serial"
+    },
+
+    "invalid_serial": {
+      "id": "invalid_serial",
+      "text": "❌ Invalid serial number.\nExpected: 20 characters, first 2 letters, rest alphanumeric.",
+      "input": "info",
+      "pass": "enter_serial"
+    },
+
     "enter_voltage": {
       "id": "enter_voltage",
-      "text": "Confirm the measured input voltage to the JXiQ heater.",
+      "text": "Confirm measured input voltage to the JXiQ heater.",
       "input": "choice",
       "choices": {
         "120 V": "power_check_120",
@@ -18,7 +53,7 @@
 
     "power_check_120": {
       "id": "power_check_120",
-      "text": "Measure power at the input terminals (Black → Red). Expect 110–126 VAC.",
+      "text": "Measure voltage at input terminals (Black → Red).\nExpected: 110–126 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [110, 126],
@@ -28,7 +63,7 @@
 
     "power_check_240": {
       "id": "power_check_240",
-      "text": "Measure power at the input terminals (Black → Red). Expect 220–252 VAC.",
+      "text": "Measure voltage at input terminals (Black → Red).\nExpected: 220–252 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [220, 252],
@@ -36,9 +71,16 @@
       "fail": "fix_power"
     },
 
+    "fix_power": {
+      "id": "fix_power",
+      "text": "Correct incoming power wiring, breaker, or supply voltage before continuing.",
+      "input": "info",
+      "terminal": true
+    },
+
     "transformer_check": {
       "id": "transformer_check",
-      "text": "Verify 24 VAC output from the transformer (Red → Yellow). Expect 22–26 VAC.",
+      "text": "Verify 24 VAC transformer output (Red → Yellow).\nExpected: 22–26 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
@@ -46,22 +88,43 @@
       "fail": "replace_transformer"
     },
 
+    "replace_transformer": {
+      "id": "replace_transformer",
+      "text": "Transformer output low — replace transformer (P/N R0456301).",
+      "input": "info",
+      "terminal": true
+    },
+
     "fuse_check": {
       "id": "fuse_check",
-      "text": "Check the 3A low-voltage fuse on the board for continuity.",
+      "text": "Check the 3A low-voltage fuse on the control board for continuity.",
       "input": "yesno",
       "pass": "pressure_switch_check",
       "fail": "replace_fuse"
     },
 
+    "replace_fuse": {
+      "id": "replace_fuse",
+      "text": "3A fuse open — replace fuse and verify no shorts before restarting.",
+      "input": "info",
+      "terminal": true
+    },
+
     "pressure_switch_check": {
       "id": "pressure_switch_check",
-      "text": "Verify the water pressure switch closes with the pump on. Measure 24 VAC across switch. Expect 22–26 VAC.",
+      "text": "Verify the water pressure switch closes with pump on.\nMeasure 24 VAC across pressure switch.\nExpected: 22–26 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
       "pass": "blower_check",
       "fail": "replace_pressure_switch"
+    },
+
+    "replace_pressure_switch": {
+      "id": "replace_pressure_switch",
+      "text": "Pressure switch not closing — replace pressure switch (P/N R0457001).",
+      "input": "info",
+      "terminal": true
     },
 
     "blower_check": {
@@ -74,7 +137,7 @@
 
     "blower_capacitor_check": {
       "id": "blower_capacitor_check",
-      "text": "Measure blower run capacitor (P/N R0614500). Expect 8 µF ±5%.",
+      "text": "Measure blower capacitor (P/N R0614500).\nExpected: 8 µF ± 5%.",
       "input": "number",
       "unit": "µF",
       "range": [7.6, 8.4],
@@ -82,23 +145,23 @@
       "fail": "replace_capacitor"
     },
 
-    "blower_failed": {
-      "id": "blower_failed",
-      "text": "Capacitor good but blower not running — replace blower assembly (P/N R0591100).",
+    "replace_capacitor": {
+      "id": "replace_capacitor",
+      "text": "Capacitor out of spec — replace run capacitor (P/N R0614500).",
       "input": "info",
       "terminal": true
     },
 
-    "replace_capacitor": {
-      "id": "replace_capacitor",
-      "text": "Replace blower run capacitor (P/N R0614500).",
+    "blower_failed": {
+      "id": "blower_failed",
+      "text": "Capacitor good but blower still not running — replace blower assembly (P/N R0591100).",
       "input": "info",
       "terminal": true
     },
 
     "igniter_check": {
       "id": "igniter_check",
-      "text": "Does the Hot Surface Igniter glow during ignition?",
+      "text": "Does the igniter glow during ignition?",
       "input": "yesno",
       "pass": "gas_valve_check",
       "fail": "igniter_voltage_check"
@@ -106,7 +169,7 @@
 
     "igniter_voltage_check": {
       "id": "igniter_voltage_check",
-      "text": "Measure voltage at Ignition Control Board terminals K → I. Expect 105–130 VAC during ignition.",
+      "text": "Measure igniter voltage at terminals K → I.\nExpected: 105–130 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [105, 130],
@@ -114,21 +177,21 @@
       "fail": "replace_icb"
     },
 
+    "replace_icb": {
+      "id": "replace_icb",
+      "text": "Ignition control board not sending voltage — replace ICB (P/N R0451800).",
+      "input": "info",
+      "terminal": true
+    },
+
     "igniter_continuity_check": {
       "id": "igniter_continuity_check",
-      "text": "With power off and igniter cool, check continuity. Expect 40–75 Ω.",
+      "text": "Check igniter continuity (power off).\nExpected: 40–75 Ω.",
       "input": "number",
       "unit": "Ω",
       "range": [40, 75],
       "pass": "gas_valve_check",
       "fail": "replace_igniter"
-    },
-
-    "replace_icb": {
-      "id": "replace_icb",
-      "text": "Ignition Control Board not sending voltage — replace board (P/N R0451800).",
-      "input": "info",
-      "terminal": true
     },
 
     "replace_igniter": {
@@ -140,7 +203,7 @@
 
     "gas_valve_check": {
       "id": "gas_valve_check",
-      "text": "Measure 24 VAC at gas valve during ignition. Expect 22–26 VAC.",
+      "text": "Measure 24 VAC at the gas valve during ignition.\nExpected: 22–26 VAC.",
       "input": "number",
       "unit": "VAC",
       "range": [22, 26],
@@ -150,7 +213,7 @@
 
     "flame_check": {
       "id": "flame_check",
-      "text": "Do burners ignite and stay lit beyond 7 seconds?",
+      "text": "Do burners ignite and stay lit > 7 seconds?",
       "input": "yesno",
       "pass": "flame_signal_check",
       "fail": "flame_sensor_check"
@@ -158,7 +221,7 @@
 
     "flame_signal_check": {
       "id": "flame_signal_check",
-      "text": "Measure flame rectification current. Expect ≥ 1.5 µA DC.",
+      "text": "Measure flame rectification current.\nExpected ≥ 1.5 µA DC.",
       "input": "number",
       "unit": "µA DC",
       "range": [1.5, 10],
@@ -175,14 +238,14 @@
 
     "flame_sensor_check": {
       "id": "flame_sensor_check",
-      "text": "No flame detected. Check gas valve, igniter, and ground connections.",
+      "text": "No flame detected — check igniter, gas valve, ground, or manifold pressure.",
       "input": "info",
       "terminal": true
     },
 
     "rs485_comm_check": {
       "id": "rs485_comm_check",
-      "text": "Verify RS-485 communication between the JXiQ and Aqualink controller.",
+      "text": "Verify RS-485 communication between JXiQ and automation.",
       "input": "yesno",
       "pass": "versa_flo_check",
       "fail": "check_comms_wiring"
@@ -190,14 +253,14 @@
 
     "check_comms_wiring": {
       "id": "check_comms_wiring",
-      "text": "Check RS-485 wiring for polarity, continuity, and shorts. Correct and retest.",
+      "text": "Check RS-485 wiring for polarity, continuity, and shorts.",
       "input": "info",
       "terminal": true
     },
 
     "versa_flo_check": {
       "id": "versa_flo_check",
-      "text": "If equipped, verify VersaFlo actuator movement during flow mode changes.",
+      "text": "If equipped, verify Versaflo actuator movement.",
       "input": "yesno",
       "pass": "temp_sensor_check",
       "fail": "versa_flo_service"
@@ -205,14 +268,14 @@
 
     "versa_flo_service": {
       "id": "versa_flo_service",
-      "text": "VersaFlo not responding — inspect actuator harness and replace if inoperative.",
+      "text": "VersaFlo not responding — inspect actuator harness and replace if needed.",
       "input": "info",
       "terminal": true
     },
 
     "temp_sensor_check": {
       "id": "temp_sensor_check",
-      "text": "Measure temperature sensor resistance (10 kΩ at 77°F). Replace if out of range.",
+      "text": "Measure temperature sensor resistance.\nExpected: 10 kΩ at 77°F (range 9–11 kΩ).",
       "input": "number",
       "unit": "kΩ",
       "range": [9, 11],
@@ -237,35 +300,7 @@
 
     "replace_main_board": {
       "id": "replace_main_board",
-      "text": "Replace main control board (P/N R0639400).",
-      "input": "info",
-      "terminal": true
-    },
-
-    "fix_power": {
-      "id": "fix_power",
-      "text": "Correct incoming power wiring, breaker, or supply voltage before continuing.",
-      "input": "info",
-      "terminal": true
-    },
-
-    "replace_transformer": {
-      "id": "replace_transformer",
-      "text": "Replace 24 VAC transformer (P/N R0456301).",
-      "input": "info",
-      "terminal": true
-    },
-
-    "replace_fuse": {
-      "id": "replace_fuse",
-      "text": "Replace 3A fuse and verify no shorted components before restarting.",
-      "input": "info",
-      "terminal": true
-    },
-
-    "replace_pressure_switch": {
-      "id": "replace_pressure_switch",
-      "text": "Replace pressure switch (P/N R0457001).",
+      "text": "Replace main board (P/N R0639400).",
       "input": "info",
       "terminal": true
     },

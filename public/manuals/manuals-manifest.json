@@ -10,12 +10,12 @@
   "Hayward": {
     "Automation": [
       {
-        "name": "Prologic & Aqualogic",
-        "path": "/manuals/Hayward/Automation/Prologic_&_Aqualogic.pdf"
+        "name": "Aquaconnnect TSG",
+        "path": "/manuals/Hayward/Automation/Aquaconnnect_TSG.pdf"
       },
       {
-        "name": "aquaconnect-consumer-troubleshooting-guide",
-        "path": "/manuals/Hayward/Automation/aquaconnect-consumer-troubleshooting-guide.pdf"
+        "name": "Prologic & Aqualogic",
+        "path": "/manuals/Hayward/Automation/Prologic_&_Aqualogic.pdf"
       }
     ],
     "Heaters": [
