@@ -10,8 +10,8 @@
   "Hayward": {
     "Automation": [
       {
-        "name": "Aquaconnnect TSG",
-        "path": "/manuals/Hayward/Automation/Aquaconnnect_TSG.pdf"
+        "name": "Aquaconnnect",
+        "path": "/manuals/Hayward/Automation/Aquaconnnect.pdf"
       },
       {
         "name": "Prologic & Aqualogic",
@@ -20,32 +20,32 @@
     ],
     "Heaters": [
       {
-        "name": "H100 TSG",
-        "path": "/manuals/Hayward/Heaters/H100_TSG.pdf"
+        "name": "H100",
+        "path": "/manuals/Hayward/Heaters/H100.pdf"
       },
       {
-        "name": "HC Series Heater",
-        "path": "/manuals/Hayward/Heaters/HC_Series_Heater.pdf"
+        "name": "Horizontal Discharge",
+        "path": "/manuals/Hayward/Heaters/Horizontal_Discharge.pdf"
       },
       {
-        "name": "HP50HA ABG HeatPump Troubleshooting Guide",
-        "path": "/manuals/Hayward/Heaters/HP50HA_ABG HeatPump_Troubleshooting_Guide.pdf"
+        "name": "Summit HeatPro",
+        "path": "/manuals/Hayward/Heaters/Summit_HeatPro.pdf"
       },
       {
-        "name": "Heat-Pump TSG",
-        "path": "/manuals/Hayward/Heaters/Heat-Pump_TSG.pdf"
+        "name": "Universal HC",
+        "path": "/manuals/Hayward/Heaters/Universal_HC.pdf"
       },
       {
-        "name": "Hfdn-manual",
-        "path": "/manuals/Hayward/Heaters/Hfdn-manual.pdf"
+        "name": "Universal HFDN",
+        "path": "/manuals/Hayward/Heaters/Universal_HFDN.pdf"
       }
     ]
   },
   "Jandy": {
     "Automation": [
       {
-        "name": "FPA AutomationTCX",
-        "path": "/manuals/Jandy/Automation/FPA_AutomationTCX.pdf"
+        "name": "TCX",
+        "path": "/manuals/Jandy/Automation/TCX.pdf"
       }
     ],
     "Heaters": [
