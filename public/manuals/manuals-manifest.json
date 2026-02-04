@@ -28,6 +28,10 @@
         "path": "/manuals/Hayward/Heaters/Horizontal_Discharge.pdf"
       },
       {
+        "name": "Induced Draft",
+        "path": "/manuals/Hayward/Heaters/Induced_Draft.pdf"
+      },
+      {
         "name": "Summit HeatPro",
         "path": "/manuals/Hayward/Heaters/Summit_HeatPro.pdf"
       },
@@ -38,6 +42,24 @@
       {
         "name": "Universal HFDN",
         "path": "/manuals/Hayward/Heaters/Universal_HFDN.pdf"
+      }
+    ],
+    "Pumps": [
+      {
+        "name": "EcoStar VS Troubleshooting and Service",
+        "path": "/manuals/Hayward/Pumps/EcoStar_VS_Troubleshooting_and_Service.pdf"
+      },
+      {
+        "name": "MaxFlo VS Troubleshooting and Service",
+        "path": "/manuals/Hayward/Pumps/MaxFlo_VS_Troubleshooting_and_Service.pdf"
+      },
+      {
+        "name": "Super Pump VS Troubleshooting and Service",
+        "path": "/manuals/Hayward/Pumps/Super_Pump_VS_Troubleshooting_and_Service.pdf"
+      },
+      {
+        "name": "TriStar VS Troubleshooting and Service",
+        "path": "/manuals/Hayward/Pumps/TriStar_VS_Troubleshooting_and_Service.pdf"
       }
     ]
   },
