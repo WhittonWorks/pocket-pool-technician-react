@@ -10,42 +10,64 @@
   "Hayward": {
     "Automation": [
       {
-        "name": "Prologic & Aqualogic",
-        "path": "/manuals/Hayward/Automation/Prologic_&_Aqualogic.pdf"
+        "name": "Aquaconnnect",
+        "path": "/manuals/Hayward/Automation/Aquaconnnect.pdf"
       },
       {
-        "name": "aquaconnect-consumer-troubleshooting-guide",
-        "path": "/manuals/Hayward/Automation/aquaconnect-consumer-troubleshooting-guide.pdf"
+        "name": "Prologic & Aqualogic",
+        "path": "/manuals/Hayward/Automation/Prologic_&_Aqualogic.pdf"
       }
     ],
     "Heaters": [
       {
-        "name": "H100 TSG",
-        "path": "/manuals/Hayward/Heaters/H100_TSG.pdf"
+        "name": "H100",
+        "path": "/manuals/Hayward/Heaters/H100.pdf"
       },
       {
-        "name": "HC Series Heater",
-        "path": "/manuals/Hayward/Heaters/HC_Series_Heater.pdf"
+        "name": "Horizontal Discharge",
+        "path": "/manuals/Hayward/Heaters/Horizontal_Discharge.pdf"
       },
       {
-        "name": "HP50HA ABG HeatPump Troubleshooting Guide",
-        "path": "/manuals/Hayward/Heaters/HP50HA_ABG HeatPump_Troubleshooting_Guide.pdf"
+        "name": "Induced Draft",
+        "path": "/manuals/Hayward/Heaters/Induced_Draft.pdf"
       },
       {
-        "name": "Heat-Pump TSG",
-        "path": "/manuals/Hayward/Heaters/Heat-Pump_TSG.pdf"
+        "name": "Summit HeatPro",
+        "path": "/manuals/Hayward/Heaters/Summit_HeatPro.pdf"
       },
       {
-        "name": "Hfdn-manual",
-        "path": "/manuals/Hayward/Heaters/Hfdn-manual.pdf"
+        "name": "Universal HC",
+        "path": "/manuals/Hayward/Heaters/Universal_HC.pdf"
+      },
+      {
+        "name": "Universal HFDN",
+        "path": "/manuals/Hayward/Heaters/Universal_HFDN.pdf"
+      }
+    ],
+    "Pumps": [
+      {
+        "name": "EcoStar VS Troubleshooting and Service",
+        "path": "/manuals/Hayward/Pumps/EcoStar_VS_Troubleshooting_and_Service.pdf"
+      },
+      {
+        "name": "MaxFlo VS Troubleshooting and Service",
+        "path": "/manuals/Hayward/Pumps/MaxFlo_VS_Troubleshooting_and_Service.pdf"
+      },
+      {
+        "name": "Super Pump VS Troubleshooting and Service",
+        "path": "/manuals/Hayward/Pumps/Super_Pump_VS_Troubleshooting_and_Service.pdf"
+      },
+      {
+        "name": "TriStar VS Troubleshooting and Service",
+        "path": "/manuals/Hayward/Pumps/TriStar_VS_Troubleshooting_and_Service.pdf"
       }
     ]
   },
   "Jandy": {
     "Automation": [
       {
-        "name": "FPA AutomationTCX",
-        "path": "/manuals/Jandy/Automation/FPA_AutomationTCX.pdf"
+        "name": "TCX",
+        "path": "/manuals/Jandy/Automation/TCX.pdf"
       }
     ],
     "Heaters": [
