@@ -90,5 +90,13 @@
         "path": "/manuals/Jandy/Watercare/FPA Sanitation & Levolor Flip Guide.pdf"
       }
     ]
+  },
+  "Pentair": {
+    "Heaters": [
+      {
+        "name": "Master temp",
+        "path": "/manuals/Pentair/Heaters/Master temp.pdf"
+      }
+    ]
   }
 }

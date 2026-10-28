@@ -1,4 +1,4 @@
-// src/pages/ManualsPage.js
+// src/pages/ManualsPage.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import ManualViewer from "../components/ManualViewer";
 
@@ -41,15 +41,14 @@ function getCategoryList(categoriesObj, desiredKey) {
     (k) => k.toLowerCase() === desiredKey.toLowerCase()
   );
 
-  return Array.isArray(categoriesObj[matchKey])
-    ? categoriesObj[matchKey]
-    : [];
+  return Array.isArray(categoriesObj[matchKey]) ? categoriesObj[matchKey] : [];
 }
 
 const ManualsPage = () => {
   const [manuals, setManuals] = useState({});
   const [selectedFile, setSelectedFile] = useState(null);
   const [error, setError] = useState("");
+  const [manifestSource, setManifestSource] = useState("");
 
   useEffect(() => {
     let alive = true;
@@ -60,14 +59,17 @@ const ManualsPage = () => {
         const data = await fetchJson(MANIFEST_PRIMARY);
         if (!alive) return;
         setManuals(data || {});
+        setManifestSource("primary: /manuals/manifest.json");
       } catch (e1) {
         try {
           const data2 = await fetchJson(MANIFEST_FALLBACK);
           if (!alive) return;
           setManuals(data2 || {});
+          setManifestSource("fallback: /manuals/manuals-manifest.json");
         } catch (e2) {
           if (!alive) return;
           setManuals({});
+          setManifestSource("");
           setError(
             e2?.message || e1?.message || "Failed to load manuals manifest."
           );
@@ -84,11 +86,34 @@ const ManualsPage = () => {
     return Object.keys(manuals || {}).sort((a, b) => a.localeCompare(b));
   }, [manuals]);
 
+  // TEMP DEBUG (visible on page): remove once Pumps render correctly
+  const haywardObj = manuals?.Hayward || {};
+  const haywardKeys = Object.keys(haywardObj || {});
+  const haywardPumpsCount = getCategoryList(haywardObj, "Heaters").length;
+
   return (
     <div className="w-full max-w-4xl mx-auto px-4 py-2 sm:py-4">
-      <h1 className="text-xl sm:text-2xl font-bold text-center mb-4 sm:mb-6">
+      <h1 className="text-xl sm:text-2xl font-bold text-center mb-2 sm:mb-3">
         📚 Equipment Manuals
       </h1>
+
+      {/* TEMP DEBUG STRIP (visible) */}
+      <div className="mb-3 p-2 rounded border border-amber-200 bg-amber-50 text-amber-900 text-xs">
+        <div>
+          <strong>DEBUG</strong> Manifest source:{" "}
+          <span className="font-mono">{manifestSource || "(not loaded)"}</span>
+        </div>
+        <div>
+          Hayward keys:{" "}
+          <span className="font-mono">
+            {haywardKeys.length ? JSON.stringify(haywardKeys) : "[]"}
+          </span>
+        </div>
+        <div>
+          Hayward Pumps count (via getCategoryList):{" "}
+          <span className="font-mono">{haywardPumpsCount}</span>
+        </div>
+      </div>
 
       {error ? (
         <div className="mb-4 p-3 rounded border border-red-200 bg-red-50 text-red-700 text-sm">
